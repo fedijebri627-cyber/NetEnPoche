@@ -20,6 +20,17 @@ st.set_page_config(
     layout="wide"
 )
 
+# Global custom CSS for link buttons (Stripe checkouts)
+st.markdown("""
+<style>
+/* Force link button text to be white */
+[data-testid="stLinkButton"] a {
+    color: white !important;
+    text-decoration: none !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # ==========================================
 # CLASS: PDF GENERATOR
 # ==========================================
