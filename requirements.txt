@@ -1,0 +1,9 @@
+streamlit
+pandas
+altair
+fpdf
+streamlit-cookies-controller
+psycopg2-binary
+SQLAlchemy
+bcrypt
+PyJWT
