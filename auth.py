@@ -19,6 +19,22 @@ except Exception:
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
+# Safely encode the password because special characters (like *) will break SQLAlchemy
+import urllib.parse
+if "@" in DATABASE_URL and "://" in DATABASE_URL:
+    try:
+        # Expected format: postgresql://user:password@host:port/db
+        prefix_part, rest_part = DATABASE_URL.split("://", 1)
+        credentials_part, host_part = rest_part.split("@", 1)
+        
+        if ":" in credentials_part:
+            user_part, pass_part = credentials_part.split(":", 1)
+            # Encode ONLY the password segment
+            encoded_pass = urllib.parse.quote_plus(pass_part)
+            DATABASE_URL = f"{prefix_part}://{user_part}:{encoded_pass}@{host_part}"
+    except Exception as e:
+        print(f"Warning: Could not encode DATABASE_URL: {e}")
+
 Base = declarative_base()
 
 class User(Base):
