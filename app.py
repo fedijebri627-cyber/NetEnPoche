@@ -878,8 +878,8 @@ with header_col2:
                         st.error("🚨 Veuillez remplir tous les champs.")
                     elif reg_password != reg_password_confirm:
                         st.error("🚨 Les mots de passe ne correspondent pas.")
-                    elif len(reg_password) < 6:
-                        st.error("🚨 Le mot de passe doit contenir au moins 6 caractères.")
+                    elif len(reg_password) < 8:
+                        st.error("🚨 Le mot de passe doit contenir au moins 8 caractères.")
                     else:
                         success, verification_token = auth.create_user(reg_email, reg_password)
                         if success:
