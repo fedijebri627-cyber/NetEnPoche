@@ -155,8 +155,9 @@ def generate_pdf(df, activity_type, urssaf_rate, total_revenue, total_taxes, tot
     pdf.set_font('Arial', '', 10)
     pdf.set_text_color(50)
     pdf.multi_cell(0, 5, "Ce document constitue un bilan analytique de votre activite generee sur NetEnPoche. Il n'a pas de valeur comptable officielle. Vous devez declarer ces montants sur votre espace mensuel ou trimestriel URSSAF.")
-    
-    return bytes(pdf.output())
+    # FPDF1 returns a python string (latin-1 encoded by default inside its logic)
+    # We must explicitly encode it to bytes for Streamlit's download button
+    return pdf.output(dest='S').encode('latin-1')
 
 
 # ==========================================
@@ -694,24 +695,14 @@ def show_upgrade_modal(feature_name=None):
         if st.session_state.user is None:
             st.warning("Connectez-vous pour vous abonner.")
         else:
-            if st.button("Essai Gratuit 14 Jours (Pro)", use_container_width=True, type="primary"):
-                import auth
-                auth.set_user_tier(st.session_state.user["id"], "pro")
-                st.session_state.tier = "pro"
-                st.session_state.user["tier"] = "pro"
-                st.success("Bienvenue en Pro ! Redémarrage...")
-                import time; time.sleep(1); st.rerun()
+            stripe_pro = st.secrets.get("STRIPE_LINK_PRO", "https://buy.stripe.com/test")
+            st.link_button("S'abonner à Pro via Stripe 💳", stripe_pro, use_container_width=True, type="primary")
 
     with col2:
         st.success("✨ **EXPERT (14€/mois)**\n\n- *Tout ce qui est dans Pro, plus :*\n- Suivi Clients (CRM)\n- Gestion des Factures\n- Export Comptable FEC\n- Export Pennylane CSV\n- Support Prioritaire")
         if st.session_state.user is not None:
-            if st.button("Essai Gratuit 14 Jours (Expert)", use_container_width=True, type="primary"):
-                import auth
-                auth.set_user_tier(st.session_state.user["id"], "expert")
-                st.session_state.tier = "expert"
-                st.session_state.user["tier"] = "expert"
-                st.success("Bienvenue en Expert ! Redémarrage...")
-                import time; time.sleep(1); st.rerun()
+            stripe_expert = st.secrets.get("STRIPE_LINK_EXPERT", "https://buy.stripe.com/test")
+            st.link_button("S'abonner à Expert via Stripe 💳", stripe_expert, use_container_width=True, type="primary")
                 
     st.caption("🔒 Sans engagement. Annulable à tout moment. Aucune carte bancaire requise pour l'essai.")
 
