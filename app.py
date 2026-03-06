@@ -871,18 +871,31 @@ with header_col2:
             with signup_tab:
                 reg_email = st.text_input("Email", key="reg_email")
                 reg_password = st.text_input("Mot de passe", type="password", key="reg_password")
+                reg_password_confirm = st.text_input("Confirmer le mot de passe", type="password", key="reg_password_confirm")
+                
                 if st.button("Créer un compte", use_container_width=True):
-                    if not reg_email or not reg_password:
-                        st.error("Remplissez tous les champs.")
+                    if not reg_email or not reg_password or not reg_password_confirm:
+                        st.error("🚨 Veuillez remplir tous les champs.")
+                    elif reg_password != reg_password_confirm:
+                        st.error("🚨 Les mots de passe ne correspondent pas.")
+                    elif len(reg_password) < 6:
+                        st.error("🚨 Le mot de passe doit contenir au moins 6 caractères.")
                     else:
-                        success, res = auth.create_user(reg_email, reg_password)
+                        success, verification_token = auth.create_user(reg_email, reg_password)
                         if success:
-                            # res is the verification_token
-                            verify_link = f"?verify={res}"
-                            st.success("Compte créé ! Vérifiez votre email pour l'activer.")
-                            st.info(f"📧 **Simulation Email :** [Cliquez ici pour activer votre compte]({verify_link})")
+                            # Send real SMTP email containing the activation link
+                            try:
+                                email_sent = auth.send_verification_email(reg_email, verification_token)
+                                if email_sent:
+                                    st.success("✅ Compte créé avec succès ! Un email d'activation vous a été envoyé. Veuillez vérifier votre boîte mail (et vos indésirables).")
+                                else:
+                                    st.warning("⚠️ Compte créé, mais l'envoi de l'email a échoué. Veuillez contacter le support.")
+                            except KeyError:
+                                st.warning("⚠️ Compte créé ! (Alerte Dev : `SMTP_SERVER` n'est pas configuré dans `secrets.toml`, l'email réel n'a pas pu être envoyé).")
+                                # Fallback display for the developer temporarily
+                                st.code(f"Lien d'activation (Temporaire) : /?verify={verification_token}")
                         else:
-                            st.error(res)
+                            st.error(verification_token)
         else:
             st.success(f"Connecté: **{st.session_state.user['email']}**")
             current_tier = st.session_state.user.get('tier', 'gratuit')

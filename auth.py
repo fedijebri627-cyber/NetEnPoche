@@ -5,7 +5,52 @@ from sqlalchemy.exc import IntegrityError
 import bcrypt
 import jwt
 import uuid
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from datetime import datetime, timedelta
+
+def send_verification_email(to_email: str, token: str):
+    """Sends a real SMTP email with the activation link."""
+    try:
+        smtp_server = st.secrets["SMTP_SERVER"]
+        smtp_port = st.secrets["SMTP_PORT"]
+        smtp_username = st.secrets["SMTP_USERNAME"]
+        smtp_password = st.secrets["SMTP_PASSWORD"]
+        sender_email = st.secrets.get("SMTP_SENDER", smtp_username)
+        # Assuming the app is hosted on Streamlit Cloud for the base URL, or localhost for dev
+        base_url = st.secrets.get("APP_URL", "http://localhost:8501")
+        
+        verify_link = f"{base_url}/?verify={token}"
+        
+        msg = MIMEMultipart()
+        msg['From'] = sender_email
+        msg['To'] = to_email
+        msg['Subject'] = "Activez votre compte NetEnPoche"
+        
+        body = f"""
+        Bonjour,
+        
+        Merci de vous être inscrit sur NetEnPoche !
+        
+        Veuillez cliquer sur le lien ci-dessous pour activer votre compte :
+        {verify_link}
+        
+        Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet email.
+        
+        L'équipe NetEnPoche.
+        """
+        msg.attach(MIMEText(body, 'plain'))
+        
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+        server.login(smtp_username, smtp_password)
+        server.send_message(msg)
+        server.quit()
+        return True
+    except Exception as e:
+        print(f"Failed to send email: {e}")
+        return False
 
 # Load secrets with local fallback
 try:
