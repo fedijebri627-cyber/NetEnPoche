@@ -41,8 +41,9 @@ export async function updateSession(request: NextRequest) {
         return NextResponse.redirect(url)
     }
 
-    // Optional: If user is logged in and tries to go to landing or auth, redirect to dashboard
-    if (user && (request.nextUrl.pathname === '/' || request.nextUrl.pathname.startsWith('/auth'))) {
+    // Optional: If user is logged in and tries to go to landing or login/register, redirect to dashboard
+    // IMPORTANT: Do NOT redirect /auth/callback — it must complete the OAuth code exchange
+    if (user && !request.nextUrl.pathname.startsWith('/auth/callback') && (request.nextUrl.pathname === '/' || request.nextUrl.pathname.startsWith('/auth'))) {
         const url = request.nextUrl.clone()
         url.pathname = '/dashboard'
         return NextResponse.redirect(url)

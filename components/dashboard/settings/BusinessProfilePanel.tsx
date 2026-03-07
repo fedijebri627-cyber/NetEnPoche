@@ -16,19 +16,23 @@ export function BusinessProfilePanel() {
 
     useEffect(() => {
         const loadProfile = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) return;
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) { setLoading(false); return; }
 
-            const { data } = await supabase
-                .from('users')
-                .select('siret, business_name, full_name')
-                .eq('id', user.id)
-                .single();
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('siret, business_name, full_name')
+                    .eq('id', user.id)
+                    .single();
 
-            if (data) {
-                setSiret(data.siret || '');
-                setBusinessName(data.business_name || '');
-                setFullName(data.full_name || '');
+                if (data && !error) {
+                    setSiret(data.siret || '');
+                    setBusinessName(data.business_name || '');
+                    setFullName(data.full_name || '');
+                }
+            } catch (e) {
+                console.error('Error loading profile:', e);
             }
             setLoading(false);
         };
