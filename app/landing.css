@@ -465,18 +465,12 @@ html {
   padding: 20px;
   border-radius: 12px;
   border: 1px solid transparent;
-  cursor: pointer;
   transition: all 0.2s;
 }
 
-.feature-item:hover,
-.feature-item.active {
+.feature-item:hover {
   background: rgba(255, 255, 255, 0.04);
   border-color: var(--gray-line);
-}
-
-.feature-item.active {
-  border-color: rgba(0, 200, 117, 0.3);
 }
 
 .feature-icon {

@@ -2,6 +2,8 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
+import { FAQSection } from '@/components/landing/FAQSection';
+import { PricingSection } from '@/components/landing/PricingSection';
 import './landing.css';
 
 export const metadata: Metadata = {
@@ -66,7 +68,6 @@ export default function LandingPage() {
         </p>
         <div className="hero-actions">
           <Link href="/auth/login" className="btn-hero-primary">Calculer mon net gratuitement</Link>
-          <button className="btn-hero-secondary">▶ Voir la démo · 2 min</button>
         </div>
         <div className="hero-trust">
           <div className="hero-trust-item"><span className="hero-trust-dot">●</span> Gratuit pour toujours</div>
@@ -232,7 +233,7 @@ export default function LandingPage() {
 
           <div className="features-grid">
             <div className="feature-list">
-              <div className="feature-item active">
+              <div className="feature-item" style={{ cursor: 'default' }}>
                 <div className="feature-icon">🧮</div>
                 <div>
                   <div className="feature-text-title">Calcul URSSAF en temps réel <span className="feature-badge badge-free">Gratuit</span></div>
@@ -380,85 +381,7 @@ export default function LandingPage() {
       </section>
 
       {/* PRICING */}
-      <section className="pricing-section" id="pricing">
-        <div style={{ textAlign: 'center' }}>
-          <div className="section-eyebrow" style={{ textAlign: 'center' }}>Tarifs</div>
-          <h2 className="section-title">Simple. Transparent. Annulable à tout moment.</h2>
-        </div>
-
-        <div className="pricing-toggle">
-          <span>Mensuel</span>
-          <div className="toggle-switch" />
-          <span>Annuel</span>
-          <span className="annual-badge">−2 mois offerts</span>
-        </div>
-
-        <div className="pricing-grid">
-          {/* Free */}
-          <div className="pricing-card">
-            <div className="plan-name">Gratuit</div>
-            <div className="plan-price">0 <span>€</span></div>
-            <div className="plan-period">Pour toujours</div>
-            <div className="plan-divider" />
-            <ul className="plan-features">
-              <li className="plan-feature"><span className="plan-feature-check">✓</span> Calcul URSSAF temps réel</li>
-              <li className="plan-feature"><span className="plan-feature-check">✓</span> Saisie mensuelle 12 mois</li>
-              <li className="plan-feature"><span className="plan-feature-check">✓</span> Suivi plafond TVA</li>
-              <li className="plan-feature"><span className="plan-feature-check">✓</span> Provision CFE recommandée</li>
-              <li className="plan-feature"><span className="plan-feature-check">✓</span> Graphique mensuel</li>
-              <li className="plan-feature dimmed"><span className="plan-feature-x">✗</span> Estimateur IR</li>
-              <li className="plan-feature dimmed"><span className="plan-feature-x">✗</span> Alertes email</li>
-              <li className="plan-feature dimmed"><span className="plan-feature-x">✗</span> Bilan PDF pro</li>
-            </ul>
-            <Link href="/auth/register" style={{ textDecoration: 'none' }}>
-              <button className="plan-cta cta-free">Commencer gratuitement</button>
-            </Link>
-          </div>
-
-          {/* Pro */}
-          <div className="pricing-card featured">
-            <div className="featured-badge">⭐ Le plus populaire</div>
-            <div className="plan-name">Pro</div>
-            <div className="plan-price">5 <span>€/mois</span></div>
-            <div className="plan-period">Soit 50 €/an · Annulable à tout moment</div>
-            <div className="plan-divider" />
-            <ul className="plan-features">
-              <li className="plan-feature"><span className="plan-feature-check">✓</span> Tout le plan Gratuit</li>
-              <li className="plan-feature"><span className="plan-feature-check">✓</span> <strong>Estimateur Impôt sur le Revenu</strong></li>
-              <li className="plan-feature"><span className="plan-feature-check">✓</span> Alertes email URSSAF & TVA</li>
-              <li className="plan-feature"><span className="plan-feature-check">✓</span> Bilan PDF professionnel</li>
-              <li className="plan-feature"><span className="plan-feature-check">✓</span> Simulateur TVA avancé</li>
-              <li className="plan-feature"><span className="plan-feature-check">✓</span> Historique multi-années</li>
-              <li className="plan-feature"><span className="plan-feature-check">✓</span> Objectif CA + projection</li>
-              <li className="plan-feature"><span className="plan-feature-check">✓</span> Score de santé financière</li>
-            </ul>
-            <Link href="/auth/register" style={{ textDecoration: 'none' }}>
-              <button className="plan-cta cta-pro">Essai gratuit 14 jours →</button>
-            </Link>
-          </div>
-
-          {/* Expert */}
-          <div className="pricing-card">
-            <div className="plan-name">Expert</div>
-            <div className="plan-price">14 <span>€/mois</span></div>
-            <div className="plan-period">Soit 140 €/an · Annulable à tout moment</div>
-            <div className="plan-divider" />
-            <ul className="plan-features">
-              <li className="plan-feature"><span className="plan-feature-check">✓</span> Tout le plan Pro</li>
-              <li className="plan-feature"><span className="plan-feature-check">✓</span> Gestion multi-activités</li>
-              <li className="plan-feature"><span className="plan-feature-check">✓</span> Suivi clients & factures</li>
-              <li className="plan-feature"><span className="plan-feature-check">✓</span> Export FEC comptable</li>
-              <li className="plan-feature"><span className="plan-feature-check">✓</span> Export Excel avec formules</li>
-              <li className="plan-feature"><span className="plan-feature-check">✓</span> Format Pennylane / Qonto</li>
-              <li className="plan-feature"><span className="plan-feature-check">✓</span> Alertes factures en retard</li>
-              <li className="plan-feature"><span className="plan-feature-check">✓</span> Support prioritaire</li>
-            </ul>
-            <Link href="/auth/register" style={{ textDecoration: 'none' }}>
-              <button className="plan-cta cta-expert">Choisir Expert →</button>
-            </Link>
-          </div>
-        </div>
-      </section>
+      <PricingSection />
 
       {/* TESTIMONIALS */}
       <section className="testimonials">
@@ -528,55 +451,7 @@ export default function LandingPage() {
       </section>
 
       {/* FAQ */}
-      <section className="faq-section" id="faq">
-        <div style={{ textAlign: 'center' }}>
-          <div className="section-eyebrow" style={{ textAlign: 'center' }}>FAQ</div>
-          <h2 className="section-title" style={{ textAlign: 'center' }}>Questions fréquentes</h2>
-        </div>
-
-        <div className="faq-list">
-          <div className="faq-item open">
-            <div className="faq-q">
-              NetEnPoche est-il officiel ou affilié à l'URSSAF ?
-              <span className="faq-chevron">▾</span>
-            </div>
-            <div className="faq-a" style={{ display: 'block' }}>Non. NetEnPoche est un outil indépendant, créé par un entrepreneur pour les entrepreneurs. Les calculs sont basés sur les taux et barèmes officiels 2026, mais le service n'est pas affilié à l'URSSAF, à la DGFiP, ni à aucun organisme gouvernemental. Il s'agit d'un outil d'estimation, non d'un acte comptable officiel.</div>
-          </div>
-          <div className="faq-item">
-            <div className="faq-q">
-              Mes données financières sont-elles en sécurité ?
-              <span className="faq-chevron">▾</span>
-            </div>
-            <div className="faq-a">Toutes les données sont chiffrées en transit (SSL/TLS) et au repos. Vos données ne sont jamais vendues ni partagées avec des tiers. Vous pouvez supprimer votre compte et toutes vos données à tout moment depuis les paramètres.</div>
-          </div>
-          <div className="faq-item">
-            <div className="faq-q">
-              Puis-je annuler mon abonnement Pro à tout moment ?
-              <span className="faq-chevron">▾</span>
-            </div>
-            <div className="faq-a">Oui, sans engagement ni frais d'annulation. Vous pouvez annuler en un clic depuis votre compte. Vous conservez l'accès Pro jusqu'à la fin de la période payée.</div>
-          </div>
-          <div className="faq-item">
-            <div className="faq-q">
-              Le calcul IR est-il fiable pour ma déclaration ?
-              <span className="faq-chevron">▾</span>
-            </div>
-            <div className="faq-a">L'estimateur IR est un outil de simulation basé sur le barème progressif 2026. Il donne une estimation fiable pour la planification financière, mais ne remplace pas une déclaration officielle ou l'avis d'un expert-comptable pour des situations fiscales complexes (revenus mixtes, crédits d'impôt spécifiques, etc.).</div>
-          </div>
-        </div>
-      </section>
-
-      {/* FINAL CTA */}
-      <section className="final-cta">
-        <h2 className="final-cta-title">Commencez à voir votre vrai net aujourd'hui</h2>
-        <p className="final-cta-sub">Gratuit. Sans carte. En 30 secondes.</p>
-        <Link href="/auth/register" className="btn-hero-primary" style={{ fontSize: 17, padding: '17px 40px' }}>Calculer mon net gratuitement →</Link>
-        <div className="final-cta-note">
-          <span>✓ Aucune inscription requise pour l'essai</span>
-          <span>✓ 14 jours Pro offerts</span>
-          <span>✓ Annulable à tout moment</span>
-        </div>
-      </section>
+      <FAQSection />
 
       {/* FOOTER */}
       <footer>
