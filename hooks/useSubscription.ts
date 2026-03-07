@@ -10,29 +10,43 @@ export function useSubscription() {
     const [user, setUser] = useState<User | null>(null);
     const [tier, setTier] = useState<'free' | 'pro' | 'expert'>('free');
     const [loading, setLoading] = useState(true);
-
-    // Future Expansion: We can also sync status and trial Ends into JWT if needed, 
-    // currently we determine access solely by the tier.
     const [status, setStatus] = useState<string | null>(null);
 
     const supabase = createBrowserClient();
+
+    // Fetch tier from the users table (source of truth)
+    async function fetchTierFromDB(userId: string) {
+        const { data } = await supabase
+            .from('users')
+            .select('subscription_tier, subscription_status')
+            .eq('id', userId)
+            .single();
+
+        if (data?.subscription_tier) {
+            setTier(data.subscription_tier as 'free' | 'pro' | 'expert');
+            setStatus(data.subscription_status || null);
+        }
+    }
 
     useEffect(() => {
         async function loadSession() {
             const { data: { session } } = await supabase.auth.getSession();
             if (session?.user) {
                 setUser(session.user);
+                // Set initial tier from metadata, then fetch from DB for accuracy
                 setTier(session.user.user_metadata?.subscription_tier || 'free');
+                await fetchTierFromDB(session.user.id);
             }
             setLoading(false);
         }
         loadSession();
 
         // Listen for auth changes (like logging in or token refreshes post-upgrade)
-        const { data: authListener } = supabase.auth.onAuthStateChange((event: string, session: any) => {
+        const { data: authListener } = supabase.auth.onAuthStateChange(async (event: string, session: any) => {
             if (session?.user) {
                 setUser(session.user);
                 setTier(session.user.user_metadata?.subscription_tier || 'free');
+                await fetchTierFromDB(session.user.id);
             } else {
                 setUser(null);
                 setTier('free');

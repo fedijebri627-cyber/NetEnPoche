@@ -21,8 +21,14 @@ export async function requireSubscription(requiredTier: RequiredTier, req?: Requ
         };
     }
 
-    // The subscription_tier is injected into raw_user_meta_data by our SQL trigger
-    const userTier = session.user.user_metadata?.subscription_tier || 'free';
+    // Fetch the subscription tier from the users DB table (source of truth)
+    const { data: profile } = await supabase
+        .from('users')
+        .select('subscription_tier')
+        .eq('id', session.user.id)
+        .single();
+
+    const userTier = profile?.subscription_tier || session.user.user_metadata?.subscription_tier || 'free';
 
     const tierRanks = {
         'free': 0,
