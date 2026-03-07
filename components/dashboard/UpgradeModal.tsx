@@ -45,6 +45,9 @@ export function UpgradeModal({ isOpen, onClose }: Props) {
             const checkoutUrl = user ? `${link}?client_reference_id=${user.id}` : link;
 
             window.location.href = checkoutUrl;
+
+            // Safety: reset spinner after 3s in case navigation fails
+            setTimeout(() => setLoadingTier(null), 3000);
         } catch (error: any) {
             console.error(error);
             alert("Une erreur de redirection est survenue.");
