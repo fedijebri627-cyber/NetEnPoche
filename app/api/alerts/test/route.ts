@@ -8,8 +8,9 @@ import { MonthlyStatusEmail } from '@/components/emails/MonthlyStatusEmail';
 const resend = new Resend(process.env.RESEND_API_KEY!);
 
 export async function POST(req: Request) {
-    const supabase = createServerClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    console.log("TEST ROUTE ACCESSED");
+    const supabase = await createServerClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
