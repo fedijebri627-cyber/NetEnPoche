@@ -66,7 +66,7 @@ const fmt = (val: number) => {
 interface BilanTemplateProps {
     entries: MonthlyEntry[];
     config: ActivityConfig;
-    userMeta: { name: string; email: string };
+    userMeta: { name: string; email: string; siret?: string; businessName?: string };
     isPro: boolean;
 }
 
@@ -107,8 +107,8 @@ export const BilanTemplate = ({ entries, config, userMeta, isPro }: BilanTemplat
 
                 {/* User Info */}
                 <Text style={s.sectionTitle}>Bilan Financier Annuel</Text>
-                <Text style={s.infoLine}>Auto-Entrepreneur : {userMeta.email}</Text>
-                <Text style={s.infoLine}>SIRET : Non Renseigné</Text>
+                <Text style={s.infoLine}>Auto-Entrepreneur : {userMeta.businessName || userMeta.name || userMeta.email}</Text>
+                <Text style={s.infoLine}>SIRET : {userMeta.siret ? `${userMeta.siret.slice(0, 3)} ${userMeta.siret.slice(3, 6)} ${userMeta.siret.slice(6, 9)} ${userMeta.siret.slice(9)}` : 'Non Renseigné'}</Text>
                 <Text style={s.infoLine}>Type d&apos;activité : {String(config.activity_type) === 'prestations_services' ? 'Prestation de services' : String(config.activity_type) === 'vente_marchandises' ? 'Vente de marchandises' : 'Profession libérale'}</Text>
                 <Text style={s.infoLine}>Taux URSSAF : {urssafRate} %</Text>
 

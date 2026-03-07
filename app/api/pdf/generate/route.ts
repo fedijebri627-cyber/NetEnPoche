@@ -16,11 +16,23 @@ export async function POST(req: Request) {
 
         const isPro = user.user_metadata?.subscription_tier === 'pro' || user.user_metadata?.subscription_tier === 'expert';
 
+        // Fetch SIRET and business name from the users table
+        const { data: profile } = await supabase
+            .from('users')
+            .select('siret, business_name, full_name')
+            .eq('id', user.id)
+            .single();
+
         const stream = await renderToStream(
             React.createElement(BilanTemplate, {
                 entries,
                 config,
-                userMeta: { name: user.user_metadata?.full_name || 'Entrepreneur', email: user.email || '' },
+                userMeta: {
+                    name: profile?.full_name || user.user_metadata?.full_name || 'Entrepreneur',
+                    email: user.email || '',
+                    siret: profile?.siret || undefined,
+                    businessName: profile?.business_name || undefined,
+                },
                 isPro
             }) as any
         );

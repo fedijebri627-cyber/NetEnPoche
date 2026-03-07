@@ -1,10 +1,14 @@
 'use client';
 
+import { useState } from 'react';
 import { AlertPreferencesPanel } from '@/components/dashboard/settings/AlertPreferencesPanel';
-import { Settings } from 'lucide-react';
+import { BusinessProfilePanel } from '@/components/dashboard/settings/BusinessProfilePanel';
+import { Settings, Building2 } from 'lucide-react';
 import { DashboardProvider } from '@/contexts/DashboardContext';
 
 export default function SettingsPage() {
+    const [activeTab, setActiveTab] = useState<'alerts' | 'profile'>('profile');
+
     return (
         <main className="flex-1 overflow-x-hidden p-6 max-w-7xl mx-auto w-full space-y-8">
 
@@ -20,23 +24,32 @@ export default function SettingsPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
-                {/* Sidebar nav for settings (stubbed for future profiling pages) */}
+                {/* Sidebar nav */}
                 <div className="lg:col-span-3">
                     <nav className="space-y-1">
-                        <span className="flex items-center gap-3 px-4 py-3 rounded-xl font-bold bg-[#162848] text-white">
+                        <button
+                            onClick={() => setActiveTab('profile')}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition ${activeTab === 'profile' ? 'bg-[#162848] text-white' : 'text-slate-500 hover:bg-white'}`}
+                        >
+                            <Building2 className="w-4 h-4" /> Profil Entreprise
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('alerts')}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition ${activeTab === 'alerts' ? 'bg-[#162848] text-white' : 'text-slate-500 hover:bg-white'}`}
+                        >
                             <Settings className="w-4 h-4" /> Alertes Emails
-                        </span>
-                        <span className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-500 hover:bg-white transition opacity-50 cursor-not-allowed">
-                            Profil Fiscal (Bientôt)
-                        </span>
+                        </button>
                     </nav>
                 </div>
 
                 {/* Main Content Pane */}
                 <div className="lg:col-span-9">
-                    <DashboardProvider>
-                        <AlertPreferencesPanel />
-                    </DashboardProvider>
+                    {activeTab === 'profile' && <BusinessProfilePanel />}
+                    {activeTab === 'alerts' && (
+                        <DashboardProvider>
+                            <AlertPreferencesPanel />
+                        </DashboardProvider>
+                    )}
                 </div>
 
             </div>
@@ -44,4 +57,3 @@ export default function SettingsPage() {
         </main>
     );
 }
-
