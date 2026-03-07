@@ -433,19 +433,19 @@ export default function LandingPage() {
         <h2 className="section-title">Comprendre vos cotisations</h2>
         <div className="blog-grid">
           <div className="blog-card">
-            <div className="blog-date">2 Février 2026</div>
-            <div className="blog-title">Comment calculer son URSSAF en auto-entreprise en 2026</div>
-            <Link href="#" className="blog-link">Lire l'article →</Link>
+            <div className="blog-date">Guide officiel</div>
+            <div className="blog-title">Taux de cotisations sociales des micro-entrepreneurs (URSSAF)</div>
+            <a href="https://www.autoentrepreneur.urssaf.fr/portail/accueil/sinformer-sur-le-statut/lessentiel-du-statut.html" target="_blank" rel="noopener noreferrer" className="blog-link">Lire sur urssaf.fr →</a>
           </div>
           <div className="blog-card">
-            <div className="blog-date">18 Janvier 2026</div>
-            <div className="blog-title">Plafond TVA 2026 : tout ce que les micro-entrepreneurs doivent savoir</div>
-            <Link href="#" className="blog-link">Lire l'article →</Link>
+            <div className="blog-date">Guide officiel</div>
+            <div className="blog-title">Franchise en base de TVA : seuils et obligations pour les micro-entreprises</div>
+            <a href="https://www.service-public.fr/professionnels-entreprises/vosdroits/F21746" target="_blank" rel="noopener noreferrer" className="blog-link">Lire sur service-public.fr →</a>
           </div>
           <div className="blog-card">
-            <div className="blog-date">5 Janvier 2026</div>
-            <div className="blog-title">Versement libératoire de l'impôt : vaut-il mieux l'activer ?</div>
-            <Link href="#" className="blog-link">Lire l'article →</Link>
+            <div className="blog-date">Guide officiel</div>
+            <div className="blog-title">Versement libératoire de l'impôt sur le revenu : conditions et calcul</div>
+            <a href="https://www.impots.gouv.fr/professionnel/le-versement-liberatoire" target="_blank" rel="noopener noreferrer" className="blog-link">Lire sur impots.gouv.fr →</a>
           </div>
         </div>
       </section>
