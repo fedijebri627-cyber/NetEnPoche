@@ -1,6 +1,6 @@
 'use client';
 
-import { Download, FileText, ArrowRight } from 'lucide-react';
+import { Download, FileText, ArrowRight, Building2 } from 'lucide-react';
 import { useDashboard } from '@/contexts/DashboardContext';
 import { calculateUrssaf } from '@/lib/calculations';
 import { useState } from 'react';
@@ -81,6 +81,14 @@ export function TableActions() {
             >
                 <FileText className="w-4 h-4" />
                 <span>{isGenerating ? 'Génération...' : `Bilan PDF (${tier === 'free' ? 'Basique' : 'Complet'})`}</span>
+            </button>
+
+            <button
+                onClick={() => window.location.href = '/dashboard/settings'}
+                className="w-full sm:w-auto flex items-center justify-center space-x-2 bg-white border border-slate-200 text-slate-500 px-6 py-3 rounded-xl hover:bg-slate-50 hover:text-slate-700 transition font-medium shadow-sm active:scale-[0.98]"
+            >
+                <Building2 className="w-4 h-4" />
+                <span>Infos Entreprise (SIRET)</span>
             </button>
 
             {tier === 'free' && (

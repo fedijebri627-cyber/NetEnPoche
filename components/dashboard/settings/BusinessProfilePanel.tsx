@@ -3,10 +3,12 @@
 import { useState, useEffect } from 'react';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { Building2, Save, Loader2, CheckCircle2 } from 'lucide-react';
+import { useSubscription } from '@/hooks/useSubscription';
 
 export function BusinessProfilePanel() {
     const supabase = createBrowserClient();
 
+    const { tier } = useSubscription();
     const [siret, setSiret] = useState('');
     const [businessName, setBusinessName] = useState('');
     const [fullName, setFullName] = useState('');
@@ -93,7 +95,12 @@ export function BusinessProfilePanel() {
                     <Building2 className="w-5 h-5 text-indigo-500" />
                 </div>
                 <div>
-                    <h3 className="font-bold text-[#0d1b35] font-syne">Profil Entreprise</h3>
+                    <h3 className="font-bold text-[#0d1b35] font-syne flex items-center gap-2">
+                        Profil Entreprise
+                        <span className="text-[10px] px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full font-sans uppercase tracking-wider">
+                            Plan {tier}
+                        </span>
+                    </h3>
                     <p className="text-sm text-slate-500">Ces informations apparaissent sur vos bilans PDF et factures.</p>
                 </div>
             </div>
