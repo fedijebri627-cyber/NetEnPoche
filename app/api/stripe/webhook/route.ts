@@ -44,10 +44,14 @@ export async function POST(req: Request) {
                     const priceId = subscription.items.data[0].price.id;
                     const expertMonthlyPriceId = process.env.STRIPE_PRICE_EXPERT_MONTHLY;
                     const expertAnnualPriceId = process.env.STRIPE_PRICE_EXPERT_ANNUAL;
+                    const proMonthlyPriceId = process.env.STRIPE_PRICE_PRO_MONTHLY;
+                    const proAnnualPriceId = process.env.STRIPE_PRICE_PRO_ANNUAL;
 
-                    let tier = 'pro'; // Default fallback
+                    let tier = 'pro'; // Default to pro if subscription exists
                     if (priceId === expertMonthlyPriceId || priceId === expertAnnualPriceId) {
                         tier = 'expert';
+                    } else if (priceId === proMonthlyPriceId || priceId === proAnnualPriceId) {
+                        tier = 'pro';
                     }
 
                     // Ensure timestamps
@@ -74,10 +78,14 @@ export async function POST(req: Request) {
                 const priceId = subscription.items.data[0].price.id;
                 const expertMonthlyPriceId = process.env.STRIPE_PRICE_EXPERT_MONTHLY;
                 const expertAnnualPriceId = process.env.STRIPE_PRICE_EXPERT_ANNUAL;
+                const proMonthlyPriceId = process.env.STRIPE_PRICE_PRO_MONTHLY;
+                const proAnnualPriceId = process.env.STRIPE_PRICE_PRO_ANNUAL;
 
                 let tier = 'pro';
                 if (priceId === expertMonthlyPriceId || priceId === expertAnnualPriceId) {
                     tier = 'expert';
+                } else if (priceId === proMonthlyPriceId || priceId === proAnnualPriceId) {
+                    tier = 'pro';
                 }
 
                 const trialEnd = subscription.trial_end ? new Date(subscription.trial_end * 1000).toISOString() : null;

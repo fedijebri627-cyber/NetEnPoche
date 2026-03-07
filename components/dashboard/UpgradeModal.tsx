@@ -10,22 +10,37 @@ interface Props {
 
 export function UpgradeModal({ isOpen, onClose }: Props) {
     const [billing, setBilling] = useState<'monthly' | 'annual'>('monthly');
-    const [loading, setLoading] = useState(false);
+    const [loadingTier, setLoadingTier] = useState<string | null>(null);
     const supabase = createBrowserClient();
 
     if (!isOpen) return null;
 
     const handleCheckout = async (tier: 'pro' | 'expert') => {
-        setLoading(true);
+        setLoadingTier(tier);
         try {
             // Get user to append to the URL for webhooks
             const { data: { user } } = await supabase.auth.getUser();
 
-            // Provided Direct Payment Links
-            const proLink = "https://buy.stripe.com/8x26oA3m7bFKbuX8ppco001";
-            const expertLink = "https://buy.stripe.com/6oU14ge0L25a7eH355co000";
+            // Select the correct link based on tier and billing cycle from environment variables
+            let link = '';
 
-            const link = tier === 'pro' ? proLink : expertLink;
+            if (tier === 'pro') {
+                link = billing === 'monthly'
+                    ? process.env.NEXT_PUBLIC_STRIPE_LINK_PRO_MONTHLY || ''
+                    : process.env.NEXT_PUBLIC_STRIPE_LINK_PRO_ANNUAL || '';
+            } else {
+                link = billing === 'monthly'
+                    ? process.env.NEXT_PUBLIC_STRIPE_LINK_EXPERT_MONTHLY || ''
+                    : process.env.NEXT_PUBLIC_STRIPE_LINK_EXPERT_ANNUAL || '';
+            }
+
+            if (!link) {
+                console.error("Stripe link not configured for", tier, billing);
+                alert("Ce lien de paiement n'est pas encore configuré.");
+                setLoadingTier(null);
+                return;
+            }
+
             // Append client_reference_id so the webhook knows who paid
             const checkoutUrl = user ? `${link}?client_reference_id=${user.id}` : link;
 
@@ -33,7 +48,7 @@ export function UpgradeModal({ isOpen, onClose }: Props) {
         } catch (error: any) {
             console.error(error);
             alert("Une erreur de redirection est survenue.");
-            setLoading(false);
+            setLoadingTier(null);
         }
     };
 
@@ -92,10 +107,10 @@ export function UpgradeModal({ isOpen, onClose }: Props) {
                         </ul>
                         <button
                             onClick={() => handleCheckout('pro')}
-                            disabled={loading}
+                            disabled={loadingTier !== null}
                             className="w-full bg-[#162848] text-white py-4 rounded-xl font-bold hover:bg-[#0d1b35] transition flex items-center justify-center mt-auto"
                         >
-                            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Sélectionner Pro"}
+                            {loadingTier === 'pro' ? <Loader2 className="w-5 h-5 animate-spin" /> : "Sélectionner Pro"}
                         </button>
                     </div>
 
@@ -119,10 +134,10 @@ export function UpgradeModal({ isOpen, onClose }: Props) {
                         </ul>
                         <button
                             onClick={() => handleCheckout('expert')}
-                            disabled={loading}
+                            disabled={loadingTier !== null}
                             className="w-full bg-[#00c875] text-white py-4 rounded-xl font-bold hover:bg-[#00c875]/90 transition flex items-center justify-center mt-auto shadow-lg shadow-[#00c875]/30"
                         >
-                            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Sélectionner Expert"}
+                            {loadingTier === 'expert' ? <Loader2 className="w-5 h-5 animate-spin" /> : "Sélectionner Expert"}
                         </button>
                     </div>
                 </div>
