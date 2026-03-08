@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --navy: #0d1b35;
   --navy-2: #162848;
   --navy-3: #1f3660;
@@ -1204,4 +1204,132 @@ th.comp-me {
 
 .blog-link:hover {
   color: white;
+}
+.intent-section {
+  padding-top: 40px;
+}
+
+.intent-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin-top: 40px;
+}
+
+.intent-card {
+  border: 1px solid var(--gray-line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 24px;
+}
+
+.intent-title {
+  font-family: var(--font-syne), sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.intent-text {
+  color: var(--gray-text);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.footer-brand img {
+  display: block;
+}
+
+@media (max-width: 1024px) {
+  .landing-nav,
+  .section,
+  .features-section,
+  .pricing-section,
+  .proof-section,
+  .testimonials,
+  .faq-section,
+  .final-cta,
+  .landing-page footer {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+
+  .features-grid,
+  .pricing-grid,
+  .testimonials-grid,
+  .blog-grid,
+  .steps-grid,
+  .problem-grid,
+  .proof-inner {
+    grid-template-columns: 1fr;
+  }
+
+  .intent-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .pricing-card.featured {
+    transform: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .landing-nav {
+    padding-top: 16px;
+    padding-bottom: 16px;
+    gap: 16px;
+    flex-direction: column;
+  }
+
+  .nav-links {
+    width: 100%;
+    gap: 14px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .hero {
+    padding: 156px 20px 72px;
+  }
+
+  .hero-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .btn-hero-primary,
+  .btn-hero-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .hero-trust {
+    gap: 12px 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .preview-content {
+    grid-template-columns: 1fr;
+  }
+
+  .intent-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pricing-card,
+  .testimonial-card,
+  .blog-card,
+  .problem-card,
+  .step-card,
+  .intent-card {
+    padding: 22px;
+  }
+
+  .final-cta-note,
+  .landing-page footer {
+    gap: 12px;
+    flex-direction: column;
+    text-align: center;
+  }
 }

@@ -1,4 +1,4 @@
-import { Header } from '@/components/dashboard/Header';
+﻿import { Header } from '@/components/dashboard/Header';
 import { Tabs } from '@/components/dashboard/Tabs';
 import { OfflineBanner } from '@/components/dashboard/OfflineBanner';
 import { Toaster } from 'sonner';
@@ -6,8 +6,12 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
     title: {
-        template: '%s — NetEnPoche',
-        default: 'Tableau de Bord 2026',
+        template: '%s | NetEnPoche',
+        default: 'Tableau de bord 2026',
+    },
+    robots: {
+        index: false,
+        follow: false,
     },
 };
 
@@ -24,3 +28,4 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
     );
 }
+

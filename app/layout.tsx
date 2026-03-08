@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+﻿import type { Metadata } from 'next';
 import { Syne, DM_Sans } from 'next/font/google';
 import Script from 'next/script';
 import { CookieBanner } from '@/components/global/CookieBanner';
@@ -18,14 +18,25 @@ const dmSans = DM_Sans({
 });
 
 const appUrl = getConfiguredAppUrl();
+const defaultTitle = 'NetEnPoche | Calculateur URSSAF auto-entrepreneur, TVA et impôt 2026';
+const defaultDescription =
+  'Calculez votre net micro-entrepreneur après URSSAF, TVA et impôt sur le revenu. NetEnPoche aide les freelances français à piloter leur activité en temps réel.';
 
 export const metadata: Metadata = {
   title: {
-    template: '%s - NetEnPoche',
-    default: 'NetEnPoche - Calculateur URSSAF, TVA et Impots',
+    template: '%s | NetEnPoche',
+    default: defaultTitle,
   },
-  description: 'Calculez votre net en poche apres URSSAF, TVA et impots en temps reel. Gratuit pour les micro-entrepreneurs francais.',
+  description: defaultDescription,
+  applicationName: 'NetEnPoche',
   metadataBase: new URL(appUrl),
+  keywords: [
+    'NetEnPoche',
+    'calculateur URSSAF',
+    'net auto-entrepreneur',
+    'TVA micro-entreprise',
+    'impôt auto-entrepreneur',
+  ],
   icons: {
     icon: '/brand/netenpoche-favicon-32.png',
     apple: '/brand/netenpoche-apple-touch.png',
@@ -33,8 +44,8 @@ export const metadata: Metadata = {
   },
   manifest: '/manifest.json',
   openGraph: {
-    title: 'NetEnPoche - Calculateur URSSAF, TVA et Impots',
-    description: 'Calculez votre net en poche apres URSSAF, TVA et impots en temps reel. Gratuit pour les micro-entrepreneurs francais.',
+    title: defaultTitle,
+    description: defaultDescription,
     url: appUrl,
     siteName: 'NetEnPoche',
     images: [
@@ -42,6 +53,7 @@ export const metadata: Metadata = {
         url: '/brand/netenpoche-og-image.png',
         width: 1200,
         height: 630,
+        alt: 'NetEnPoche, calculateur URSSAF pour micro-entrepreneurs',
       },
     ],
     locale: 'fr_FR',
@@ -49,10 +61,17 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'NetEnPoche - Combien vous gardez vraiment ?',
-    description: 'Calculateur URSSAF, TVA et impots pour auto-entrepreneurs francais.',
+    title: defaultTitle,
+    description: defaultDescription,
     images: ['/brand/netenpoche-og-image.png'],
   },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  category: 'finance',
+  creator: 'NetEnPoche',
+  publisher: 'NetEnPoche',
   other: {
     'theme-color': '#0b1730',
     'mobile-web-app-capable': 'yes',
@@ -72,11 +91,10 @@ export default function RootLayout({
       <head>
         <Script defer data-domain="netenpoche.fr" src="https://plausible.io/js/script.js" strategy="afterInteractive" />
       </head>
-      <body className="font-sans antialiased text-slate-900 bg-slate-50">
+      <body className="bg-slate-50 font-sans text-slate-900 antialiased">
         {children}
         <CookieBanner />
       </body>
     </html>
   );
 }
-

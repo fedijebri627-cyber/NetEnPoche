@@ -1,44 +1,145 @@
-/* eslint-disable react/no-unescaped-entities */
+﻿/* eslint-disable react/no-unescaped-entities */
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import Script from 'next/script';
 import { FAQSection } from '@/components/landing/FAQSection';
+import { faqData } from '@/components/landing/faqData';
 import { PricingSection } from '@/components/landing/PricingSection';
+import { getConfiguredAppUrl } from '@/lib/app-url';
 import './landing.css';
 
+const appUrl = getConfiguredAppUrl();
+const homeTitle = 'Calculateur URSSAF, TVA et impôt pour micro-entrepreneurs';
+const homeDescription =
+  'NetEnPoche est un calculateur URSSAF pour auto-entrepreneurs et micro-entrepreneurs français. Calculez votre net après cotisations, TVA et impôt sur le revenu en temps réel.';
+
 export const metadata: Metadata = {
-  description: 'Calculez votre net en poche après URSSAF, TVA et impôts en temps réel. Gratuit pour les micro-entrepreneurs français. Alertes, bilan PDF, estimateur IR.',
+  title: homeTitle,
+  description: homeDescription,
+  keywords: [
+    'netenpoche',
+    'calculateur urssaf',
+    'simulateur urssaf auto entrepreneur',
+    'micro entrepreneur urssaf',
+    'calcul net auto entrepreneur',
+    'tva micro entreprise',
+    'impot auto entrepreneur',
+    'micro entrepreneur france',
+  ],
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    title: `${homeTitle} | NetEnPoche`,
+    description: homeDescription,
+    url: appUrl,
+    siteName: 'NetEnPoche',
+    locale: 'fr_FR',
+    type: 'website',
+    images: [
+      {
+        url: '/brand/netenpoche-og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'NetEnPoche, calculateur URSSAF pour micro-entrepreneurs',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `${homeTitle} | NetEnPoche`,
+    description: homeDescription,
+    images: ['/brand/netenpoche-og-image.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
+  },
 };
 
 export default function LandingPage() {
-  const jsonLd = {
+  const organizationJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'NetEnPoche',
+    url: appUrl,
+    logo: `${appUrl}/brand/netenpoche-icon-1024.png`,
+    description: homeDescription,
+    areaServed: 'FR',
+  };
+
+  const websiteJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'NetEnPoche',
+    url: appUrl,
+    inLanguage: 'fr-FR',
+    description: homeDescription,
+  };
+
+  const softwareApplicationJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
     name: 'NetEnPoche',
-    operatingSystem: 'Any',
-    applicationCategory: 'BusinessApplication',
-    description: 'Simulateur URSSAF 2026 et calcul net auto-entrepreneur',
+    operatingSystem: 'Web',
+    applicationCategory: 'FinanceApplication',
+    applicationSubCategory: 'Calculateur URSSAF pour micro-entrepreneurs',
+    url: appUrl,
+    description: homeDescription,
+    areaServed: 'FR',
     offers: {
-      '@type': 'Offer',
-      price: '0.00',
+      '@type': 'AggregateOffer',
       priceCurrency: 'EUR',
+      lowPrice: '0',
+      highPrice: '140',
+      offerCount: '3',
     },
+    featureList: [
+      'Calcul URSSAF en temps réel',
+      'Suivi du plafond de TVA',
+      "Estimateur d'impôt sur le revenu",
+      'Alertes échéances URSSAF',
+      'Bilan PDF professionnel',
+      'Suivi clients et factures',
+    ],
   };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqData.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer,
+      },
+    })),
+  };
+
+  const structuredData = [organizationJsonLd, websiteJsonLd, softwareApplicationJsonLd, faqJsonLd];
 
   return (
     <div className="landing-page">
       <Script
         id="schema-jsonld"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
 
       {/* NAV */}
       <nav className="landing-nav">
         <Link href="/" className="nav-logo">
           <Image
-            src="/brand/netenpoche-logo-horizontal.png"
+            src="/brand/netenpoche-logo-transparent.png"
             alt="NetEnPoche"
             width={200}
             height={52}
@@ -50,21 +151,22 @@ export default function LandingPage() {
           <a href="#features" className="nav-link">Fonctionnalités</a>
           <a href="#pricing" className="nav-link">Tarifs</a>
           <a href="#faq" className="nav-link">FAQ</a>
-          <Link href="/auth/login" className="nav-cta">Essai gratuit →</Link>
+          <Link href="/auth/register" className="nav-cta">Créer mon compte</Link>
         </div>
       </nav>
 
       {/* HERO */}
       <section className="hero">
-        <div className="hero-eyebrow">🇫🇷 Pour les micro-entrepreneurs français</div>
+        <div className="hero-eyebrow">Calculateur URSSAF 2026 pour micro-entrepreneurs français</div>
         <h1 className="hero-title">
-          Combien vous gardez<br /><span className="highlight">vraiment</span> ?
+          Calculateur URSSAF, TVA et impôt<br /><span className="highlight">pour connaître votre vrai net</span>
         </h1>
         <p className="hero-sub">
-          NetEnPoche calcule votre net après URSSAF, TVA et impôts — en temps réel. Fini les mauvaises surprises en fin d'année. Le meilleur calculateur URSSAF auto-entrepreneur gratuit.
+          NetEnPoche aide les auto-entrepreneurs à calculer leur net après cotisations sociales, TVA et impôt sur le revenu. Suivez votre chiffre d'affaires, anticipez vos échéances et évitez les mauvaises surprises de fin d'année.
         </p>
         <div className="hero-actions">
-          <Link href="/auth/login" className="btn-hero-primary">Calculer mon net gratuitement</Link>
+          <Link href="/auth/register" className="btn-hero-primary">Essayer gratuitement</Link>
+          <a href="#pricing" className="btn-hero-secondary">Comparer les offres</a>
         </div>
         <div className="hero-trust">
           <div className="hero-trust-item"><span className="hero-trust-dot">●</span> Gratuit pour toujours</div>
@@ -169,19 +271,44 @@ export default function LandingPage() {
       <div className="proof-section">
         <div className="proof-inner">
           <div className="proof-stat">
-            <div className="proof-number">4.2M</div>
-            <div className="proof-label">micro-entrepreneurs en France<br />tous concernés par l'URSSAF</div>
+            <div className="proof-number">4,2 M</div>
+            <div className="proof-label">micro-entrepreneurs en France<br />concernés par l'URSSAF et la TVA</div>
           </div>
           <div className="proof-stat">
-            <div className="proof-number">0€</div>
-            <div className="proof-label">outil gratuit fiable qui calcule<br />votre vrai net après impôts</div>
+            <div className="proof-number">0 €</div>
+            <div className="proof-label">pour commencer à calculer<br />votre vrai net après charges</div>
           </div>
           <div className="proof-stat">
-            <div className="proof-number">SSL</div>
-            <div className="proof-label">données chiffrées et sécurisées<br />jamais revendues ni partagées</div>
+            <div className="proof-number">2026</div>
+            <div className="proof-label">règles et projections fiscales<br />pour mieux piloter votre activité</div>
           </div>
         </div>
       </div>
+
+      <section className="section intent-section" id="intent">
+        <div className="section-eyebrow">Ce que calcule NetEnPoche</div>
+        <h2 className="section-title">Les vraies questions d'un auto-entrepreneur, traitées au même endroit</h2>
+        <p className="section-sub">Le site répond aux recherches les plus fréquentes autour de l'URSSAF, de la TVA et du net micro-entrepreneur, sans vous obliger à jongler entre plusieurs simulateurs.</p>
+
+        <div className="intent-grid">
+          <div className="intent-card">
+            <div className="intent-title">Calculer votre net après URSSAF</div>
+            <div className="intent-text">Visualisez immédiatement les cotisations sociales et ce qu'il vous reste vraiment après prélèvements.</div>
+          </div>
+          <div className="intent-card">
+            <div className="intent-title">Anticiper le plafond de TVA</div>
+            <div className="intent-text">Suivez la franchise en base de TVA et repérez le bon moment pour ajuster vos factures.</div>
+          </div>
+          <div className="intent-card">
+            <div className="intent-title">Estimer l'impôt sur le revenu</div>
+            <div className="intent-text">Projetez votre net après impôt selon votre situation fiscale, vos parts et votre activité.</div>
+          </div>
+          <div className="intent-card">
+            <div className="intent-title">Piloter votre activité freelance</div>
+            <div className="intent-text">Alertes, bilan PDF, suivi clients et factures pour passer du simple calcul à une vraie vision financière.</div>
+          </div>
+        </div>
+      </section>
 
       {/* COMMENT ÇA MARCHE */}
       <section className="section" id="how-it-works">
@@ -461,16 +588,32 @@ export default function LandingPage() {
       {/* FAQ */}
       <FAQSection />
 
+      <section className="final-cta">
+        <h2 className="final-cta-title">Arrêtez d'estimer votre net micro-entrepreneur au hasard.</h2>
+        <p className="final-cta-sub">Créez votre compte gratuit et visualisez immédiatement vos cotisations URSSAF, votre TVA et votre net après impôt.</p>
+        <Link href="/auth/register" className="btn-hero-primary">Créer mon compte gratuit</Link>
+        <div className="final-cta-note">
+          <span>Essai gratuit sur les offres payantes</span>
+          <span>Aucune carte requise pour commencer</span>
+        </div>
+      </section>
+
       {/* FOOTER */}
       <footer>
-        <Link href="/" className="nav-logo" style={{ fontSize: 16 }}>
-          <span className="nav-logo-dot" />
-          NetEnPoche
+        <Link href="/" className="nav-logo footer-brand" aria-label="NetEnPoche accueil">
+          <Image
+            src="/brand/netenpoche-logo-transparent.png"
+            alt="NetEnPoche"
+            width={160}
+            height={42}
+            className="h-8 w-auto"
+          />
         </Link>
         <div className="footer-links">
-          <Link href="#" className="footer-link">CGU</Link>
-          <Link href="#" className="footer-link">Confidentialité (RGPD)</Link>
-          <Link href="#" className="footer-link">Contact</Link>
+          <a href="#features" className="footer-link">Fonctionnalités</a>
+          <a href="#pricing" className="footer-link">Tarifs</a>
+          <a href="#faq" className="footer-link">FAQ</a>
+          <Link href="/auth/login" className="footer-link">Connexion</Link>
         </div>
         <span>© 2026 NetEnPoche. Tous droits réservés.</span>
       </footer>
@@ -478,3 +621,7 @@ export default function LandingPage() {
     </div>
   );
 }
+
+
+
+

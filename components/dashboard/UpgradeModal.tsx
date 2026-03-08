@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { X, CheckCircle2, Loader2 } from 'lucide-react';
@@ -9,6 +9,12 @@ interface Props {
     isOpen: boolean;
     onClose: () => void;
 }
+
+const euroFormatter = new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency: 'EUR',
+    maximumFractionDigits: 0,
+});
 
 export function UpgradeModal({ isOpen, onClose }: Props) {
     const [billing, setBilling] = useState<'monthly' | 'annual'>('monthly');
@@ -63,104 +69,103 @@ export function UpgradeModal({ isOpen, onClose }: Props) {
         }
     };
 
+    const proPrice = euroFormatter.format(billing === 'monthly' ? 5 : 50);
+    const expertPrice = euroFormatter.format(billing === 'monthly' ? 14 : 140);
+
     return (
-        <div className="fixed inset-0 bg-[#0d1b35]/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl overflow-hidden relative flex flex-col max-h-[90vh]">
-                <div className="relative p-8 text-center bg-slate-50 border-b border-slate-100">
-                    <button onClick={onClose} className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-700 bg-white rounded-full shadow-sm">
-                        <X className="w-5 h-5" />
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#0d1b35]/80 p-4 backdrop-blur-sm">
+            <div className="relative flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl">
+                <div className="relative border-b border-slate-100 bg-slate-50 p-8 text-center">
+                    <button onClick={onClose} className="absolute right-6 top-6 rounded-full bg-white p-2 text-slate-400 shadow-sm hover:text-slate-700">
+                        <X className="h-5 w-5" />
                     </button>
 
-                    <div className="flex flex-col items-center py-6 bg-gradient-to-b from-slate-50 to-white rounded-t-2xl">
+                    <div className="flex flex-col items-center rounded-t-2xl bg-gradient-to-b from-slate-50 to-white py-6">
                         <Image
                             src="/brand/netenpoche-icon-1024.png"
                             alt="NetEnPoche Pro"
                             width={64}
                             height={64}
-                            className="rounded-2xl shadow-xl shadow-green-500/30 mb-3"
+                            className="mb-3 rounded-2xl shadow-xl shadow-green-500/30"
                             priority
                         />
                     </div>
-                    <h2 className="text-3xl font-bold font-syne text-[#0d1b35] mb-2">Passez au niveau superieur</h2>
-                    <p className="text-slate-500 max-w-lg mx-auto">
-                        Debloquez l optimisation fiscale, le suivi client et gagnez des milliers d euros chaque annee.
+                    <h2 className="mb-2 text-3xl font-bold text-[#0d1b35] font-syne">Passez au niveau supérieur</h2>
+                    <p className="mx-auto max-w-lg text-slate-500">
+                        Débloquez l'optimisation fiscale, le suivi client et gagnez des milliers d'euros chaque année.
                     </p>
 
-                    <div className="flex items-center justify-center mt-6">
-                        <div className="bg-white p-1 rounded-full border border-slate-200 shadow-sm inline-flex">
+                    <div className="mt-6 flex items-center justify-center">
+                        <div className="inline-flex rounded-full border border-slate-200 bg-white p-1 shadow-sm">
                             <button
                                 onClick={() => setBilling('monthly')}
-                                className={`px-6 py-2 rounded-full text-sm font-bold transition ${billing === 'monthly' ? 'bg-[#0d1b35] text-white' : 'text-slate-500 hover:text-slate-900'}`}
+                                className={`rounded-full px-6 py-2 text-sm font-bold transition ${billing === 'monthly' ? 'bg-[#0d1b35] text-white' : 'text-slate-500 hover:text-slate-900'}`}
                             >
                                 Mensuel
                             </button>
                             <button
                                 onClick={() => setBilling('annual')}
-                                className={`flex items-center px-6 py-2 rounded-full text-sm font-bold transition ${billing === 'annual' ? 'bg-[#0d1b35] text-white' : 'text-slate-500 hover:text-slate-900'}`}
+                                className={`flex items-center rounded-full px-6 py-2 text-sm font-bold transition ${billing === 'annual' ? 'bg-[#0d1b35] text-white' : 'text-slate-500 hover:text-slate-900'}`}
                             >
-                                Annuel <span className="ml-2 bg-[#00c875]/20 text-[#00c875] px-2 py-0.5 rounded text-[10px] uppercase">-20%</span>
+                                Annuel <span className="ml-2 rounded bg-[#00c875]/20 px-2 py-0.5 text-[10px] uppercase text-[#00c875]">-20%</span>
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <div className="p-8 grid md:grid-cols-2 gap-8 overflow-y-auto">
-                    <div className="border border-slate-200 rounded-3xl p-6 relative bg-white hover:border-[#00c875] hover:shadow-lg transition">
-                        <h3 className="text-xl font-bold font-syne text-[#0d1b35] mb-2">Pro</h3>
+                <div className="grid gap-8 overflow-y-auto p-8 md:grid-cols-2">
+                    <div className="relative rounded-3xl border border-slate-200 bg-white p-6 transition hover:border-[#00c875] hover:shadow-lg">
+                        <h3 className="mb-2 text-xl font-bold text-[#0d1b35] font-syne">Pro</h3>
                         <div className="mb-4">
-                            <span className="text-4xl font-black text-[#0d1b35]">
-                                {billing === 'monthly' ? '5â‚¬' : '50â‚¬'}
-                            </span>
-                            <span className="text-slate-500 font-medium">/{billing === 'monthly' ? 'mois' : 'an'}</span>
+                            <span className="text-4xl font-black text-[#0d1b35]">{proPrice}</span>
+                            <span className="font-medium text-slate-500">/{billing === 'monthly' ? 'mois' : 'an'}</span>
                         </div>
-                        <ul className="space-y-3 mb-8">
-                            <li className="flex gap-3 text-slate-600"><CheckCircle2 className="w-5 h-5 text-[#00c875] shrink-0" /> Calculateur de net reel en temps reel</li>
-                            <li className="flex gap-3 text-slate-600"><CheckCircle2 className="w-5 h-5 text-[#00c875] shrink-0" /> Optimisation et simulation impot sur le revenu</li>
-                            <li className="flex gap-3 text-slate-600"><CheckCircle2 className="w-5 h-5 text-[#00c875] shrink-0" /> Alertes intelligentes franchissement TVA</li>
+                        <ul className="mb-8 space-y-3">
+                            <li className="flex gap-3 text-slate-600"><CheckCircle2 className="h-5 w-5 shrink-0 text-[#00c875]" /> Calculateur de net réel en temps réel</li>
+                            <li className="flex gap-3 text-slate-600"><CheckCircle2 className="h-5 w-5 shrink-0 text-[#00c875]" /> Optimisation et simulation d'impôt sur le revenu</li>
+                            <li className="flex gap-3 text-slate-600"><CheckCircle2 className="h-5 w-5 shrink-0 text-[#00c875]" /> Alertes intelligentes de franchissement TVA</li>
                         </ul>
                         <button
                             onClick={() => handleCheckout('pro')}
                             disabled={loadingTier !== null}
-                            className="w-full bg-[#162848] text-white py-4 rounded-xl font-bold hover:bg-[#0d1b35] transition flex items-center justify-center mt-auto"
+                            className="mt-auto flex w-full items-center justify-center rounded-xl bg-[#162848] py-4 font-bold text-white transition hover:bg-[#0d1b35]"
                         >
-                            {loadingTier === 'pro' ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Selectionner Pro'}
+                            {loadingTier === 'pro' ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Sélectionner Pro'}
                         </button>
                     </div>
 
-                    <div className="border-2 border-[#00c875] rounded-3xl p-6 relative bg-gradient-to-b from-white to-[#00c875]/5 shadow-xl">
-                        <div className="absolute top-0 right-6 -translate-y-1/2 bg-[#00c875] text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                    <div className="relative rounded-3xl border-2 border-[#00c875] bg-gradient-to-b from-white to-[#00c875]/5 p-6 shadow-xl">
+                        <div className="absolute right-6 top-0 -translate-y-1/2 rounded-full bg-[#00c875] px-3 py-1 text-xs font-bold uppercase tracking-wider text-white">
                             Le plus populaire
                         </div>
-                        <h3 className="text-xl font-bold font-syne text-[#0d1b35] mb-2">Expert</h3>
+                        <h3 className="mb-2 text-xl font-bold text-[#0d1b35] font-syne">Expert</h3>
                         <div className="mb-4">
-                            <span className="text-4xl font-black text-[#0d1b35]">
-                                {billing === 'monthly' ? '14â‚¬' : '140â‚¬'}
-                            </span>
-                            <span className="text-slate-500 font-medium">/{billing === 'monthly' ? 'mois' : 'an'}</span>
+                            <span className="text-4xl font-black text-[#0d1b35]">{expertPrice}</span>
+                            <span className="font-medium text-slate-500">/{billing === 'monthly' ? 'mois' : 'an'}</span>
                         </div>
-                        <ul className="space-y-3 mb-8">
-                            <li className="flex gap-3 text-slate-900 font-medium"><CheckCircle2 className="w-5 h-5 text-[#00c875] shrink-0" /> Tout ce qui est inclus dans Pro</li>
-                            <li className="flex gap-3 text-slate-600"><CheckCircle2 className="w-5 h-5 text-[#00c875] shrink-0" /> Edition de factures conformes</li>
-                            <li className="flex gap-3 text-slate-600"><CheckCircle2 className="w-5 h-5 text-[#00c875] shrink-0" /> CRM Client</li>
-                            <li className="flex gap-3 text-slate-600"><CheckCircle2 className="w-5 h-5 text-[#00c875] shrink-0" /> Multi-activites complexes (Mixte BIC/BNC)</li>
+                        <ul className="mb-8 space-y-3">
+                            <li className="flex gap-3 font-medium text-slate-900"><CheckCircle2 className="h-5 w-5 shrink-0 text-[#00c875]" /> Tout ce qui est inclus dans Pro</li>
+                            <li className="flex gap-3 text-slate-600"><CheckCircle2 className="h-5 w-5 shrink-0 text-[#00c875]" /> Édition de factures conformes</li>
+                            <li className="flex gap-3 text-slate-600"><CheckCircle2 className="h-5 w-5 shrink-0 text-[#00c875]" /> CRM client</li>
+                            <li className="flex gap-3 text-slate-600"><CheckCircle2 className="h-5 w-5 shrink-0 text-[#00c875]" /> Multi-activités complexes (mixte BIC/BNC)</li>
                         </ul>
                         <button
                             onClick={() => handleCheckout('expert')}
                             disabled={loadingTier !== null}
-                            className="w-full bg-[#00c875] text-white py-4 rounded-xl font-bold hover:bg-[#00c875]/90 transition flex items-center justify-center mt-auto shadow-lg shadow-[#00c875]/30"
+                            className="mt-auto flex w-full items-center justify-center rounded-xl bg-[#00c875] py-4 font-bold text-white shadow-lg shadow-[#00c875]/30 transition hover:bg-[#00c875]/90"
                         >
-                            {loadingTier === 'expert' ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Selectionner Expert'}
+                            {loadingTier === 'expert' ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Sélectionner Expert'}
                         </button>
                     </div>
                 </div>
 
-                <div className="bg-slate-50 p-4 text-center border-t border-slate-100 flex flex-col items-center justify-center">
-                    <span className="text-sm font-bold text-[#00c875] bg-[#00c875]/10 px-4 py-1.5 rounded-full mb-2">
+                <div className="flex flex-col items-center justify-center border-t border-slate-100 bg-slate-50 p-4 text-center">
+                    <span className="mb-2 rounded-full bg-[#00c875]/10 px-4 py-1.5 text-sm font-bold text-[#00c875]">
                         Essai gratuit 14 jours - aucune carte requise
                     </span>
                     <div className="flex space-x-4 text-xs text-slate-500">
-                        <span>Paiement securise par Stripe</span>
-                        <span>â€¢</span>
+                        <span>Paiement sécurisé par Stripe</span>
+                        <span>•</span>
                         <span>Annulation en un clic</span>
                     </div>
                 </div>
@@ -168,4 +173,3 @@ export function UpgradeModal({ isOpen, onClose }: Props) {
         </div>
     );
 }
-
