@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   --navy: #0d1b35;
   --navy-2: #162848;
   --navy-3: #1f3660;
@@ -1331,5 +1331,138 @@ th.comp-me {
     gap: 12px;
     flex-direction: column;
     text-align: center;
+  }
+}
+.seo-page-shell {
+  min-height: 100vh;
+  background: linear-gradient(180deg, var(--navy) 0%, #091224 100%);
+}
+
+.seo-hero {
+  padding: 164px 60px 56px;
+}
+
+.seo-hero-inner {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.seo-hero-title,
+.seo-hero-sub {
+  max-width: 840px;
+}
+
+.seo-hero-actions {
+  justify-content: flex-start;
+  margin-bottom: 0;
+}
+
+.seo-section-tight {
+  padding-top: 56px;
+  padding-bottom: 56px;
+}
+
+.seo-highlights-grid,
+.seo-copy-grid,
+.seo-faq-list,
+.seo-guides-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin-top: 40px;
+}
+
+.seo-highlight-card,
+.seo-copy-card,
+.seo-faq-card,
+.seo-guide-card {
+  border: 1px solid var(--gray-line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 24px;
+}
+
+.seo-highlight-card {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.seo-highlight-card p,
+.seo-copy-card p,
+.seo-faq-card p,
+.seo-guide-card p {
+  color: var(--gray-text);
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.seo-highlight-mark {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--green-dim);
+  color: var(--green);
+  font-weight: 700;
+}
+
+.seo-copy-card h3,
+.seo-faq-card h3,
+.seo-guide-title {
+  font-family: var(--font-syne), sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.seo-guide-card {
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.seo-guide-card span {
+  display: inline-block;
+  margin-top: 16px;
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.seo-guide-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(0, 200, 117, 0.28);
+}
+
+.seo-final-cta {
+  padding-top: 96px;
+}
+
+@media (max-width: 1024px) {
+  .seo-hero,
+  .seo-section-tight {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+
+  .seo-highlights-grid,
+  .seo-copy-grid,
+  .seo-faq-list,
+  .seo-guides-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .seo-hero {
+    padding: 188px 20px 36px;
+  }
+
+  .seo-hero-actions {
+    align-items: stretch;
   }
 }

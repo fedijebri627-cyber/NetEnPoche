@@ -1,4 +1,4 @@
-﻿/* eslint-disable react/no-unescaped-entities */
+/* eslint-disable react/no-unescaped-entities */
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -7,6 +7,7 @@ import { FAQSection } from '@/components/landing/FAQSection';
 import { faqData } from '@/components/landing/faqData';
 import { PricingSection } from '@/components/landing/PricingSection';
 import { getConfiguredAppUrl } from '@/lib/app-url';
+import { seoLandingPages } from '@/lib/seo-pages';
 import './landing.css';
 
 const appUrl = getConfiguredAppUrl();
@@ -562,10 +563,25 @@ export default function LandingPage() {
         </div>
       </section>
 
+      <section className="section" id="guides">
+        <div className="section-eyebrow">Guides cibles</div>
+        <h2 className="section-title">Des pages dediees aux requetes SEO que vous pouvez vraiment gagner</h2>
+        <p className="section-sub">Au lieu de viser seulement la requete institutionnelle "calcul URSSAF", NetEnPoche cree aussi des points d entree plus precis pour les micro-entrepreneurs qui cherchent un resultat exploitable.</p>
+        <div className="seo-guides-grid">
+          {seoLandingPages.map((page) => (
+            <Link key={page.slug} href={`/${page.slug}`} className="seo-guide-card">
+              <div className="seo-guide-title">{page.cardTitle}</div>
+              <p>{page.cardDescription}</p>
+              <span>Consulter la page</span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       {/* BLOG PREVIEW */}
       <section className="section" id="ressources">
-        <div className="section-eyebrow">Ressources & Guides</div>
-        <h2 className="section-title">Comprendre vos cotisations</h2>
+        <div className="section-eyebrow">Sources officielles</div>
+        <h2 className="section-title">Comparer NetEnPoche avec les references publiques</h2>
         <div className="blog-grid">
           <div className="blog-card">
             <div className="blog-date">Guide officiel</div>
