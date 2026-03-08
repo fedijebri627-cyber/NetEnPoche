@@ -8,10 +8,6 @@ import Image from 'next/image'
 import { Loader2 } from 'lucide-react'
 import type { Metadata } from 'next'
 
-export const metadata: Metadata = {
-    title: 'Connexion',
-}
-
 export default function LoginPage() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')

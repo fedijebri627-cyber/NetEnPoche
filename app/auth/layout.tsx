@@ -2,6 +2,14 @@ import React from 'react';
 import { Shield } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+    title: {
+        template: '%s — NetEnPoche',
+        default: 'Authentification',
+    },
+};
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
     return (

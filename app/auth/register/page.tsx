@@ -8,10 +8,6 @@ import Image from 'next/image'
 import { Loader2, CheckCircle2 } from 'lucide-react'
 import type { Metadata } from 'next'
 
-export const metadata: Metadata = {
-    title: 'Créer un compte',
-}
-
 export default function RegisterPage() {
     const [fullName, setFullName] = useState('')
     const [email, setEmail] = useState('')

@@ -5,7 +5,10 @@ import { Toaster } from 'sonner';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-    title: 'Tableau de Bord 2026',
+    title: {
+        template: '%s — NetEnPoche',
+        default: 'Tableau de Bord 2026',
+    },
 };
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
