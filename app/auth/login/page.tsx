@@ -1,13 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { createBrowserClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Loader2 } from 'lucide-react'
 import { createAppUrl, getBrowserAppUrl, sanitizeNextPath } from '@/lib/app-url'
 
-export default function LoginPage() {
+function LoginPageContent() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [error, setError] = useState<string | null>(null)
@@ -116,7 +116,7 @@ export default function LoginPage() {
                     <input
                         id="password"
                         type="password"
-                        placeholder="Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢"
+                        placeholder="Mot de passe"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
@@ -134,10 +134,25 @@ export default function LoginPage() {
             </form>
 
             <p className="text-center text-sm text-slate-500">
-                Pas encore de compte ?{' '}
-                <Link href="/auth/register" className="text-brand-green hover:underline font-medium">S&apos;inscrire</Link>
+                Pas encore de compte?{' '}
+                <Link href="/auth/register" className="text-brand-green hover:underline font-medium">S'inscrire</Link>
             </p>
         </div>
     )
 }
 
+function LoginPageFallback() {
+    return (
+        <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
+        </div>
+    )
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={<LoginPageFallback />}>
+            <LoginPageContent />
+        </Suspense>
+    )
+}

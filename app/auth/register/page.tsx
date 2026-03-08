@@ -1,13 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { createBrowserClient } from '@/lib/supabase/client'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Loader2, CheckCircle2 } from 'lucide-react'
 import { createAppUrl, getBrowserAppUrl, sanitizeNextPath } from '@/lib/app-url'
 
-export default function RegisterPage() {
+function RegisterPageContent() {
     const [fullName, setFullName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -96,7 +96,7 @@ export default function RegisterPage() {
                     <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
                     <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
                 </svg>
-                <span>S&apos;inscrire avec Google</span>
+                <span>S'inscrire avec Google</span>
             </button>
 
             <div className="relative">
@@ -140,7 +140,7 @@ export default function RegisterPage() {
                     <input
                         id="password"
                         type="password"
-                        placeholder="Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢"
+                        placeholder="Mot de passe"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
@@ -166,10 +166,25 @@ export default function RegisterPage() {
             </form>
 
             <p className="text-center text-sm text-slate-500">
-                Vous avez deja un compte ?{' '}
+                Vous avez deja un compte?{' '}
                 <Link href="/auth/login" className="text-brand-green hover:underline font-medium">Se connecter</Link>
             </p>
         </div>
     )
 }
 
+function RegisterPageFallback() {
+    return (
+        <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
+        </div>
+    )
+}
+
+export default function RegisterPage() {
+    return (
+        <Suspense fallback={<RegisterPageFallback />}>
+            <RegisterPageContent />
+        </Suspense>
+    )
+}
