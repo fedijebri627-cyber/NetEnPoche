@@ -8,7 +8,6 @@ import { PricingSection } from '@/components/landing/PricingSection';
 import './landing.css';
 
 export const metadata: Metadata = {
-  title: 'Calculateur URSSAF, TVA et Impôts pour Auto-Entrepreneurs',
   description: 'Calculez votre net en poche après URSSAF, TVA et impôts en temps réel. Gratuit pour les micro-entrepreneurs français. Alertes, bilan PDF, estimateur IR.',
 };
 
