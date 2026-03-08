@@ -21,10 +21,9 @@ export function Header() {
 
     return (
         <header className="sticky top-0 z-50 h-[62px] bg-[#0d1b35] text-white flex items-center justify-between px-6 shadow-md">
-            {/* Logo */}
             <Link href="/dashboard" className="flex items-center">
                 <Image
-                    src="/brand/netenpoche-logo-horizontal.png"
+                    src="/brand/netenpoche-logo-transparent.png"
                     alt="NetEnPoche"
                     width={180}
                     height={46}
@@ -33,12 +32,10 @@ export function Header() {
                 />
             </Link>
 
-            {/* Center Year Selector */}
             <div className="flex items-center bg-[#162848] px-4 py-1.5 rounded-full border border-slate-700/50">
-                <span className="text-sm font-medium text-slate-300">Année fiscale : <strong className="text-white">2026</strong></span>
+                <span className="text-sm font-medium text-slate-300">Annee fiscale : <strong className="text-white">2026</strong></span>
             </div>
 
-            {/* Right side Profile & Badge */}
             <div className="flex items-center space-x-4">
                 {getTierBadge()}
                 <ProfileDropdown />
@@ -46,3 +43,4 @@ export function Header() {
         </header>
     );
 }
+

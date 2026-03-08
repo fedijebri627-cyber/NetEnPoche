@@ -1,9 +1,9 @@
-import { Page, Text, View, Document, StyleSheet, Svg, Rect, Line, G, Image } from '@react-pdf/renderer';
+﻿import { Page, Text, View, Document, StyleSheet, Svg, Rect, Line, G, Image } from '@react-pdf/renderer';
 import { ActivityConfig, MonthlyEntry } from '@/contexts/DashboardContext';
 import { calculateUrssaf, calculateIR } from '@/lib/calculations';
 
-const MONTHS = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
-const SHORT_MONTHS = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jui', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
+const MONTHS = ['Janvier', 'FÃ©vrier', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'AoÃ»t', 'Septembre', 'Octobre', 'Novembre', 'DÃ©cembre'];
+const SHORT_MONTHS = ['Jan', 'FÃ©v', 'Mar', 'Avr', 'Mai', 'Jui', 'Jul', 'AoÃ»', 'Sep', 'Oct', 'Nov', 'DÃ©c'];
 
 const s = StyleSheet.create({
     page: { backgroundColor: '#ffffff', paddingTop: 30, paddingBottom: 60, paddingHorizontal: 40, fontFamily: 'Helvetica', fontSize: 10 },
@@ -105,7 +105,7 @@ export const BilanTemplate = ({ entries, config, userMeta, isPro }: BilanTemplat
             <Page size="A4" style={s.page}>
                 <View style={{ alignItems: 'center', marginBottom: 20 }}>
                     <Image
-                        src="/public/brand/netenpoche-icon-512.png"
+                        src="https://www.netenpoche.fr/brand/netenpoche-icon-1024.png"
                         style={{ width: 60, height: 60, borderRadius: 12, marginBottom: 10 }}
                     />
                     <Text style={{ fontSize: 24, fontFamily: 'Helvetica-Bold', color: '#0d1b35' }}>NetEnPoche</Text>
@@ -114,8 +114,8 @@ export const BilanTemplate = ({ entries, config, userMeta, isPro }: BilanTemplat
                 {/* User Info */}
                 <Text style={s.sectionTitle}>Bilan Financier Annuel</Text>
                 <Text style={s.infoLine}>Auto-Entrepreneur : {userMeta.businessName || userMeta.name || userMeta.email}</Text>
-                <Text style={s.infoLine}>SIRET : {userMeta.siret ? `${userMeta.siret.slice(0, 3)} ${userMeta.siret.slice(3, 6)} ${userMeta.siret.slice(6, 9)} ${userMeta.siret.slice(9)}` : 'Non Renseigné'}</Text>
-                <Text style={s.infoLine}>Type d&apos;activité : {String(config.activity_type) === 'prestations_services' ? 'Prestation de services' : String(config.activity_type) === 'vente_marchandises' ? 'Vente de marchandises' : 'Profession libérale'}</Text>
+                <Text style={s.infoLine}>SIRET : {userMeta.siret ? `${userMeta.siret.slice(0, 3)} ${userMeta.siret.slice(3, 6)} ${userMeta.siret.slice(6, 9)} ${userMeta.siret.slice(9)}` : 'Non RenseignÃ©'}</Text>
+                <Text style={s.infoLine}>Type d&apos;activitÃ© : {String(config.activity_type) === 'prestations_services' ? 'Prestation de services' : String(config.activity_type) === 'vente_marchandises' ? 'Vente de marchandises' : 'Profession libÃ©rale'}</Text>
                 <Text style={s.infoLine}>Taux URSSAF : {urssafRate} %</Text>
 
                 {/* Summary Table */}
@@ -139,7 +139,7 @@ export const BilanTemplate = ({ entries, config, userMeta, isPro }: BilanTemplat
                 </View>
 
                 {/* Detail Mensuel */}
-                <Text style={s.sectionTitle}>Détail Mensuel</Text>
+                <Text style={s.sectionTitle}>DÃ©tail Mensuel</Text>
                 <View style={s.detailTable}>
                     {/* Header row */}
                     <View style={s.detailHeaderRow}>
@@ -168,7 +168,7 @@ export const BilanTemplate = ({ entries, config, userMeta, isPro }: BilanTemplat
                 {/* Footer */}
                 <View style={s.footer} fixed>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                        <Text style={s.footerLeft}>Généré par NetEnPoche - Document non-officiel, à titre informatif</Text>
+                        <Text style={s.footerLeft}>GÃ©nÃ©rÃ© par NetEnPoche - Document non-officiel, Ã  titre informatif</Text>
                     </View>
                     <Text style={s.footerRight}>Page 1/2</Text>
                 </View>
@@ -252,14 +252,14 @@ export const BilanTemplate = ({ entries, config, userMeta, isPro }: BilanTemplat
                 {/* Notice Fiscale */}
                 <Text style={s.noticeTitle}>Notice Fiscale</Text>
                 <Text style={s.noticeText}>
-                    Ce document constitue un bilan analytique de votre activité générée sur NetEnPoche. Il n&apos;a pas de valeur comptable officielle. Vous devez déclarer ces montants sur votre espace mensuel ou trimestriel URSSAF.
+                    Ce document constitue un bilan analytique de votre activitÃ© gÃ©nÃ©rÃ©e sur NetEnPoche. Il n&apos;a pas de valeur comptable officielle. Vous devez dÃ©clarer ces montants sur votre espace mensuel ou trimestriel URSSAF.
                 </Text>
 
                 {/* Footer */}
                 <View style={s.footer} fixed>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                        <Text style={s.footerIcon}>ⓘ</Text>
-                        <Text style={s.footerLeft}>Généré par NetEnPoche - Document non-officiel, à titre informatif</Text>
+                        <Text style={s.footerIcon}>â“˜</Text>
+                        <Text style={s.footerLeft}>GÃ©nÃ©rÃ© par NetEnPoche - Document non-officiel, Ã  titre informatif</Text>
                     </View>
                     <Text style={s.footerRight}>Page 2/2</Text>
                 </View>
@@ -267,3 +267,5 @@ export const BilanTemplate = ({ entries, config, userMeta, isPro }: BilanTemplat
         </Document>
     );
 };
+
+

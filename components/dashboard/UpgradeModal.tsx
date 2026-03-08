@@ -1,6 +1,7 @@
 'use client';
+
 import { useState } from 'react';
-import { X, CheckCircle2, Loader2, Sparkles } from 'lucide-react';
+import { X, CheckCircle2, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { createBrowserClient } from '@/lib/supabase/client';
 
@@ -11,47 +12,53 @@ interface Props {
 
 export function UpgradeModal({ isOpen, onClose }: Props) {
     const [billing, setBilling] = useState<'monthly' | 'annual'>('monthly');
-    const [loadingTier, setLoadingTier] = useState<string | null>(null);
+    const [loadingTier, setLoadingTier] = useState<'pro' | 'expert' | null>(null);
     const supabase = createBrowserClient();
 
     if (!isOpen) return null;
 
     const handleCheckout = async (tier: 'pro' | 'expert') => {
         setLoadingTier(tier);
+
         try {
-            // Get user to append to the URL for webhooks
-            const { data: { user } } = await supabase.auth.getUser();
+            const response = await fetch('/api/stripe/create-checkout-session', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    tier,
+                    billingPeriod: billing,
+                }),
+            });
 
-            // Select the correct link based on tier and billing cycle from environment variables
-            let link = '';
-
-            if (tier === 'pro') {
-                link = billing === 'monthly'
-                    ? process.env.NEXT_PUBLIC_STRIPE_LINK_PRO_MONTHLY || ''
-                    : process.env.NEXT_PUBLIC_STRIPE_LINK_PRO_ANNUAL || '';
-            } else {
-                link = billing === 'monthly'
-                    ? process.env.NEXT_PUBLIC_STRIPE_LINK_EXPERT_MONTHLY || ''
-                    : process.env.NEXT_PUBLIC_STRIPE_LINK_EXPERT_ANNUAL || '';
-            }
-
-            if (!link) {
-                console.error("Stripe link not configured for", tier, billing);
-                alert("Ce lien de paiement n'est pas encore configuré.");
-                setLoadingTier(null);
+            const data = await response.json();
+            if (response.ok && data.url) {
+                window.location.assign(data.url);
                 return;
             }
 
-            // Append client_reference_id so the webhook knows who paid
-            const checkoutUrl = user ? `${link}?client_reference_id=${user.id}` : link;
+            const fallbackLink =
+                tier === 'pro'
+                    ? billing === 'monthly'
+                        ? process.env.NEXT_PUBLIC_STRIPE_LINK_PRO_MONTHLY
+                        : process.env.NEXT_PUBLIC_STRIPE_LINK_PRO_ANNUAL
+                    : billing === 'monthly'
+                        ? process.env.NEXT_PUBLIC_STRIPE_LINK_EXPERT_MONTHLY
+                        : process.env.NEXT_PUBLIC_STRIPE_LINK_EXPERT_ANNUAL;
 
-            window.location.href = checkoutUrl;
+            if (!fallbackLink) {
+                throw new Error(data.error || 'Le checkout Stripe est indisponible.');
+            }
 
-            // Safety: reset spinner after 3s in case navigation fails
-            setTimeout(() => setLoadingTier(null), 3000);
-        } catch (error: any) {
+            const {
+                data: { user },
+            } = await supabase.auth.getUser();
+            const checkoutUrl = user ? `${fallbackLink}?client_reference_id=${user.id}` : fallbackLink;
+            window.location.assign(checkoutUrl);
+        } catch (error: unknown) {
             console.error(error);
-            alert("Une erreur de redirection est survenue.");
+            alert(error instanceof Error ? error.message : 'Une erreur de redirection est survenue.');
             setLoadingTier(null);
         }
     };
@@ -59,8 +66,6 @@ export function UpgradeModal({ isOpen, onClose }: Props) {
     return (
         <div className="fixed inset-0 bg-[#0d1b35]/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
             <div className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl overflow-hidden relative flex flex-col max-h-[90vh]">
-
-                {/* Header */}
                 <div className="relative p-8 text-center bg-slate-50 border-b border-slate-100">
                     <button onClick={onClose} className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-700 bg-white rounded-full shadow-sm">
                         <X className="w-5 h-5" />
@@ -68,7 +73,7 @@ export function UpgradeModal({ isOpen, onClose }: Props) {
 
                     <div className="flex flex-col items-center py-6 bg-gradient-to-b from-slate-50 to-white rounded-t-2xl">
                         <Image
-                            src="/brand/netenpoche-icon-512.png"
+                            src="/brand/netenpoche-icon-1024.png"
                             alt="NetEnPoche Pro"
                             width={64}
                             height={64}
@@ -76,12 +81,11 @@ export function UpgradeModal({ isOpen, onClose }: Props) {
                             priority
                         />
                     </div>
-                    <h2 className="text-3xl font-bold font-syne text-[#0d1b35] mb-2">Passez au niveau supérieur</h2>
+                    <h2 className="text-3xl font-bold font-syne text-[#0d1b35] mb-2">Passez au niveau superieur</h2>
                     <p className="text-slate-500 max-w-lg mx-auto">
-                        Débloquez l'optimisation fiscale, le suivi client et gagnez des milliers d'euros chaque année.
+                        Debloquez l optimisation fiscale, le suivi client et gagnez des milliers d euros chaque annee.
                     </p>
 
-                    {/* Billing Toggle */}
                     <div className="flex items-center justify-center mt-6">
                         <div className="bg-white p-1 rounded-full border border-slate-200 shadow-sm inline-flex">
                             <button
@@ -100,20 +104,18 @@ export function UpgradeModal({ isOpen, onClose }: Props) {
                     </div>
                 </div>
 
-                {/* Pricing Grid */}
                 <div className="p-8 grid md:grid-cols-2 gap-8 overflow-y-auto">
-                    {/* Pro Plan */}
                     <div className="border border-slate-200 rounded-3xl p-6 relative bg-white hover:border-[#00c875] hover:shadow-lg transition">
                         <h3 className="text-xl font-bold font-syne text-[#0d1b35] mb-2">Pro</h3>
                         <div className="mb-4">
                             <span className="text-4xl font-black text-[#0d1b35]">
-                                {billing === 'monthly' ? '5€' : '50€'}
+                                {billing === 'monthly' ? '5â‚¬' : '50â‚¬'}
                             </span>
                             <span className="text-slate-500 font-medium">/{billing === 'monthly' ? 'mois' : 'an'}</span>
                         </div>
                         <ul className="space-y-3 mb-8">
-                            <li className="flex gap-3 text-slate-600"><CheckCircle2 className="w-5 h-5 text-[#00c875] shrink-0" /> Calculateur de net réel en temps réel</li>
-                            <li className="flex gap-3 text-slate-600"><CheckCircle2 className="w-5 h-5 text-[#00c875] shrink-0" /> Optimisation et simulation Impôt sur le Revenu</li>
+                            <li className="flex gap-3 text-slate-600"><CheckCircle2 className="w-5 h-5 text-[#00c875] shrink-0" /> Calculateur de net reel en temps reel</li>
+                            <li className="flex gap-3 text-slate-600"><CheckCircle2 className="w-5 h-5 text-[#00c875] shrink-0" /> Optimisation et simulation impot sur le revenu</li>
                             <li className="flex gap-3 text-slate-600"><CheckCircle2 className="w-5 h-5 text-[#00c875] shrink-0" /> Alertes intelligentes franchissement TVA</li>
                         </ul>
                         <button
@@ -121,11 +123,10 @@ export function UpgradeModal({ isOpen, onClose }: Props) {
                             disabled={loadingTier !== null}
                             className="w-full bg-[#162848] text-white py-4 rounded-xl font-bold hover:bg-[#0d1b35] transition flex items-center justify-center mt-auto"
                         >
-                            {loadingTier === 'pro' ? <Loader2 className="w-5 h-5 animate-spin" /> : "Sélectionner Pro"}
+                            {loadingTier === 'pro' ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Selectionner Pro'}
                         </button>
                     </div>
 
-                    {/* Expert Plan */}
                     <div className="border-2 border-[#00c875] rounded-3xl p-6 relative bg-gradient-to-b from-white to-[#00c875]/5 shadow-xl">
                         <div className="absolute top-0 right-6 -translate-y-1/2 bg-[#00c875] text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
                             Le plus populaire
@@ -133,33 +134,33 @@ export function UpgradeModal({ isOpen, onClose }: Props) {
                         <h3 className="text-xl font-bold font-syne text-[#0d1b35] mb-2">Expert</h3>
                         <div className="mb-4">
                             <span className="text-4xl font-black text-[#0d1b35]">
-                                {billing === 'monthly' ? '14€' : '140€'}
+                                {billing === 'monthly' ? '14â‚¬' : '140â‚¬'}
                             </span>
                             <span className="text-slate-500 font-medium">/{billing === 'monthly' ? 'mois' : 'an'}</span>
                         </div>
                         <ul className="space-y-3 mb-8">
                             <li className="flex gap-3 text-slate-900 font-medium"><CheckCircle2 className="w-5 h-5 text-[#00c875] shrink-0" /> Tout ce qui est inclus dans Pro</li>
-                            <li className="flex gap-3 text-slate-600"><CheckCircle2 className="w-5 h-5 text-[#00c875] shrink-0" /> Édition de factures conformes</li>
+                            <li className="flex gap-3 text-slate-600"><CheckCircle2 className="w-5 h-5 text-[#00c875] shrink-0" /> Edition de factures conformes</li>
                             <li className="flex gap-3 text-slate-600"><CheckCircle2 className="w-5 h-5 text-[#00c875] shrink-0" /> CRM Client</li>
-                            <li className="flex gap-3 text-slate-600"><CheckCircle2 className="w-5 h-5 text-[#00c875] shrink-0" /> Multi-activités complexes (Mixte BIC/BNC)</li>
+                            <li className="flex gap-3 text-slate-600"><CheckCircle2 className="w-5 h-5 text-[#00c875] shrink-0" /> Multi-activites complexes (Mixte BIC/BNC)</li>
                         </ul>
                         <button
                             onClick={() => handleCheckout('expert')}
                             disabled={loadingTier !== null}
                             className="w-full bg-[#00c875] text-white py-4 rounded-xl font-bold hover:bg-[#00c875]/90 transition flex items-center justify-center mt-auto shadow-lg shadow-[#00c875]/30"
                         >
-                            {loadingTier === 'expert' ? <Loader2 className="w-5 h-5 animate-spin" /> : "Sélectionner Expert"}
+                            {loadingTier === 'expert' ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Selectionner Expert'}
                         </button>
                     </div>
                 </div>
 
                 <div className="bg-slate-50 p-4 text-center border-t border-slate-100 flex flex-col items-center justify-center">
                     <span className="text-sm font-bold text-[#00c875] bg-[#00c875]/10 px-4 py-1.5 rounded-full mb-2">
-                        Essai gratuit 14 jours — aucune carte requise
+                        Essai gratuit 14 jours - aucune carte requise
                     </span>
                     <div className="flex space-x-4 text-xs text-slate-500">
-                        <span>🔒 Paiement sécurisé par Stripe</span>
-                        <span>•</span>
+                        <span>Paiement securise par Stripe</span>
+                        <span>â€¢</span>
                         <span>Annulation en un clic</span>
                     </div>
                 </div>
@@ -167,3 +168,4 @@ export function UpgradeModal({ isOpen, onClose }: Props) {
         </div>
     );
 }
+

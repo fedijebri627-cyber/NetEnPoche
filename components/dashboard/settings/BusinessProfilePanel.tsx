@@ -1,13 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { createBrowserClient } from '@/lib/supabase/client';
+import { useEffect, useState } from 'react';
 import { Building2, Save, Loader2, CheckCircle2 } from 'lucide-react';
 import { useSubscription } from '@/hooks/useSubscription';
 
 export function BusinessProfilePanel() {
-    const supabase = createBrowserClient();
-
     const { tier } = useSubscription();
     const [siret, setSiret] = useState('');
     const [businessName, setBusinessName] = useState('');
@@ -15,57 +12,71 @@ export function BusinessProfilePanel() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [businessFieldsReady, setBusinessFieldsReady] = useState(true);
 
     useEffect(() => {
         const loadProfile = async () => {
             try {
-                const { data: { user } } = await supabase.auth.getUser();
-                if (!user) { setLoading(false); return; }
+                setError(null);
+                const response = await fetch('/api/account/business-profile', { cache: 'no-store' });
+                const data = await response.json();
 
-                const { data, error } = await supabase
-                    .from('users')
-                    .select('siret, business_name, full_name')
-                    .eq('id', user.id)
-                    .single();
-
-                if (data && !error) {
-                    setSiret(data.siret || '');
-                    setBusinessName(data.business_name || '');
-                    setFullName(data.full_name || '');
+                if (!response.ok) {
+                    throw new Error(data.error || 'Impossible de charger le profil.');
                 }
-            } catch (e) {
-                console.error('Error loading profile:', e);
+
+                setSiret(data.siret || '');
+                setBusinessName(data.businessName || '');
+                setFullName(data.fullName || '');
+                setBusinessFieldsReady(data.businessFieldsReady !== false);
+            } catch (loadError: unknown) {
+                console.error('Error loading profile:', loadError);
+                setError(loadError instanceof Error ? loadError.message : 'Impossible de charger les informations de l entreprise.');
+            } finally {
+                setLoading(false);
             }
-            setLoading(false);
         };
-        loadProfile();
+
+        void loadProfile();
     }, []);
 
     const handleSave = async () => {
         setSaving(true);
         setSaved(false);
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+        setError(null);
 
-        const { error } = await supabase
-            .from('users')
-            .update({
-                siret: siret.trim() || null,
-                business_name: businessName.trim() || null,
-                full_name: fullName.trim() || null,
-            })
-            .eq('id', user.id);
+        try {
+            const response = await fetch('/api/account/business-profile', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    siret,
+                    businessName,
+                    fullName,
+                }),
+            });
 
-        setSaving(false);
-        if (!error) {
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.error || 'Erreur lors de la sauvegarde.');
+            }
+
+            setSiret(data.siret || '');
+            setBusinessName(data.businessName || '');
+            setFullName(data.fullName || '');
             setSaved(true);
             setTimeout(() => setSaved(false), 3000);
-        } else {
-            alert("Erreur lors de la sauvegarde.");
+        } catch (saveError: unknown) {
+            console.error('Error saving profile:', saveError);
+            setError(saveError instanceof Error ? saveError.message : 'Erreur lors de la sauvegarde.');
+        } finally {
+            setSaving(false);
         }
     };
 
-    // Format SIRET with spaces (XXX XXX XXX XXXXX)
     const handleSiretChange = (value: string) => {
         const digits = value.replace(/\D/g, '').slice(0, 14);
         setSiret(digits);
@@ -89,7 +100,6 @@ export function BusinessProfilePanel() {
 
     return (
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            {/* Header */}
             <div className="px-6 py-5 border-b border-slate-100 flex items-center gap-3">
                 <div className="p-2 bg-indigo-50 rounded-lg">
                     <Building2 className="w-5 h-5 text-indigo-500" />
@@ -105,9 +115,19 @@ export function BusinessProfilePanel() {
                 </div>
             </div>
 
-            {/* Form */}
             <div className="p-6 space-y-5">
-                {/* Full Name */}
+                {!businessFieldsReady && (
+                    <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+                        La base de donnees de production n a pas encore la migration SIRET / business_name. Cette section ne pourra pas etre sauvegardee tant que la migration Supabase ne sera pas appliquee.
+                    </div>
+                )}
+
+                {error && (
+                    <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+                        {error}
+                    </div>
+                )}
+
                 <div className="space-y-1.5">
                     <label className="text-sm font-medium text-slate-700" htmlFor="fullName">
                         Nom complet
@@ -118,11 +138,11 @@ export function BusinessProfilePanel() {
                         placeholder="Jean Dupont"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
+                        disabled={!businessFieldsReady}
+                        className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition disabled:opacity-60"
                     />
                 </div>
 
-                {/* Business Name */}
                 <div className="space-y-1.5">
                     <label className="text-sm font-medium text-slate-700" htmlFor="businessName">
                         Nom commercial <span className="text-slate-400 font-normal">(optionnel)</span>
@@ -133,14 +153,14 @@ export function BusinessProfilePanel() {
                         placeholder="Mon Entreprise"
                         value={businessName}
                         onChange={(e) => setBusinessName(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
+                        disabled={!businessFieldsReady}
+                        className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition disabled:opacity-60"
                     />
                 </div>
 
-                {/* SIRET */}
                 <div className="space-y-1.5">
                     <label className="text-sm font-medium text-slate-700" htmlFor="siret">
-                        Numéro SIRET <span className="text-slate-400 font-normal">(14 chiffres)</span>
+                        Numero SIRET <span className="text-slate-400 font-normal">(14 chiffres)</span>
                     </label>
                     <input
                         id="siret"
@@ -148,8 +168,9 @@ export function BusinessProfilePanel() {
                         placeholder="123 456 789 01234"
                         value={formatSiretDisplay(siret)}
                         onChange={(e) => handleSiretChange(e.target.value)}
-                        maxLength={17} /* 14 digits + 3 spaces */
-                        className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 font-mono tracking-wider focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
+                        disabled={!businessFieldsReady}
+                        maxLength={17}
+                        className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 font-mono tracking-wider focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition disabled:opacity-60"
                     />
                     {siret && siret.length > 0 && siret.length < 14 && (
                         <p className="text-xs text-amber-500 mt-1">
@@ -164,17 +185,15 @@ export function BusinessProfilePanel() {
                 </div>
             </div>
 
-            {/* Save Button */}
             <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-                {saved && (
+                {saved ? (
                     <span className="text-sm text-green-600 font-medium flex items-center gap-1.5">
-                        <CheckCircle2 className="w-4 h-4" /> Enregistré !
+                        <CheckCircle2 className="w-4 h-4" /> Enregistre
                     </span>
-                )}
-                {!saved && <span />}
+                ) : <span />}
                 <button
                     onClick={handleSave}
-                    disabled={saving}
+                    disabled={saving || !businessFieldsReady}
                     className="flex items-center gap-2 bg-[#162848] text-white px-5 py-2.5 rounded-xl font-medium hover:bg-[#0d1b35] transition disabled:opacity-50"
                 >
                     {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
@@ -184,3 +203,4 @@ export function BusinessProfilePanel() {
         </div>
     );
 }
+

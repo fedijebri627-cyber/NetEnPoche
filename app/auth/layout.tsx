@@ -1,12 +1,11 @@
 import React from 'react';
-import { Shield } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
     title: {
-        template: '%s — NetEnPoche',
+        template: '%s - NetEnPoche',
         default: 'Authentification',
     },
 };
@@ -14,11 +13,10 @@ export const metadata: Metadata = {
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
     return (
         <div className="min-h-screen bg-brand-navy flex flex-col items-center justify-center p-4 selection:bg-brand-green/30">
-
             <div className="mb-10 flex flex-col items-center">
                 <Link href="/" className="flex flex-col items-center group transition-transform hover:scale-105">
                     <Image
-                        src="/brand/netenpoche-icon-512.png"
+                        src="/brand/netenpoche-icon-1024.png"
                         alt="NetEnPoche"
                         width={80}
                         height={80}
@@ -41,8 +39,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             </div>
 
             <div className="mt-8 text-slate-400 text-sm">
-                &copy; {new Date().getFullYear()} NetEnPoche. Tous droits réservés.
+                &copy; {new Date().getFullYear()} NetEnPoche. Tous droits reserves.
             </div>
         </div>
     );
 }
+

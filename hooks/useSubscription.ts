@@ -2,68 +2,84 @@
 
 import { useEffect, useState } from 'react';
 import { createBrowserClient } from '@/lib/supabase/client';
-import { User } from '@supabase/supabase-js';
+import type { Session, User } from '@supabase/supabase-js';
+import {
+    getHighestSubscriptionTier,
+    normalizeSubscriptionTier,
+    type SubscriptionTier,
+} from '@/lib/account/profile';
 
 export type FeatureFlag = 'ir_estimator' | 'client_tracker' | 'pdf_export' | 'advanced_alerts';
 
 export function useSubscription() {
     const [user, setUser] = useState<User | null>(null);
-    const [tier, setTier] = useState<'free' | 'pro' | 'expert'>('free');
+    const [tier, setTier] = useState<SubscriptionTier>('free');
     const [fullName, setFullName] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [status, setStatus] = useState<string | null>(null);
 
     const supabase = createBrowserClient();
 
-    // Fetch tier and profile from the users table (source of truth)
-    async function fetchProfileFromDB(userId: string) {
+    async function fetchProfileFromApi() {
         try {
-            const { data } = await supabase
-                .from('users')
-                .select('subscription_tier, subscription_status, full_name')
-                .eq('id', userId)
-                .single();
-
-            if (data) {
-                setTier((data.subscription_tier as 'free' | 'pro' | 'expert') || 'free');
-                setStatus(data.subscription_status || null);
-                setFullName(data.full_name || null);
+            const response = await fetch('/api/account/profile', { cache: 'no-store' });
+            if (!response.ok) {
+                return;
             }
-        } catch (e) {
-            console.error('Error fetching profile:', e);
+
+            const data = await response.json();
+            setTier((currentTier) => getHighestSubscriptionTier(currentTier, data.tier));
+            setStatus(data.status || null);
+            setFullName(data.fullName || null);
+        } catch (error) {
+            console.error('Error fetching profile:', error);
         }
     }
 
     useEffect(() => {
-        async function loadSession() {
-            setLoading(true);
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session?.user) {
-                setUser(session.user);
-                // Set initial tier from metadata for speed, but fetch from DB for truth
-                setTier(session.user.user_metadata?.subscription_tier || 'free');
-                await fetchProfileFromDB(session.user.id);
-            }
-            setLoading(false);
-        }
-        loadSession();
+        let isMounted = true;
 
-        // Listen for auth changes
-        const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+        async function hydrate(sessionOverride?: Session | null) {
+            setLoading(true);
+            const session = sessionOverride ?? (await supabase.auth.getSession()).data.session;
+
+            if (!isMounted) {
+                return;
+            }
+
             if (session?.user) {
+                const sessionTier = normalizeSubscriptionTier(session.user.user_metadata?.subscription_tier);
                 setUser(session.user);
-                await fetchProfileFromDB(session.user.id);
+                setTier((currentTier) => getHighestSubscriptionTier(currentTier, sessionTier));
+                setFullName(
+                    typeof session.user.user_metadata?.full_name === 'string'
+                        ? session.user.user_metadata.full_name
+                        : null
+                );
+                await fetchProfileFromApi();
             } else {
                 setUser(null);
                 setTier('free');
                 setFullName(null);
+                setStatus(null);
             }
+
+            if (isMounted) {
+                setLoading(false);
+            }
+        }
+
+        void hydrate();
+
+        const { data: authListener } = supabase.auth.onAuthStateChange(async (_event: string, session: Session | null) => {
+            await hydrate(session);
         });
 
         return () => {
+            isMounted = false;
             authListener.subscription.unsubscribe();
         };
-    }, []);
+    }, [supabase]);
 
     const canAccess = (feature: FeatureFlag): boolean => {
         switch (feature) {
@@ -88,7 +104,9 @@ export function useSubscription() {
         isTrialing: status === 'trialing',
         isPro: tier === 'pro' || tier === 'expert',
         isExpert: tier === 'expert',
-        upgradeToPro: () => { /* Redirect logic placeholder */ },
-        manageBilling: () => { /* Redirect logic placeholder */ }
+        upgradeToPro: () => { },
+        manageBilling: () => { },
     };
 }
+
+

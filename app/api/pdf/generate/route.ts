@@ -1,49 +1,45 @@
 import { NextResponse } from 'next/server';
-import { renderToStream } from '@react-pdf/renderer';
+import { renderToStream, type DocumentProps } from '@react-pdf/renderer';
 import { BilanTemplate } from '@/lib/pdf/BilanTemplate';
 import { createServerClient } from '@/lib/supabase/server';
 import React from 'react';
+import { getBusinessAccountProfile } from '@/lib/account/profile';
 
 export async function POST(req: Request) {
     try {
         const supabase = await createServerClient();
-        const { data: { user } } = await supabase.auth.getUser();
+        const {
+            data: { user },
+        } = await supabase.auth.getUser();
 
         if (!user) return new NextResponse('Unauthorized', { status: 401 });
 
         const body = await req.json();
         const { entries, config } = body;
 
-        const isPro = user.user_metadata?.subscription_tier === 'pro' || user.user_metadata?.subscription_tier === 'expert';
+        const profile = await getBusinessAccountProfile(user);
+        const isPro = profile.subscription_tier === 'pro' || profile.subscription_tier === 'expert';
 
-        // Fetch SIRET and business name from the users table
-        const { data: profile } = await supabase
-            .from('users')
-            .select('siret, business_name, full_name')
-            .eq('id', user.id)
-            .single();
+        const document = React.createElement(BilanTemplate, {
+            entries,
+            config,
+            userMeta: {
+                name: profile.full_name || user.user_metadata?.full_name || 'Entrepreneur',
+                email: user.email || '',
+                siret: profile.siret || undefined,
+                businessName: profile.business_name || undefined,
+            },
+            isPro,
+        }) as unknown as React.ReactElement<DocumentProps>;
 
-        const stream = await renderToStream(
-            React.createElement(BilanTemplate, {
-                entries,
-                config,
-                userMeta: {
-                    name: profile?.full_name || user.user_metadata?.full_name || 'Entrepreneur',
-                    email: user.email || '',
-                    siret: profile?.siret || undefined,
-                    businessName: profile?.business_name || undefined,
-                },
-                isPro
-            }) as any
-        );
+        const stream = await renderToStream(document);
 
-        // Convert the Node stream to a Web ReadableStream
         const readableStream = new ReadableStream({
             start(controller) {
                 stream.on('data', (chunk) => controller.enqueue(chunk));
                 stream.on('end', () => controller.close());
-                stream.on('error', (err) => controller.error(err));
-            }
+                stream.on('error', (error) => controller.error(error));
+            },
         });
 
         const currentYear = new Date().getFullYear();
@@ -51,12 +47,11 @@ export async function POST(req: Request) {
         return new NextResponse(readableStream, {
             headers: {
                 'Content-Type': 'application/pdf',
-                'Content-Disposition': `attachment; filename="NetEnPoche-Bilan-${currentYear}.pdf"`
-            }
+                'Content-Disposition': `attachment; filename="NetEnPoche-Bilan-${currentYear}.pdf"`,
+            },
         });
-
-    } catch (e: any) {
-        console.error("PDF Gen Error", e);
+    } catch (error: unknown) {
+        console.error('PDF Gen Error', error);
         return NextResponse.json({ error: 'Failed to generate PDF' }, { status: 500 });
     }
 }

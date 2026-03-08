@@ -1,21 +1,19 @@
 import { NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
+import { ensureAccountProfile } from '@/lib/account/profile';
 
 export async function GET() {
     const supabase = await createServerClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    // Feature lock verification - Check DB for source of truth
-    const { data: dbUser } = await supabase
-        .from('users')
-        .select('subscription_tier')
-        .eq('id', user.id)
-        .single();
-
-    const tier = dbUser?.subscription_tier || user.user_metadata?.subscription_tier;
-    if (tier !== 'expert') return NextResponse.json({ error: 'Requires Expert tier' }, { status: 403 });
+    const profile = await ensureAccountProfile(user);
+    if (profile.subscription_tier !== 'expert') {
+        return NextResponse.json({ error: 'Requires Expert tier' }, { status: 403 });
+    }
 
     const { data, error } = await supabase
         .from('clients')
@@ -28,13 +26,16 @@ export async function GET() {
 
 export async function POST(req: Request) {
     const supabase = await createServerClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    // Feature lock verification
-    const tier = user.user_metadata?.subscription_tier;
-    if (tier !== 'expert') return NextResponse.json({ error: 'Requires Expert tier' }, { status: 403 });
+    const profile = await ensureAccountProfile(user);
+    if (profile.subscription_tier !== 'expert') {
+        return NextResponse.json({ error: 'Requires Expert tier' }, { status: 403 });
+    }
 
     const body = await req.json();
     const { name, type, email } = body;
@@ -50,3 +51,4 @@ export async function POST(req: Request) {
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     return NextResponse.json(data);
 }
+

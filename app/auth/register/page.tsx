@@ -2,11 +2,10 @@
 
 import { useState } from 'react'
 import { createBrowserClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import Image from 'next/image'
 import { Loader2, CheckCircle2 } from 'lucide-react'
-import type { Metadata } from 'next'
+import { createAppUrl, getBrowserAppUrl, sanitizeNextPath } from '@/lib/app-url'
 
 export default function RegisterPage() {
     const [fullName, setFullName] = useState('')
@@ -16,8 +15,9 @@ export default function RegisterPage() {
     const [loading, setLoading] = useState(false)
     const [success, setSuccess] = useState(false)
 
-    const router = useRouter()
+    const searchParams = useSearchParams()
     const supabase = createBrowserClient()
+    const nextPath = sanitizeNextPath(searchParams.get('next'))
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -31,7 +31,7 @@ export default function RegisterPage() {
                 data: {
                     full_name: fullName,
                 },
-                emailRedirectTo: `${window.location.origin}/auth/callback`,
+                emailRedirectTo: createAppUrl(`/auth/callback?next=${encodeURIComponent(nextPath)}`, getBrowserAppUrl()),
             }
         })
 
@@ -45,12 +45,17 @@ export default function RegisterPage() {
     }
 
     const handleGoogleLogin = async () => {
-        await supabase.auth.signInWithOAuth({
+        setError(null)
+        const { error: oauthError } = await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                redirectTo: `${window.location.origin}/auth/callback`,
+                redirectTo: createAppUrl(`/auth/callback?next=${encodeURIComponent(nextPath)}`, getBrowserAppUrl()),
             },
         })
+
+        if (oauthError) {
+            setError(oauthError.message)
+        }
     }
 
     if (success) {
@@ -59,9 +64,9 @@ export default function RegisterPage() {
                 <div className="bg-brand-green/10 p-4 rounded-full inline-flex items-center justify-center">
                     <CheckCircle2 className="w-12 h-12 text-brand-green" />
                 </div>
-                <h1 className="text-2xl font-bold font-syne text-slate-900 tracking-tight">Vérifiez vos emails !</h1>
+                <h1 className="text-2xl font-bold font-syne text-slate-900 tracking-tight">Verifiez vos emails</h1>
                 <p className="text-slate-500">
-                    Nous vous avons envoyé un lien magique pour valider votre inscription.
+                    Nous vous avons envoye un lien magique pour valider votre inscription.
                 </p>
             </div>
         )
@@ -70,8 +75,8 @@ export default function RegisterPage() {
     return (
         <div className="flex flex-col space-y-6">
             <div className="text-center space-y-2">
-                <h1 className="text-3xl font-bold font-syne text-slate-900 tracking-tight">Créer un compte</h1>
-                <p className="text-slate-500">Démarrez l'aventure NetEnPoche aujourd'hui.</p>
+                <h1 className="text-3xl font-bold font-syne text-slate-900 tracking-tight">Creer un compte</h1>
+                <p className="text-slate-500">Demarrez l aventure NetEnPoche aujourd hui.</p>
             </div>
 
             {error && (
@@ -91,7 +96,7 @@ export default function RegisterPage() {
                     <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
                     <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
                 </svg>
-                <span>S'inscrire avec Google</span>
+                <span>S&apos;inscrire avec Google</span>
             </button>
 
             <div className="relative">
@@ -135,14 +140,14 @@ export default function RegisterPage() {
                     <input
                         id="password"
                         type="password"
-                        placeholder="••••••••"
+                        placeholder="Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
                         minLength={8}
                         className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition"
                     />
-                    <p className="text-xs text-slate-500">8 caractères minimum.</p>
+                    <p className="text-xs text-slate-500">8 caracteres minimum.</p>
                 </div>
 
                 <div className="pt-2 flex flex-col items-center space-y-3">
@@ -151,19 +156,20 @@ export default function RegisterPage() {
                         disabled={loading}
                         className="w-full flex items-center justify-center bg-brand-green text-white font-medium py-3 rounded-xl hover:bg-brand-green/90 transition disabled:opacity-70 disabled:cursor-not-allowed active:scale-[0.98]"
                     >
-                        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Commencer l'essai gratuit"}
+                        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Commencer l essai gratuit'}
                     </button>
 
                     <span className="text-xs font-medium text-brand-green bg-brand-green/10 px-3 py-1 rounded-full">
-                        Essai gratuit 14 jours — aucune carte requise
+                        Essai gratuit 14 jours - aucune carte requise
                     </span>
                 </div>
             </form>
 
             <p className="text-center text-sm text-slate-500">
-                Vous avez déjà un compte ?{' '}
+                Vous avez deja un compte ?{' '}
                 <Link href="/auth/login" className="text-brand-green hover:underline font-medium">Se connecter</Link>
             </p>
         </div>
     )
 }
+

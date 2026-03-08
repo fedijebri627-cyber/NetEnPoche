@@ -2,11 +2,10 @@
 
 import { useState } from 'react'
 import { createBrowserClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import Image from 'next/image'
 import { Loader2 } from 'lucide-react'
-import type { Metadata } from 'next'
+import { createAppUrl, getBrowserAppUrl, sanitizeNextPath } from '@/lib/app-url'
 
 export default function LoginPage() {
     const [email, setEmail] = useState('')
@@ -15,14 +14,16 @@ export default function LoginPage() {
     const [loading, setLoading] = useState(false)
 
     const router = useRouter()
+    const searchParams = useSearchParams()
     const supabase = createBrowserClient()
+    const nextPath = sanitizeNextPath(searchParams.get('next'))
+    const oauthError = searchParams.get('error')
 
     const handleEmailLogin = async (e: React.FormEvent) => {
         e.preventDefault()
         setLoading(true)
         setError(null)
 
-        // Supabase Auth SignIn
         const { error: signInError } = await supabase.auth.signInWithPassword({
             email,
             password,
@@ -32,27 +33,37 @@ export default function LoginPage() {
             setError(signInError.message)
             setLoading(false)
         } else {
-            router.push('/dashboard')
+            router.push(nextPath)
             router.refresh()
         }
     }
 
     const handleGoogleLogin = async () => {
-        // Implement Google OAuth
-        await supabase.auth.signInWithOAuth({
+        setError(null)
+        const { error: oauthLoginError } = await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                redirectTo: `${window.location.origin}/auth/callback`,
+                redirectTo: createAppUrl(`/auth/callback?next=${encodeURIComponent(nextPath)}`, getBrowserAppUrl()),
             },
         })
+
+        if (oauthLoginError) {
+            setError(oauthLoginError.message)
+        }
     }
 
     return (
         <div className="flex flex-col space-y-6">
             <div className="text-center space-y-2">
                 <h1 className="text-3xl font-bold font-syne text-slate-900 tracking-tight">Bienvenue</h1>
-                <p className="text-slate-500">Connectez-vous pour accéder à votre espace</p>
+                <p className="text-slate-500">Connectez-vous pour acceder a votre espace</p>
             </div>
+
+            {oauthError === 'oauth_callback' && !error && (
+                <div className="bg-amber-50 text-amber-700 text-sm p-3 rounded-lg border border-amber-100 flex items-center justify-center text-center">
+                    La connexion Google a echoue. Verifiez les URL de redirection Google et Supabase puis reessayez.
+                </div>
+            )}
 
             {error && (
                 <div className="bg-red-50 text-red-600 text-sm p-3 rounded-lg border border-red-100 flex items-center justify-center">
@@ -61,6 +72,7 @@ export default function LoginPage() {
             )}
 
             <button
+                type="button"
                 onClick={handleGoogleLogin}
                 className="w-full flex items-center justify-center space-x-2 bg-white border border-slate-200 text-slate-700 py-3 rounded-xl font-medium hover:bg-slate-50 transition active:scale-[0.98]"
             >
@@ -99,12 +111,12 @@ export default function LoginPage() {
                 <div className="space-y-1">
                     <div className="flex items-center justify-between">
                         <label className="text-sm font-medium text-slate-700" htmlFor="password">Mot de passe</label>
-                        <Link href="/auth/forgot" className="text-sm text-brand-green hover:underline">Mot de passe oublié ?</Link>
+                        <Link href="/auth/forgot" className="text-sm text-brand-green hover:underline">Mot de passe oublie ?</Link>
                     </div>
                     <input
                         id="password"
                         type="password"
-                        placeholder="••••••••"
+                        placeholder="Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
@@ -123,8 +135,9 @@ export default function LoginPage() {
 
             <p className="text-center text-sm text-slate-500">
                 Pas encore de compte ?{' '}
-                <Link href="/auth/register" className="text-brand-green hover:underline font-medium">S'inscrire</Link>
+                <Link href="/auth/register" className="text-brand-green hover:underline font-medium">S&apos;inscrire</Link>
             </p>
         </div>
     )
 }
+
