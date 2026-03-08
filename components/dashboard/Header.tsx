@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Shield } from 'lucide-react';
+import Image from 'next/image';
 import { useSubscription } from '@/hooks/useSubscription';
 import { ProfileDropdown } from './ProfileDropdown';
 
@@ -22,11 +22,15 @@ export function Header() {
     return (
         <header className="sticky top-0 z-50 h-[62px] bg-[#0d1b35] text-white flex items-center justify-between px-6 shadow-md">
             {/* Logo */}
-            <Link href="/dashboard" className="flex items-center space-x-2">
-                <div className="bg-[#00c875]/20 p-1.5 rounded-lg">
-                    <Shield className="w-5 h-5 text-[#00c875]" />
-                </div>
-                <span className="font-syne font-bold text-lg tracking-tight">NetEnPoche</span>
+            <Link href="/dashboard" className="flex items-center">
+                <Image
+                    src="/brand/netenpoche-logo-horizontal.png"
+                    alt="NetEnPoche"
+                    width={180}
+                    height={46}
+                    priority
+                    className="h-9 w-auto"
+                />
             </Link>
 
             {/* Center Year Selector */}

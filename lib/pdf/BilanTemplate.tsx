@@ -1,4 +1,4 @@
-import { Page, Text, View, Document, StyleSheet, Svg, Rect, Line, G } from '@react-pdf/renderer';
+import { Page, Text, View, Document, StyleSheet, Svg, Rect, Line, G, Image } from '@react-pdf/renderer';
 import { ActivityConfig, MonthlyEntry } from '@/contexts/DashboardContext';
 import { calculateUrssaf, calculateIR } from '@/lib/calculations';
 
@@ -103,7 +103,13 @@ export const BilanTemplate = ({ entries, config, userMeta, isPro }: BilanTemplat
         <Document>
             {/* ============= PAGE 1: SUMMARY + DETAIL ============= */}
             <Page size="A4" style={s.page}>
-                <Text style={s.pageTitle}>NetEnPoche - Bilan Financier Annuel</Text>
+                <View style={{ alignItems: 'center', marginBottom: 20 }}>
+                    <Image
+                        src="/public/brand/netenpoche-icon-512.png"
+                        style={{ width: 60, height: 60, borderRadius: 12, marginBottom: 10 }}
+                    />
+                    <Text style={{ fontSize: 24, fontFamily: 'Helvetica-Bold', color: '#0d1b35' }}>NetEnPoche</Text>
+                </View>
 
                 {/* User Info */}
                 <Text style={s.sectionTitle}>Bilan Financier Annuel</Text>

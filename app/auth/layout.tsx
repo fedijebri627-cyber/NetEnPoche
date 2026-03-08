@@ -1,17 +1,30 @@
 import React from 'react';
 import { Shield } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
     return (
         <div className="min-h-screen bg-brand-navy flex flex-col items-center justify-center p-4 selection:bg-brand-green/30">
 
-            <div className="mb-8 flex items-center justify-center space-x-2">
-                <Link href="/" className="flex items-center space-x-2 group">
-                    <div className="bg-brand-green/10 p-2 rounded-xl group-hover:bg-brand-green/20 transition">
-                        <Shield className="w-8 h-8 text-brand-green" />
-                    </div>
-                    <span className="text-2xl font-bold font-syne text-white tracking-tight">NetEnPoche</span>
+            <div className="mb-10 flex flex-col items-center">
+                <Link href="/" className="flex flex-col items-center group transition-transform hover:scale-105">
+                    <Image
+                        src="/brand/netenpoche-icon-512.png"
+                        alt="NetEnPoche"
+                        width={80}
+                        height={80}
+                        className="rounded-2xl shadow-2xl shadow-green-500/20 mb-4"
+                        priority
+                    />
+                    <Image
+                        src="/brand/netenpoche-logo-horizontal.png"
+                        alt="NetEnPoche"
+                        width={200}
+                        height={52}
+                        className="h-10 w-auto"
+                        priority
+                    />
                 </Link>
             </div>
 

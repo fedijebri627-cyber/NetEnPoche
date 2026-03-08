@@ -4,7 +4,13 @@ import { useState } from 'react'
 import { createBrowserClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Loader2, CheckCircle2 } from 'lucide-react'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+    title: 'Créer un compte',
+}
 
 export default function RegisterPage() {
     const [fullName, setFullName] = useState('')

@@ -17,8 +17,46 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "NetEnPoche - L'assistant financier des auto-entrepreneurs",
-  description: "Calculez vos cotisations URSSAF et votre impôt sur le revenu en un clic.",
+  title: {
+    template: '%s — NetEnPoche',
+    default: 'NetEnPoche — Calculateur URSSAF, TVA et Impôts',
+  },
+  description: "Calculez votre net en poche après URSSAF, TVA et impôts en temps réel. Gratuit pour les micro-entrepreneurs français.",
+  metadataBase: new URL('https://netenpoche.fr'),
+  icons: {
+    icon: '/brand/netenpoche-favicon-32.png',
+    apple: '/brand/netenpoche-apple-touch.png',
+    shortcut: '/brand/netenpoche-favicon-32.png',
+  },
+  manifest: '/manifest.json',
+  openGraph: {
+    title: 'NetEnPoche — Calculateur URSSAF, TVA et Impôts',
+    description: 'Calculez votre net en poche après URSSAF, TVA et impôts en temps réel. Gratuit pour les micro-entrepreneurs français.',
+    url: 'https://netenpoche.fr',
+    siteName: 'NetEnPoche',
+    images: [
+      {
+        url: '/brand/netenpoche-og-image.png',
+        width: 1200,
+        height: 630,
+      },
+    ],
+    locale: 'fr_FR',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'NetEnPoche — Combien vous gardez vraiment ?',
+    description: 'Calculateur URSSAF, TVA et impôts pour auto-entrepreneurs français.',
+    images: ['/brand/netenpoche-og-image.png'],
+  },
+  other: {
+    'theme-color': '#0b1730',
+    'mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'black-translucent',
+    'apple-mobile-web-app-title': 'NetEnPoche',
+  },
 };
 
 export default function RootLayout({

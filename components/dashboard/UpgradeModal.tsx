@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { X, CheckCircle2, Loader2, Sparkles } from 'lucide-react';
+import Image from 'next/image';
 import { createBrowserClient } from '@/lib/supabase/client';
 
 interface Props {
@@ -65,8 +66,15 @@ export function UpgradeModal({ isOpen, onClose }: Props) {
                         <X className="w-5 h-5" />
                     </button>
 
-                    <div className="inline-flex items-center justify-center p-3 bg-[#00c875]/10 rounded-2xl mb-4">
-                        <Sparkles className="w-8 h-8 text-[#00c875]" />
+                    <div className="flex flex-col items-center py-6 bg-gradient-to-b from-slate-50 to-white rounded-t-2xl">
+                        <Image
+                            src="/brand/netenpoche-icon-512.png"
+                            alt="NetEnPoche Pro"
+                            width={64}
+                            height={64}
+                            className="rounded-2xl shadow-xl shadow-green-500/30 mb-3"
+                            priority
+                        />
                     </div>
                     <h2 className="text-3xl font-bold font-syne text-[#0d1b35] mb-2">Passez au niveau supérieur</h2>
                     <p className="text-slate-500 max-w-lg mx-auto">

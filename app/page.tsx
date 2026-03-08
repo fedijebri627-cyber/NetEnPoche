@@ -1,23 +1,15 @@
 /* eslint-disable react/no-unescaped-entities */
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import Script from 'next/script';
 import { FAQSection } from '@/components/landing/FAQSection';
 import { PricingSection } from '@/components/landing/PricingSection';
 import './landing.css';
 
 export const metadata: Metadata = {
-  title: 'NetEnPoche — Calculateur URSSAF, TVA et Impôts pour Auto-Entrepreneurs',
+  title: 'Calculateur URSSAF, TVA et Impôts pour Auto-Entrepreneurs',
   description: 'Calculez votre net en poche après URSSAF, TVA et impôts en temps réel. Gratuit pour les micro-entrepreneurs français. Alertes, bilan PDF, estimateur IR.',
-  openGraph: {
-    title: 'NetEnPoche — Calculateur URSSAF, TVA et Impôts pour Auto-Entrepreneurs',
-    description: 'Calculez votre net en poche après URSSAF, TVA et impôts en temps réel. Gratuit pour les micro-entrepreneurs français. Alertes, bilan PDF, estimateur IR.',
-    url: 'https://netenpoche.fr',
-    images: [{ url: 'https://netenpoche.fr/og-image.png' }],
-  },
-  alternates: {
-    canonical: 'https://netenpoche.fr',
-  }
 };
 
 export default function LandingPage() {
@@ -46,8 +38,14 @@ export default function LandingPage() {
       {/* NAV */}
       <nav className="landing-nav">
         <Link href="/" className="nav-logo">
-          <span className="nav-logo-dot" />
-          NetEnPoche
+          <Image
+            src="/brand/netenpoche-logo-horizontal.png"
+            alt="NetEnPoche"
+            width={200}
+            height={52}
+            priority
+            className="h-10 w-auto"
+          />
         </Link>
         <div className="nav-links">
           <a href="#features" className="nav-link">Fonctionnalités</a>
@@ -81,10 +79,21 @@ export default function LandingPage() {
           <div className="preview-glow"></div>
           <div className="preview-frame">
             <div className="preview-bar">
-              <div className="preview-dot" style={{ background: '#ff5f57' }} />
-              <div className="preview-dot" style={{ background: '#ffbd2e' }} />
-              <div className="preview-dot" style={{ background: '#28c840' }} />
-              <span style={{ marginLeft: 12, fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>netenpoche.fr — Simulateur URSSAF 2026</span>
+              <div className="flex gap-1.5 px-4">
+                <div className="w-3 h-3 rounded-full bg-[#ff5f57]" />
+                <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
+                <div className="w-3 h-3 rounded-full bg-[#28c840]" />
+                <Image
+                  src="/brand/netenpoche-favicon-32.png"
+                  alt=""
+                  width={16}
+                  height={16}
+                  className="ml-2 rounded-sm opacity-70"
+                />
+                <span className="text-xs text-white/30 ml-1">
+                  netenpoche.fr — Tableau de bord 2026
+                </span>
+              </div>
             </div>
             <div className="preview-content">
               <div className="preview-kpi">

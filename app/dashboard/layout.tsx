@@ -2,6 +2,11 @@ import { Header } from '@/components/dashboard/Header';
 import { Tabs } from '@/components/dashboard/Tabs';
 import { OfflineBanner } from '@/components/dashboard/OfflineBanner';
 import { Toaster } from 'sonner';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+    title: 'Tableau de Bord 2026',
+};
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     return (
