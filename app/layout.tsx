@@ -1,4 +1,4 @@
-﻿import type { Metadata } from 'next';
+import type { Metadata } from 'next';
 import { Syne, DM_Sans } from 'next/font/google';
 import Script from 'next/script';
 import { CookieBanner } from '@/components/global/CookieBanner';
@@ -69,6 +69,9 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  verification: {
+    google: 'gvmIkCjUPyqOS58IJ_J12s-W05ZaZwy-tevTC2pCqhc',
+  },
   category: 'finance',
   creator: 'NetEnPoche',
   publisher: 'NetEnPoche',
@@ -89,6 +92,7 @@ export default function RootLayout({
   return (
     <html lang="fr" className={`${syne.variable} ${dmSans.variable}`}>
       <head>
+        <meta name="google-site-verification" content="gvmIkCjUPyqOS58IJ_J12s-W05ZaZwy-tevTC2pCqhc" />
         <Script defer data-domain="netenpoche.fr" src="https://plausible.io/js/script.js" strategy="afterInteractive" />
       </head>
       <body className="bg-slate-50 font-sans text-slate-900 antialiased">
@@ -98,4 +102,5 @@ export default function RootLayout({
     </html>
   );
 }
+
 
