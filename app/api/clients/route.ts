@@ -7,8 +7,14 @@ export async function GET() {
 
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    // Feature lock verification
-    const tier = user.user_metadata?.subscription_tier;
+    // Feature lock verification - Check DB for source of truth
+    const { data: dbUser } = await supabase
+        .from('users')
+        .select('subscription_tier')
+        .eq('id', user.id)
+        .single();
+
+    const tier = dbUser?.subscription_tier || user.user_metadata?.subscription_tier;
     if (tier !== 'expert') return NextResponse.json({ error: 'Requires Expert tier' }, { status: 403 });
 
     const { data, error } = await supabase

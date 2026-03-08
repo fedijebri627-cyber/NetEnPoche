@@ -39,7 +39,7 @@ export function BusinessProfilePanel() {
             setLoading(false);
         };
         loadProfile();
-    }, [supabase]);
+    }, []);
 
     const handleSave = async () => {
         setSaving(true);

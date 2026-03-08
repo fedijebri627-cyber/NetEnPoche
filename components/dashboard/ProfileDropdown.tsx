@@ -5,20 +5,16 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { User as UserIcon, Settings, LogOut, ChevronDown } from 'lucide-react';
 import { createBrowserClient } from '@/lib/supabase/client';
+import { useSubscription } from '@/hooks/useSubscription';
 
 export function ProfileDropdown() {
     const [open, setOpen] = useState(false);
-    const [email, setEmail] = useState<string | null>(null);
+    const { fullName, user, loading } = useSubscription();
     const ref = useRef<HTMLDivElement>(null);
     const router = useRouter();
 
-    // Fetch user email on mount
-    useEffect(() => {
-        const supabase = createBrowserClient();
-        supabase.auth.getUser().then(({ data }) => {
-            setEmail(data.user?.email ?? null);
-        });
-    }, []);
+    const email = user?.email || null;
+    const displayName = fullName || email || '...';
 
     // Close dropdown on outside click
     useEffect(() => {
@@ -59,7 +55,7 @@ export function ProfileDropdown() {
                             </div>
                             <div className="overflow-hidden">
                                 <p className="text-xs text-slate-400 leading-tight">Connecté en tant que</p>
-                                <p className="text-sm font-medium text-white truncate">{email ?? '...'}</p>
+                                <p className="text-sm font-medium text-white truncate">{displayName}</p>
                             </div>
                         </div>
                     </div>

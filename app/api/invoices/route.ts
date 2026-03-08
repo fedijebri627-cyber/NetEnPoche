@@ -6,7 +6,16 @@ export async function GET(req: Request) {
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    if (user.user_metadata?.subscription_tier !== 'expert') return NextResponse.json({ error: 'Expert tier required' }, { status: 403 });
+
+    // Check DB for truth
+    const { data: dbUser } = await supabase
+        .from('users')
+        .select('subscription_tier')
+        .eq('id', user.id)
+        .single();
+
+    const tier = dbUser?.subscription_tier || user.user_metadata?.subscription_tier;
+    if (tier !== 'expert') return NextResponse.json({ error: 'Expert tier required' }, { status: 403 });
 
     const { searchParams } = new URL(req.url);
     const year = searchParams.get('year') || new Date().getFullYear().toString();
@@ -26,7 +35,16 @@ export async function POST(req: Request) {
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    if (user.user_metadata?.subscription_tier !== 'expert') return NextResponse.json({ error: 'Expert tier required' }, { status: 403 });
+
+    // Check DB for truth
+    const { data: dbUserPost } = await supabase
+        .from('users')
+        .select('subscription_tier')
+        .eq('id', user.id)
+        .single();
+
+    const tierPost = dbUserPost?.subscription_tier || user.user_metadata?.subscription_tier;
+    if (tierPost !== 'expert') return NextResponse.json({ error: 'Expert tier required' }, { status: 403 });
 
     const body = await req.json();
     const { client_id, amount_ht, invoice_date, due_date, status } = body;
