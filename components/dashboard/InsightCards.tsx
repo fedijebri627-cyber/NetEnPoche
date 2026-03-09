@@ -201,7 +201,12 @@ export function NetChangeExplainerCard() {
 export function MultiYearReviewCard() {
     const { year } = useDashboard();
     const [history, setHistory] = useState<MultiYearSummary[]>([]);
+    const [selectedYear, setSelectedYear] = useState<number>(year);
     const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        setSelectedYear(year);
+    }, [year]);
 
     useEffect(() => {
         const fetchHistory = async () => {
@@ -222,53 +227,85 @@ export function MultiYearReviewCard() {
         void fetchHistory();
     }, [year]);
 
+    const availableYears = useMemo(
+        () => [...new Set(history.map((item) => item.year))].sort((a, b) => b - a),
+        [history]
+    );
+
+    useEffect(() => {
+        if (availableYears.length > 0 && !availableYears.includes(selectedYear)) {
+            setSelectedYear(availableYears[0]);
+        }
+    }, [availableYears, selectedYear]);
+
+    const selectedSummary = useMemo(
+        () => history.find((item) => item.year === selectedYear) ?? history[0] ?? null,
+        [history, selectedYear]
+    );
+
     if (loading) return <div className="animate-pulse h-80 rounded-3xl bg-slate-100" />;
 
     return (
         <FeatureLock featureName="Historique multi-annees" requiredTier="pro">
             <div className="h-full rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-                <div className="flex items-center justify-between gap-4 mb-5">
+                <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                         <h3 className="flex items-center gap-2 text-lg font-bold font-syne text-[#0d1b35]">
                             <BarChart3 className="h-5 w-5 text-indigo-500" />
                             Revue multi-annees
                         </h3>
-                        <p className="mt-1 text-sm text-slate-500">Comparez votre rythme de croissance, votre net et votre objectif sur plusieurs exercices.</p>
+                        <p className="mt-1 text-sm text-slate-500">Consultez un exercice a la fois et basculez rapidement entre les annees disponibles.</p>
                     </div>
-                    {loading && <Loader2 className="h-5 w-5 animate-spin text-slate-400" />}
+                    <div className="flex items-center gap-3">
+                        {loading && <Loader2 className="h-5 w-5 animate-spin text-slate-400" />}
+                        <select
+                            value={selectedSummary?.year ?? ''}
+                            onChange={(event) => setSelectedYear(Number(event.target.value))}
+                            className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+                        >
+                            {availableYears.map((availableYear) => (
+                                <option key={availableYear} value={availableYear}>
+                                    Exercice {availableYear}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
 
-                <div className="space-y-3">
-                    {history.map((item) => (
-                        <div key={item.year} className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                            <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                                <div>
-                                    <div className="text-lg font-bold font-syne text-[#0d1b35]">Exercice {item.year}</div>
-                                    <div className="text-sm text-slate-500">CA {formatCurrency(item.totalCA)} - Net {formatCurrency(item.netReel)}</div>
-                                </div>
-                                <div className="text-sm font-semibold text-slate-600">
-                                    {item.goal && item.goalProgress !== null
-                                        ? `Objectif ${(item.goalProgress * 100).toFixed(0)}%`
-                                        : 'Sans objectif annuel'}
-                                </div>
+                {!selectedSummary ? (
+                    <div className="rounded-2xl border border-slate-100 bg-slate-50 p-6 text-sm text-slate-500">
+                        Aucun historique disponible pour le moment.
+                    </div>
+                ) : (
+                    <div className="rounded-2xl border border-slate-100 bg-slate-50 p-5">
+                        <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <div className="text-lg font-bold font-syne text-[#0d1b35]">Exercice {selectedSummary.year}</div>
+                                <div className="text-sm text-slate-500">CA {formatCurrency(selectedSummary.totalCA)} - Net {formatCurrency(selectedSummary.netReel)}</div>
                             </div>
-                            <div className="grid gap-3 sm:grid-cols-3">
-                                <div className="rounded-xl bg-white p-3">
-                                    <div className="text-xs uppercase tracking-wide text-slate-500">URSSAF</div>
-                                    <div className="mt-1 font-bold text-slate-800">{formatCurrency(item.urssaf)}</div>
-                                </div>
-                                <div className="rounded-xl bg-white p-3">
-                                    <div className="text-xs uppercase tracking-wide text-slate-500">IR estime</div>
-                                    <div className="mt-1 font-bold text-slate-800">{formatCurrency(item.ir)}</div>
-                                </div>
-                                <div className="rounded-xl bg-white p-3">
-                                    <div className="text-xs uppercase tracking-wide text-slate-500">CFE</div>
-                                    <div className="mt-1 font-bold text-slate-800">{formatCurrency(item.cfe)}</div>
-                                </div>
+                            <div className="text-sm font-semibold text-slate-600">
+                                {selectedSummary.goal && selectedSummary.goalProgress !== null
+                                    ? `Objectif ${(selectedSummary.goalProgress * 100).toFixed(0)}%`
+                                    : 'Sans objectif annuel'}
                             </div>
                         </div>
-                    ))}
-                </div>
+
+                        <div className="grid gap-3 sm:grid-cols-3">
+                            <div className="rounded-xl bg-white p-4">
+                                <div className="text-xs uppercase tracking-wide text-slate-500">URSSAF</div>
+                                <div className="mt-1 font-bold text-slate-800">{formatCurrency(selectedSummary.urssaf)}</div>
+                            </div>
+                            <div className="rounded-xl bg-white p-4">
+                                <div className="text-xs uppercase tracking-wide text-slate-500">IR estime</div>
+                                <div className="mt-1 font-bold text-slate-800">{formatCurrency(selectedSummary.ir)}</div>
+                            </div>
+                            <div className="rounded-xl bg-white p-4">
+                                <div className="text-xs uppercase tracking-wide text-slate-500">CFE</div>
+                                <div className="mt-1 font-bold text-slate-800">{formatCurrency(selectedSummary.cfe)}</div>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </FeatureLock>
     );
