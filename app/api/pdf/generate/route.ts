@@ -3,7 +3,7 @@ import { renderToStream, type DocumentProps } from '@react-pdf/renderer';
 import { BilanTemplate } from '@/lib/pdf/BilanTemplate';
 import { createServerClient } from '@/lib/supabase/server';
 import React from 'react';
-import { getBusinessAccountProfile } from '@/lib/account/profile';
+import { resolveBusinessAccountProfileWithSessionClient } from '@/lib/account/profile';
 
 export async function POST(req: Request) {
     try {
@@ -17,7 +17,7 @@ export async function POST(req: Request) {
         const body = await req.json();
         const { entries, config } = body;
 
-        const profile = await getBusinessAccountProfile(user);
+        const profile = await resolveBusinessAccountProfileWithSessionClient(supabase, user);
         const isPro = profile.subscription_tier === 'pro' || profile.subscription_tier === 'expert';
 
         const document = React.createElement(BilanTemplate, {

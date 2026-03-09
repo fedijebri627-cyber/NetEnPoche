@@ -2,7 +2,7 @@
 
 import { Download, FileText, ArrowRight, Building2 } from 'lucide-react';
 import { useDashboard } from '@/contexts/DashboardContext';
-import { calculateUrssaf } from '@/lib/calculations';
+import { calculateCompositeNetBreakdown } from '@/lib/dashboard-insights';
 import { useState } from 'react';
 import { useSubscription } from '@/hooks/useSubscription';
 import { UpgradeModal } from './UpgradeModal';
@@ -14,19 +14,19 @@ export function TableActions() {
     const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
     const generateCSV = () => {
-        let csvContent = "data:text/csv;charset=utf-8,";
-        csvContent += "Mois,CA Encaissé (€),URSSAF Estimé (€)\n";
+        let csvContent = 'data:text/csv;charset=utf-8,';
+        csvContent += 'Mois,CA Encaisse (EUR),URSSAF Estime (EUR),Net Estime (EUR)\n';
 
         const sortedEntries = [...entries].sort((a, b) => a.month - b.month);
-        sortedEntries.forEach(entry => {
-            const urssaf = calculateUrssaf(entry.ca_amount, config.activity_type, config.acre_enabled);
-            csvContent += `${entry.month},${entry.ca_amount},${urssaf.toFixed(2)}\n`;
+        sortedEntries.forEach((entry) => {
+            const breakdown = calculateCompositeNetBreakdown(entry.ca_amount, config);
+            csvContent += `${entry.month},${entry.ca_amount},${breakdown.urssaf.toFixed(2)},${breakdown.netReel.toFixed(2)}\n`;
         });
 
         const encodedUri = encodeURI(csvContent);
-        const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", `netenpoche_export_${year}.csv`);
+        const link = document.createElement('a');
+        link.setAttribute('href', encodedUri);
+        link.setAttribute('download', `netenpoche_export_${year}.csv`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -38,15 +38,18 @@ export function TableActions() {
             const response = await fetch('/api/pdf/generate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ entries, config })
+                body: JSON.stringify({ entries, config }),
             });
 
-            if (!response.ok) throw new Error('Erreur de génération PDF');
+            if (!response.ok) {
+                const payload = await response.json().catch(() => null);
+                throw new Error(payload?.error || 'Erreur de generation PDF');
+            }
 
             const arrayBuffer = await response.arrayBuffer();
             const bytes = new Uint8Array(arrayBuffer);
             let binary = '';
-            for (let i = 0; i < bytes.byteLength; i++) {
+            for (let i = 0; i < bytes.byteLength; i += 1) {
                 binary += String.fromCharCode(bytes[i]);
             }
             const base64 = window.btoa(binary);
@@ -58,7 +61,7 @@ export function TableActions() {
             link.click();
         } catch (error) {
             console.error(error);
-            alert("Erreur lors de la génération du PDF.");
+            alert(error instanceof Error ? error.message : 'Erreur lors de la generation du PDF.');
         } finally {
             setIsGenerating(false);
         }
@@ -80,11 +83,11 @@ export function TableActions() {
                 className="w-full sm:w-auto flex items-center justify-center space-x-2 bg-white border border-slate-200 text-slate-700 px-6 py-3 rounded-xl hover:bg-slate-50 hover:border-slate-300 transition font-medium shadow-sm active:scale-[0.98] disabled:opacity-50"
             >
                 <FileText className="w-4 h-4" />
-                <span>{isGenerating ? 'Génération...' : `Bilan PDF (${tier === 'free' ? 'Basique' : 'Complet'})`}</span>
+                <span>{isGenerating ? 'Generation...' : `Bilan PDF (${tier === 'free' ? 'Basique' : 'Complet'})`}</span>
             </button>
 
             <button
-                onClick={() => window.location.href = '/dashboard/settings'}
+                onClick={() => { window.location.href = '/dashboard/settings'; }}
                 className="w-full sm:w-auto flex items-center justify-center space-x-2 bg-white border border-slate-200 text-slate-500 px-6 py-3 rounded-xl hover:bg-slate-50 hover:text-slate-700 transition font-medium shadow-sm active:scale-[0.98]"
             >
                 <Building2 className="w-4 h-4" />

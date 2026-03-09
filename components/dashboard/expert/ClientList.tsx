@@ -27,70 +27,70 @@ export function ClientList({ clients }: ClientListProps) {
 
     if (clients.length === 0) {
         return (
-            <div className="bg-white border border-slate-200 rounded-3xl p-8 text-center">
-                <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <Activity className="w-6 h-6 text-slate-400" />
+            <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center">
+                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100">
+                    <Activity className="h-6 w-6 text-slate-400" />
                 </div>
                 <h3 className="font-bold text-slate-800">Aucun client</h3>
-                <p className="text-slate-500 text-sm mt-1">Ajoutez votre premier client pour commencer le tracking.</p>
+                <p className="mt-1 text-sm text-slate-500">Ajoutez votre premier client pour commencer le tracking.</p>
             </div>
         );
     }
 
     return (
         <div className="space-y-3">
-            {clients.map(c => {
-                const totalInvoicesCounter = c.invoices?.length || 0;
-                const totalBilled = c.invoices?.reduce((acc, inv) => acc + Number(inv.amount_ht), 0) || 0;
-                const isExpanded = expandedIds.has(c.id);
+            {clients.map((client) => {
+                const totalInvoicesCounter = client.invoices?.length || 0;
+                const totalBilled = client.invoices?.reduce((acc, invoice) => acc + Number(invoice.amount_ht), 0) || 0;
+                const isExpanded = expandedIds.has(client.id);
 
                 return (
-                    <div key={c.id} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm transition-all">
+                    <div key={client.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all">
                         <div
-                            onClick={() => toggleExpand(c.id)}
-                            className="p-4 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors"
+                            onClick={() => toggleExpand(client.id)}
+                            className="flex cursor-pointer items-center justify-between p-4 transition-colors hover:bg-slate-50"
                         >
                             <div className="flex items-center gap-4">
-                                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${c.type === 'b2b' ? 'bg-indigo-100 text-indigo-600' : 'bg-emerald-100 text-emerald-600'}`}>
-                                    {c.type === 'b2b' ? <Building2 className="w-5 h-5" /> : <User2 className="w-5 h-5" />}
+                                <div className={`flex h-10 w-10 items-center justify-center rounded-full ${client.type === 'b2b' ? 'bg-indigo-100 text-indigo-600' : 'bg-emerald-100 text-emerald-600'}`}>
+                                    {client.type === 'b2b' ? <Building2 className="h-5 w-5" /> : <User2 className="h-5 w-5" />}
                                 </div>
                                 <div>
-                                    <h4 className="font-bold text-slate-800 text-lg leading-tight">{c.name}</h4>
-                                    <p className="text-xs font-semibold text-slate-400 tracking-wide uppercase mt-0.5">{c.type}</p>
+                                    <h4 className="text-lg font-bold leading-tight text-slate-800">{client.name}</h4>
+                                    <p className="mt-0.5 text-xs font-semibold uppercase tracking-wide text-slate-400">{client.type}</p>
                                 </div>
                             </div>
 
                             <div className="flex items-center gap-6">
-                                <div className="hidden sm:block text-right">
+                                <div className="hidden text-right sm:block">
                                     <p className="text-sm font-bold text-slate-800">{new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(totalBilled)}</p>
                                     <p className="text-xs text-slate-500">{totalInvoicesCounter} factures</p>
                                 </div>
-                                <ChevronRight className={`w-5 h-5 text-slate-400 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
+                                <ChevronRight className={`h-5 w-5 text-slate-400 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
                             </div>
                         </div>
 
                         {isExpanded && (
-                            <div className="bg-slate-50 p-4 border-t border-slate-100">
-                                <h5 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Historique des Factures</h5>
+                            <div className="border-t border-slate-100 bg-slate-50 p-4">
+                                <h5 className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-500">Historique des Factures</h5>
                                 {totalInvoicesCounter > 0 ? (
                                     <div className="space-y-2">
-                                        {c.invoices?.map((inv, idx) => (
-                                            <div key={idx} className="flex items-center justify-between bg-white p-3 rounded-lg border border-slate-200 shadow-sm text-sm">
+                                        {client.invoices?.map((invoice, index) => (
+                                            <div key={index} className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-3 text-sm shadow-sm">
                                                 <div className="flex items-center gap-3">
-                                                    <FileText className="w-4 h-4 text-slate-400" />
-                                                    <span className="text-slate-600">{new Date(inv.invoice_date).toLocaleDateString()}</span>
+                                                    <FileText className="h-4 w-4 text-slate-400" />
+                                                    <span className="text-slate-600">{new Date(invoice.invoice_date).toLocaleDateString()}</span>
                                                 </div>
                                                 <div className="flex items-center gap-3">
-                                                    <span className={`px-2 py-1 rounded-md text-xs font-bold ${inv.status === 'paid' ? 'bg-green-100 text-green-700' : inv.status === 'overdue' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>
-                                                        {inv.status.toUpperCase()}
+                                                    <span className={`rounded-md px-2 py-1 text-xs font-bold ${invoice.status === 'paid' ? 'bg-green-100 text-green-700' : invoice.status === 'overdue' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>
+                                                        {invoice.status.toUpperCase()}
                                                     </span>
-                                                    <span className="font-bold text-slate-800">{new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(Number(inv.amount_ht))}</span>
+                                                    <span className="font-bold text-slate-800">{new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(Number(invoice.amount_ht))}</span>
                                                 </div>
                                             </div>
                                         ))}
                                     </div>
                                 ) : (
-                                    <p className="text-sm text-slate-500 italic">Aucune facture émise pour ce client.</p>
+                                    <p className="text-sm italic text-slate-500">{'Aucune facture \u00e9mise pour ce client.'}</p>
                                 )}
                             </div>
                         )}

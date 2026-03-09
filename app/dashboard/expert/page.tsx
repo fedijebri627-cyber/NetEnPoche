@@ -1,89 +1,102 @@
 'use client';
 
+import { DashboardProvider, useDashboard } from '@/contexts/DashboardContext';
 import { FeatureLock } from '@/components/dashboard/FeatureLock';
 import { ClientForm } from '@/components/dashboard/expert/ClientForm';
 import { InvoiceForm } from '@/components/dashboard/expert/InvoiceForm';
-import { ClientList, ClientData } from '@/components/dashboard/expert/ClientList';
+import { ClientList } from '@/components/dashboard/expert/ClientList';
 import { ClientRevenuePieChart } from '@/components/dashboard/expert/ClientRevenuePieChart';
-import { useState, useEffect } from 'react';
+import { AdminPackCard, ClientInsightsCard, CollectionsCockpitCard } from '@/components/dashboard/expert/OperationsCards';
+import { HealthScoreCard } from '@/components/dashboard/InsightCards';
+import { useEffect, useState } from 'react';
 import { BriefcaseBusiness } from 'lucide-react';
+import type { InsightClient, InsightInvoice } from '@/lib/dashboard-insights';
 
-export default function ExpertDashboard() {
-    const [clients, setClients] = useState<ClientData[]>([]);
+function ExpertDashboardContent() {
+    const [clients, setClients] = useState<InsightClient[]>([]);
+    const [invoices, setInvoices] = useState<InsightInvoice[]>([]);
     const [loading, setLoading] = useState(true);
+    const { year } = useDashboard();
 
     const fetchCRMData = async () => {
         setLoading(true);
         try {
-            // First fetch invoices to group them 
-            const invRes = await fetch('/api/invoices');
-            const invoicesData = await invRes.json();
+            const [invoiceResponse, clientResponse] = await Promise.all([
+                fetch(`/api/invoices?year=${year}`, { cache: 'no-store' }),
+                fetch('/api/clients', { cache: 'no-store' }),
+            ]);
 
-            // Then fetch clients
-            const cliRes = await fetch('/api/clients');
-            const clientsData = await cliRes.json();
+            const invoiceRows = await invoiceResponse.json();
+            const clientRows = await clientResponse.json();
+            const invoiceData = Array.isArray(invoiceRows) ? invoiceRows : [];
+            const clientData = Array.isArray(clientRows) ? clientRows : [];
 
-            if (Array.isArray(clientsData)) {
-                // Map invoices onto their owner clients
-                const mappedClients = clientsData.map((c: any) => {
-                    const mappedInvoices = Array.isArray(invoicesData) ? invoicesData.filter((i: any) => i.client_id === c.id) : [];
-                    return { ...c, invoices: mappedInvoices };
-                });
-                setClients(mappedClients);
-            }
-        } catch (e) {
-            console.error(e);
+            setInvoices(invoiceData);
+            setClients(clientData.map((client: InsightClient) => ({
+                ...client,
+                invoices: invoiceData.filter((invoice: InsightInvoice) => invoice.client_id === client.id),
+            })));
+        } catch (error) {
+            console.error(error);
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchCRMData();
-    }, []);
+        void fetchCRMData();
+    }, [year]);
 
     return (
-        <main className="flex-1 overflow-x-hidden p-6 max-w-7xl mx-auto w-full">
-            <FeatureLock featureName="Clients & Facturations Automatisées" requiredTier="expert">
-
-                <div className="flex items-center gap-3 mb-8">
-                    <div className="p-3 bg-[#0d1b35] rounded-xl shadow-sm">
-                        <BriefcaseBusiness className="w-6 h-6 text-white" />
+        <main className="mx-auto flex-1 w-full max-w-7xl overflow-x-hidden p-6">
+            <FeatureLock featureName="Clients et facturation automatisee" requiredTier="expert">
+                <div className="mb-8 flex items-center gap-3">
+                    <div className="rounded-xl bg-[#0d1b35] p-3 shadow-sm">
+                        <BriefcaseBusiness className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-bold font-syne text-[#0d1b35]">Gestion Commerciale</h1>
-                        <p className="text-slate-500">Gérez vos clients, facturez, et auto-synchronisez votre Chiffre d'Affaires.</p>
+                        <h1 className="font-syne text-2xl font-bold text-[#0d1b35]">Gestion commerciale</h1>
+                        <p className="text-slate-500">Gerez vos clients, vos factures et le cash qui en decoule.</p>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
-
-                    {/* Left Column: Data Entry */}
-                    <div className="xl:col-span-4 space-y-6">
+                <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-12">
+                    <div className="space-y-5 xl:col-span-4">
                         <ClientForm onSuccess={fetchCRMData} />
-                        <InvoiceForm clients={clients} onSuccess={fetchCRMData} />
+                        <InvoiceForm clients={clients as any} onSuccess={fetchCRMData} />
+                        <AdminPackCard year={year} />
                     </div>
 
-                    {/* Right Column: Tracking & Reporting */}
-                    <div className="xl:col-span-8 space-y-6">
-                        <ClientRevenuePieChart clients={clients} />
-
-                        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-                            <h3 className="font-syne font-bold text-lg text-[#0d1b35] mb-4">Portefeuille Clients</h3>
+                    <div className="space-y-5 xl:col-span-8">
+                        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                            <h3 className="mb-4 font-syne text-lg font-bold text-[#0d1b35]">Portefeuille clients</h3>
                             {loading ? (
-                                <div className="animate-pulse space-y-4">
-                                    <div className="h-20 bg-slate-100 rounded-2xl w-full"></div>
-                                    <div className="h-20 bg-slate-100 rounded-2xl w-full"></div>
+                                <div className="space-y-4 animate-pulse">
+                                    <div className="h-20 w-full rounded-2xl bg-slate-100"></div>
+                                    <div className="h-20 w-full rounded-2xl bg-slate-100"></div>
                                 </div>
                             ) : (
-                                <ClientList clients={clients} />
+                                <ClientList clients={clients as any} />
                             )}
                         </div>
-                    </div>
 
+                        <div className="grid grid-cols-1 gap-5 2xl:grid-cols-2">
+                            <CollectionsCockpitCard invoices={invoices} onRefresh={fetchCRMData} />
+                            <ClientInsightsCard clients={clients} invoices={invoices} />
+                            <ClientRevenuePieChart clients={clients as any} />
+                            <HealthScoreCard clients={clients} />
+                        </div>
+                    </div>
                 </div>
             </FeatureLock>
         </main>
     );
 }
 
+export default function ExpertDashboard() {
+    return (
+        <DashboardProvider>
+            <ExpertDashboardContent />
+        </DashboardProvider>
+    );
+}

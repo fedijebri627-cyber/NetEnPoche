@@ -1,89 +1,151 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { FeatureLock } from './FeatureLock';
 import { useDashboard } from '@/contexts/DashboardContext';
-import { calculateUrssaf, getTVAStatus } from '@/lib/calculations';
-import { TrendingUp, ArrowRight } from 'lucide-react';
+import { formatCurrency, simulateScenario } from '@/lib/dashboard-insights';
+import { ArrowRight, TrendingUp } from 'lucide-react';
+
+type ScenarioMode = 'extra_invoice' | 'price_increase' | 'tva_crossing' | 'vl_toggle';
+
+const modeLabels: Record<ScenarioMode, { title: string; description: string; defaultValue: number }> = {
+    extra_invoice: {
+        title: 'Facture supplementaire',
+        description: 'Simulez l impact d une facture en plus sur votre net et vos reserves.',
+        defaultValue: 2000,
+    },
+    price_increase: {
+        title: 'Hausse tarifaire',
+        description: 'Mesurez le gain net si vous relevez vos prix moyens.',
+        defaultValue: 10,
+    },
+    tva_crossing: {
+        title: 'Passage TVA',
+        description: 'Visualisez l effet d un depassement du seuil TVA sur votre trajectoire.',
+        defaultValue: 1500,
+    },
+    vl_toggle: {
+        title: 'Versement liberatoire',
+        description: 'Comparez instantanement votre situation avec et sans versement liberatoire.',
+        defaultValue: 0,
+    },
+};
 
 export function ScenarioSimulatorCard() {
     const { entries, config, loading } = useDashboard();
-    const [extraAmountStr, setExtraAmountStr] = useState('');
+    const [mode, setMode] = useState<ScenarioMode>('extra_invoice');
+    const [value, setValue] = useState(modeLabels.extra_invoice.defaultValue.toString());
 
-    if (loading) return <div className="animate-pulse h-40 bg-slate-100 rounded-3xl" />;
+    const scenario = useMemo(
+        () => simulateScenario(entries, config, mode, parseFloat(value) || 0),
+        [config, entries, mode, value]
+    );
 
-    const extraAmount = parseFloat(extraAmountStr) || 0;
+    if (loading) return <div className="animate-pulse h-72 bg-slate-100 rounded-3xl" />;
 
-    // Current State
-    const currentTotalCA = entries.reduce((acc, curr) => acc + curr.ca_amount, 0);
-    const currentUrssaf = calculateUrssaf(currentTotalCA, config.activity_type, config.acre_enabled);
-    const currentTVA = getTVAStatus(currentTotalCA, config.activity_type);
+    const switchMode = (nextMode: ScenarioMode) => {
+        setMode(nextMode);
+        setValue(modeLabels[nextMode].defaultValue.toString());
+    };
 
-    // New Simulated State
-    const simulatedTotalCA = currentTotalCA + extraAmount;
-    const simulatedUrssaf = calculateUrssaf(simulatedTotalCA, config.activity_type, config.acre_enabled);
-    const simulatedTVA = getTVAStatus(simulatedTotalCA, config.activity_type);
-
-    // Deltas
-    const urssafDelta = simulatedUrssaf - currentUrssaf;
-    const netDelta = extraAmount - urssafDelta; // Simplified net for the simulator
+    const needsInput = mode !== 'vl_toggle';
+    const valueSuffix = mode === 'price_increase' ? '%' : 'EUR';
 
     return (
-        <FeatureLock featureName="Simulateur de Scénarios" requiredTier="pro">
+        <FeatureLock featureName="Scenario Lab v2" requiredTier="pro">
             <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
-                <h3 className="text-lg font-bold font-syne text-[#0d1b35] flex items-center gap-2 mb-4">
-                    <TrendingUp className="w-5 h-5 text-[#6366f1]" />
-                    Simulation (Et si...?)
-                </h3>
-
-                <div className="mb-6">
-                    <label className="text-sm font-medium text-slate-600 block mb-2">
-                        "Et si je facturais <strong className="text-slate-900">X €</strong> de plus ?"
-                    </label>
-                    <div className="relative">
-                        <input
-                            type="number"
-                            min="0"
-                            step="100"
-                            placeholder="0"
-                            value={extraAmountStr}
-                            onChange={(e) => setExtraAmountStr(e.target.value)}
-                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-lg font-medium text-[#0d1b35] focus:outline-none focus:ring-2 focus:ring-[#6366f1]/20 focus:border-[#6366f1] transition"
-                        />
-                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium font-syne text-lg pointer-events-none">€</span>
+                <div className="flex flex-col gap-2 mb-5 md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <h3 className="text-lg font-bold font-syne text-[#0d1b35] flex items-center gap-2">
+                            <TrendingUp className="w-5 h-5 text-[#6366f1]" />
+                            Scenario Lab v2
+                        </h3>
+                        <p className="text-sm text-slate-500 mt-1">Testez vos decisions de facturation, de prix, de TVA et d option fiscale avant d agir.</p>
+                    </div>
+                    <div className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                        <span className="font-semibold text-slate-900">Mode actif:</span> {modeLabels[mode].title}
                     </div>
                 </div>
 
-                {extraAmount > 0 ? (
-                    <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
-                        <ul className="space-y-3">
-                            <li className="flex justify-between items-center text-sm">
-                                <span className="text-slate-500">Nouveau Net Gagné</span>
-                                <span className="font-bold text-[#00c875] flex items-center gap-1">
-                                    +{new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(netDelta)}
-                                </span>
-                            </li>
-                            <li className="flex justify-between items-center text-sm">
-                                <span className="text-slate-500">URSSAF Supplémentaire</span>
-                                <span className="font-bold text-[#e84040]">
-                                    -{new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(urssafDelta)}
-                                </span>
-                            </li>
-                            <li className="pt-3 border-t border-slate-200 flex justify-between items-center text-sm">
-                                <span className="text-slate-600 font-medium">Statut TVA</span>
-                                <div className="flex items-center gap-2">
-                                    <span className={`w-2 h-2 rounded-full ${currentTVA.status === 'safe' ? 'bg-[#00c875]' : currentTVA.status === 'warning' ? 'bg-[#f5a623]' : 'bg-[#e84040]'}`} />
-                                    <ArrowRight className="w-3 h-3 text-slate-300" />
-                                    <span className={`w-2 h-2 rounded-full ${simulatedTVA.status === 'safe' ? 'bg-[#00c875]' : simulatedTVA.status === 'warning' ? 'bg-[#f5a623]' : 'bg-[#e84040]'}`} />
+                <div className="grid gap-6 xl:grid-cols-[1.2fr_0.9fr]">
+                    <div className="space-y-5">
+                        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-2">
+                            {(Object.keys(modeLabels) as ScenarioMode[]).map((scenarioMode) => (
+                                <button
+                                    key={scenarioMode}
+                                    onClick={() => switchMode(scenarioMode)}
+                                    className={`rounded-2xl border px-4 py-4 text-left transition ${mode === scenarioMode ? 'border-indigo-500 bg-indigo-50 text-indigo-700 shadow-sm' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'}`}
+                                >
+                                    <div className="text-sm font-bold">{modeLabels[scenarioMode].title}</div>
+                                    <div className="mt-1 text-xs text-inherit/80 leading-5">{modeLabels[scenarioMode].description}</div>
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
+                            <label className="text-sm font-medium text-slate-600 block mb-2">
+                                {needsInput ? (mode === 'price_increase' ? 'Pourcentage de hausse' : 'Valeur de simulation') : 'Comparaison active'}
+                            </label>
+                            {needsInput ? (
+                                <div className="relative">
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        step={mode === 'price_increase' ? '1' : '100'}
+                                        value={value}
+                                        onChange={(event) => setValue(event.target.value)}
+                                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-lg font-medium text-[#0d1b35] focus:outline-none focus:ring-2 focus:ring-[#6366f1]/20 focus:border-[#6366f1] transition"
+                                    />
+                                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">{valueSuffix}</span>
                                 </div>
-                            </li>
-                        </ul>
+                            ) : (
+                                <div className="rounded-xl bg-white border border-slate-200 px-4 py-3 text-sm text-slate-600">
+                                    Le simulateur compare votre configuration actuelle avec l autre option fiscale.
+                                </div>
+                            )}
+                        </div>
                     </div>
-                ) : (
-                    <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100 border-dashed text-center">
-                        <p className="text-sm text-slate-400">Entrez un montant pour simuler l'impact sur vos cotisations et votre plafond TVA.</p>
+
+                    <div className="rounded-2xl bg-slate-50 border border-slate-100 p-4 flex flex-col justify-between">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 mb-4">
+                            <div className="rounded-xl bg-white p-4 border border-slate-100">
+                                <div className="text-xs uppercase tracking-wide text-slate-500">Net final estime</div>
+                                <div className="mt-1 text-2xl font-black font-syne text-[#0d1b35]">{formatCurrency(scenario.finalNet)}</div>
+                            </div>
+                            <div className="rounded-xl bg-white p-4 border border-slate-100">
+                                <div className="text-xs uppercase tracking-wide text-slate-500">Delta net</div>
+                                <div className={`mt-1 text-2xl font-black font-syne ${scenario.netDelta >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                                    {scenario.netDelta >= 0 ? '+' : ''}{formatCurrency(scenario.netDelta)}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            <div className="rounded-xl bg-white p-4 border border-slate-100">
+                                <div className="text-xs uppercase tracking-wide text-slate-500">URSSAF supplementaire</div>
+                                <div className="mt-1 text-lg font-bold text-slate-800">{scenario.urssafDelta >= 0 ? '+' : ''}{formatCurrency(scenario.urssafDelta)}</div>
+                            </div>
+                            <div className="rounded-xl bg-white p-4 border border-slate-100">
+                                <div className="text-xs uppercase tracking-wide text-slate-500">Impact impot</div>
+                                <div className="mt-1 text-lg font-bold text-slate-800">{scenario.irDelta >= 0 ? '+' : ''}{formatCurrency(scenario.irDelta)}</div>
+                            </div>
+                            <div className="rounded-xl bg-white p-4 border border-slate-100">
+                                <div className="text-xs uppercase tracking-wide text-slate-500">Projection TVA</div>
+                                <div className="mt-1 flex items-center gap-2 text-lg font-bold text-slate-800">
+                                    <span className={`h-2.5 w-2.5 rounded-full ${scenario.finalTvaStatus === 'danger' ? 'bg-red-500' : scenario.finalTvaStatus === 'warning' ? 'bg-amber-400' : 'bg-emerald-500'}`} />
+                                    {scenario.finalTvaPercentage.toFixed(1)}%
+                                </div>
+                            </div>
+                            <div className="rounded-xl bg-white p-4 border border-slate-100">
+                                <div className="text-xs uppercase tracking-wide text-slate-500">CA simule</div>
+                                <div className="mt-1 text-lg font-bold text-[#0d1b35] flex items-center gap-1">
+                                    {formatCurrency(scenario.finalCa)}
+                                    <ArrowRight className="w-3 h-3 text-slate-300" />
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                )}
+                </div>
             </div>
         </FeatureLock>
     );

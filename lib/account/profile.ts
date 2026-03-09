@@ -30,6 +30,10 @@ const tierRank: Record<SubscriptionTier, number> = {
 
 let adminClient: ReturnType<typeof createClient> | null = null;
 
+interface SessionScopedClient {
+    from: (relation: string) => any;
+}
+
 function normalizeNullableString(value: unknown) {
     if (typeof value !== 'string') {
         return null;
@@ -39,15 +43,28 @@ function normalizeNullableString(value: unknown) {
     return trimmed.length > 0 ? trimmed : null;
 }
 
+function hasAdminClientConfig() {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    return Boolean(
+        url &&
+        serviceRoleKey &&
+        anonKey &&
+        serviceRoleKey !== anonKey
+    );
+}
+
 function getSupabaseAdminClient() {
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    if (!hasAdminClientConfig()) {
         throw new Error('Supabase admin client is not configured.');
     }
 
     if (!adminClient) {
         adminClient = createClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL,
-            process.env.SUPABASE_SERVICE_ROLE_KEY,
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.SUPABASE_SERVICE_ROLE_KEY!,
             {
                 auth: {
                     autoRefreshToken: false,
@@ -99,13 +116,19 @@ function mapCoreProfile(row: Partial<AccountProfileCore> | null, user: User): Ac
 }
 
 export async function ensureAccountProfile(user: User) {
-    const supabaseAdmin = getSupabaseAdminClient();
+    if (!hasAdminClientConfig()) {
+        return mapCoreProfile(null, user);
+    }
 
-    const { data: existing, error } = await supabaseAdmin
+    const supabaseAdmin = getSupabaseAdminClient();
+    const existingQuery = await supabaseAdmin
         .from('users')
         .select(ACCOUNT_CORE_SELECT)
         .eq('id', user.id)
-        .maybeSingle<AccountProfileCore>();
+        .maybeSingle();
+
+    const existing = existingQuery.data as AccountProfileCore | null;
+    const error = existingQuery.error;
 
     if (error) {
         throw error;
@@ -163,15 +186,53 @@ export async function ensureAccountProfile(user: User) {
     return mapCoreProfile(updated, user);
 }
 
+export async function resolveAccountProfileWithSessionClient(
+    supabase: SessionScopedClient,
+    user: User
+) {
+    if (hasAdminClientConfig()) {
+        return ensureAccountProfile(user);
+    }
+
+    try {
+        const { data, error } = await supabase
+            .from('users')
+            .select(ACCOUNT_CORE_SELECT)
+            .eq('id', user.id)
+            .maybeSingle();
+
+        if (error) {
+            throw error;
+        }
+
+        return mapCoreProfile(data, user);
+    } catch (error) {
+        console.warn('Falling back to session profile resolution.', error);
+        return mapCoreProfile(null, user);
+    }
+}
+
 export async function getBusinessAccountProfile(user: User): Promise<AccountBusinessProfile> {
     const core = await ensureAccountProfile(user);
-    const supabaseAdmin = getSupabaseAdminClient();
 
-    const { data, error } = await supabaseAdmin
+    if (!hasAdminClientConfig()) {
+        return {
+            ...core,
+            business_name: null,
+            siret: null,
+            business_fields_ready: false,
+        };
+    }
+
+    const supabaseAdmin = getSupabaseAdminClient();
+    const businessQuery = await supabaseAdmin
         .from('users')
         .select(ACCOUNT_BUSINESS_SELECT)
         .eq('id', user.id)
-        .maybeSingle<AccountBusinessProfile>();
+        .maybeSingle();
+
+    const data = businessQuery.data as Partial<AccountBusinessProfile> | null;
+    const error = businessQuery.error;
 
     if (error) {
         if (isBusinessFieldError(error)) {
@@ -193,6 +254,57 @@ export async function getBusinessAccountProfile(user: User): Promise<AccountBusi
         siret: normalizeNullableString(data?.siret),
         business_fields_ready: true,
     };
+}
+
+export async function resolveBusinessAccountProfileWithSessionClient(
+    supabase: SessionScopedClient,
+    user: User
+): Promise<AccountBusinessProfile> {
+    if (hasAdminClientConfig()) {
+        return getBusinessAccountProfile(user);
+    }
+
+    const core = await resolveAccountProfileWithSessionClient(supabase, user);
+
+    try {
+        const businessQuery = await supabase
+            .from('users')
+            .select(ACCOUNT_BUSINESS_SELECT)
+            .eq('id', user.id)
+            .maybeSingle();
+
+        const data = businessQuery.data as Partial<AccountBusinessProfile> | null;
+        const error = businessQuery.error;
+
+        if (error) {
+            if (isBusinessFieldError(error)) {
+                return {
+                    ...core,
+                    business_name: null,
+                    siret: null,
+                    business_fields_ready: false,
+                };
+            }
+
+            throw error;
+        }
+
+        return {
+            ...core,
+            full_name: normalizeNullableString(data?.full_name) || core.full_name,
+            business_name: normalizeNullableString(data?.business_name),
+            siret: normalizeNullableString(data?.siret),
+            business_fields_ready: true,
+        };
+    } catch (error) {
+        console.warn('Falling back to core business profile resolution.', error);
+        return {
+            ...core,
+            business_name: null,
+            siret: null,
+            business_fields_ready: false,
+        };
+    }
 }
 
 export async function updateBusinessAccountProfile(

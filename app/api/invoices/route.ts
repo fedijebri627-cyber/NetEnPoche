@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
-import { ensureAccountProfile } from '@/lib/account/profile';
+import { resolveAccountProfileWithSessionClient } from '@/lib/account/profile';
 
 export async function GET(req: Request) {
     const supabase = await createServerClient();
@@ -10,7 +10,7 @@ export async function GET(req: Request) {
 
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const profile = await ensureAccountProfile(user);
+    const profile = await resolveAccountProfileWithSessionClient(supabase, user);
     if (profile.subscription_tier !== 'expert') {
         return NextResponse.json({ error: 'Expert tier required' }, { status: 403 });
     }
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
 
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const profile = await ensureAccountProfile(user);
+    const profile = await resolveAccountProfileWithSessionClient(supabase, user);
     if (profile.subscription_tier !== 'expert') {
         return NextResponse.json({ error: 'Expert tier required' }, { status: 403 });
     }
@@ -44,9 +44,14 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { client_id, amount_ht, invoice_date, due_date, status } = body;
 
+    const normalizedStatus = status === 'paid' || status === 'overdue' || status === 'sent' ? status : 'draft';
+    const paidAt = normalizedStatus === 'paid'
+        ? (typeof body.paid_at === 'string' && body.paid_at.length > 0 ? body.paid_at : new Date().toISOString().slice(0, 10))
+        : null;
+
     const { data: invoice, error: invError } = await supabase
         .from('invoices')
-        .insert([{ user_id: user.id, client_id, amount_ht, invoice_date, due_date, status }])
+        .insert([{ user_id: user.id, client_id, amount_ht, invoice_date, due_date, status: normalizedStatus, paid_at: paidAt }])
         .select()
         .single();
 
@@ -85,4 +90,3 @@ export async function POST(req: Request) {
         sync: { month, oldAmount, newAmount },
     });
 }
-

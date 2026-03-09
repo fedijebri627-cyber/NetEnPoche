@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
-import { getBusinessAccountProfile, updateBusinessAccountProfile } from '@/lib/account/profile';
+import {
+    resolveBusinessAccountProfileWithSessionClient,
+    updateBusinessAccountProfile,
+} from '@/lib/account/profile';
 
 export async function GET() {
     try {
@@ -13,7 +16,7 @@ export async function GET() {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const profile = await getBusinessAccountProfile(user);
+        const profile = await resolveBusinessAccountProfileWithSessionClient(supabase, user);
 
         return NextResponse.json({
             id: profile.id,

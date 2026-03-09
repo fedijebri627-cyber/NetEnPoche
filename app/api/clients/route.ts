@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
-import { ensureAccountProfile } from '@/lib/account/profile';
+import { resolveAccountProfileWithSessionClient } from '@/lib/account/profile';
 
 export async function GET() {
     const supabase = await createServerClient();
@@ -10,7 +10,7 @@ export async function GET() {
 
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const profile = await ensureAccountProfile(user);
+    const profile = await resolveAccountProfileWithSessionClient(supabase, user);
     if (profile.subscription_tier !== 'expert') {
         return NextResponse.json({ error: 'Requires Expert tier' }, { status: 403 });
     }
@@ -32,7 +32,7 @@ export async function POST(req: Request) {
 
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const profile = await ensureAccountProfile(user);
+    const profile = await resolveAccountProfileWithSessionClient(supabase, user);
     if (profile.subscription_tier !== 'expert') {
         return NextResponse.json({ error: 'Requires Expert tier' }, { status: 403 });
     }

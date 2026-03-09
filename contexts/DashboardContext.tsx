@@ -1,20 +1,11 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { ActivityType } from '@/lib/calculations';
 import { toast } from 'sonner';
+import type { InsightConfig, HouseholdStatus } from '@/lib/dashboard-insights';
 
-// Context State Definition
-export interface ActivityConfig {
+export interface ActivityConfig extends InsightConfig {
     id: string;
-    year: number;
-    activity_type: ActivityType;
-    acre_enabled: boolean;
-    versement_liberatoire: boolean;
-    annual_ca_goal: number | null;
-    situation_familiale: 'celibataire' | 'marie' | 'pacse';
-    parts_fiscales: number;
-    autres_revenus: number;
 }
 
 export interface MonthlyEntry {
@@ -36,22 +27,25 @@ interface DashboardContextProps {
 
 const DashboardContext = createContext<DashboardContextProps | undefined>(undefined);
 
-export function DashboardProvider({ children }: { children: ReactNode }) {
-    const [year, setYear] = useState(new Date().getFullYear());
-    // Default safe config while loading
-    const [config, setConfigState] = useState<ActivityConfig>({
-        id: 'temp',
+function getDefaultConfig(year: number): ActivityConfig {
+    return {
+        id: `temp-${year}`,
         year,
         activity_type: 'services_bnc',
+        secondary_activity_type: null,
+        secondary_activity_share: null,
         acre_enabled: false,
         versement_liberatoire: false,
         annual_ca_goal: null,
-        situation_familiale: 'celibataire',
+        situation_familiale: 'celibataire' satisfies HouseholdStatus,
         parts_fiscales: 1,
-        autres_revenus: 0
-    });
+        autres_revenus: 0,
+    };
+}
 
-    // Pre-fill entries with 0 for all 12 months
+export function DashboardProvider({ children }: { children: ReactNode }) {
+    const [year, setYear] = useState(new Date().getFullYear());
+    const [config, setConfigState] = useState<ActivityConfig>(getDefaultConfig(new Date().getFullYear()));
     const [entries, setEntriesState] = useState<MonthlyEntry[]>(
         Array.from({ length: 12 }, (_, i) => ({ month: i + 1, ca_amount: 0, notes: null }))
     );
@@ -64,14 +58,24 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
         try {
             const [configRes, entriesRes] = await Promise.all([
                 fetch(`/api/config?year=${year}`),
-                fetch(`/api/entries?year=${year}`)
+                fetch(`/api/entries?year=${year}`),
             ]);
 
             if (configRes.ok) {
                 const configData = await configRes.json();
-                setConfigState(configData);
+                setConfigState({
+                    ...getDefaultConfig(year),
+                    ...configData,
+                    id: configData.id || `temp-${year}`,
+                    year,
+                    secondary_activity_type: configData.secondary_activity_type || null,
+                    secondary_activity_share:
+                        configData.secondary_activity_share === null || configData.secondary_activity_share === undefined
+                            ? null
+                            : Number(configData.secondary_activity_share),
+                });
             } else if (configRes.status === 401 || configRes.status === 403) {
-                toast.error("Votre session a expiré.");
+                toast.error('Votre session a expire.');
                 window.location.href = '/auth/login';
                 return;
             }
@@ -80,18 +84,22 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
                 const entriesData: MonthlyEntry[] = await entriesRes.json();
                 const mergedEntries = Array.from({ length: 12 }, (_, i) => {
                     const month = i + 1;
-                    const found = entriesData.find(e => e.month === month);
-                    return { month, ca_amount: found ? Number(found.ca_amount) : 0, notes: found?.notes || null };
+                    const found = entriesData.find((entry) => entry.month === month);
+                    return {
+                        month,
+                        ca_amount: found ? Number(found.ca_amount) : 0,
+                        notes: found?.notes || null,
+                    };
                 });
                 setEntriesState(mergedEntries);
             } else if (entriesRes.status === 401 || entriesRes.status === 403) {
-                toast.error("Votre session a expiré.");
+                toast.error('Votre session a expire.');
                 window.location.href = '/auth/login';
                 return;
             }
         } catch (err: any) {
             setError(err.message);
-            toast.error("Erreur de connexion avec le serveur.");
+            toast.error('Erreur de connexion avec le serveur.');
         } finally {
             setLoading(false);
         }
@@ -103,48 +111,53 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
 
     const updateConfig = async (newConfig: Partial<ActivityConfig>) => {
         const updatedConfig = { ...config, ...newConfig, year };
-        // Optimistic UI Update
         setConfigState(updatedConfig);
         try {
             const res = await fetch('/api/config', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updatedConfig)
+                body: JSON.stringify(updatedConfig),
             });
-            if (!res.ok) throw new Error("Failed to save configuration");
-            toast.success("Configuration sauvegardée");
+            if (!res.ok) throw new Error('Failed to save configuration');
+            toast.success('Configuration sauvegardee');
         } catch (err: any) {
             console.error('Failed to save config:', err);
-            toast.error("Erreur lors de la sauvegarde.");
+            toast.error('Erreur lors de la sauvegarde.');
             setError('Failed to save configuration.');
+            fetchData();
         }
-    }
+    };
 
     const updateEntry = async (month: number, value: number) => {
-        // Optimistic UI Update
-        const updatedEntries = entries.map(e => e.month === month ? { ...e, ca_amount: value } : e);
+        const updatedEntries = entries.map((entry) => entry.month === month ? { ...entry, ca_amount: value } : entry);
         setEntriesState(updatedEntries);
 
         try {
             const res = await fetch('/api/entries', {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ year, month, ca_amount: value })
+                body: JSON.stringify({ year, month, ca_amount: value }),
             });
-            if (!res.ok) throw new Error("Erreur de sauvegarde");
-            toast.success("CA mis à jour");
+            if (!res.ok) throw new Error('Erreur de sauvegarde');
+            toast.success('CA mis a jour');
         } catch (err: any) {
             console.error(`Failed to save entry for month ${month}:`, err);
-            toast.error("Sauvegarde échouée. Annulation...");
+            toast.error('Sauvegarde echouee. Annulation...');
             setError(`Error saving month ${month}`);
-            // Revert on failure
             fetchData();
         }
-    }
+    };
 
     return (
         <DashboardContext.Provider value={{
-            year, setYear, config, updateConfig, entries, updateEntry, loading, error
+            year,
+            setYear,
+            config,
+            updateConfig,
+            entries,
+            updateEntry,
+            loading,
+            error,
         }}>
             {children}
         </DashboardContext.Provider>

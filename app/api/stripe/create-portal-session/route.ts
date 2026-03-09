@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
 import { stripe } from '@/lib/stripe/server';
-import { ensureAccountProfile } from '@/lib/account/profile';
+import { resolveAccountProfileWithSessionClient } from '@/lib/account/profile';
 import { createAppUrl, getRequestAppUrl } from '@/lib/app-url';
 
 export async function POST(req: Request) {
@@ -15,7 +15,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const profile = await ensureAccountProfile(user);
+        const profile = await resolveAccountProfileWithSessionClient(supabase, user);
 
         if (!profile.stripe_customer_id) {
             return NextResponse.json(

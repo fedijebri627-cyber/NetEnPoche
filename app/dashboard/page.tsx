@@ -12,73 +12,85 @@ import { MonthlyChargesChart } from '@/components/dashboard/MonthlyChargesChart'
 import { ScenarioSimulatorCard } from '@/components/dashboard/ScenarioSimulatorCard';
 import { InvoiceDashboardWidget } from '@/components/dashboard/InvoiceDashboardWidget';
 import { OnboardingModal } from '@/components/dashboard/OnboardingModal';
-import { calculateUrssaf, calculateCFEProvision, calculateAnnualProjection, calculateIR } from '@/lib/calculations';
+import { DecisionTimelineCard, HealthScoreCard, NetChangeExplainerCard, ReservePlannerCard } from '@/components/dashboard/InsightCards';
+import { calculateAnnualProjection } from '@/lib/calculations';
+import { calculateCompositeNetBreakdown } from '@/lib/dashboard-insights';
 import { Loader2 } from 'lucide-react';
 
 function DashboardContent() {
-    const { entries, config, loading } = useDashboard();
+    const { entries, config, loading, year } = useDashboard();
 
     if (loading) {
-        return <div className="flex h-[80vh] items-center justify-center"><Loader2 className="w-10 h-10 text-[#00c875] animate-spin" /></div>;
+        return <div className="flex h-[80vh] items-center justify-center"><Loader2 className="h-10 w-10 animate-spin text-[#00c875]" /></div>;
     }
 
-    // Calculate live global values for the KPI Bar
     const totalCA = entries.reduce((acc, curr) => acc + curr.ca_amount, 0);
-    const totalUrssaf = calculateUrssaf(totalCA, config.activity_type, config.acre_enabled);
-    const cfeProvision = calculateCFEProvision(totalCA, config.activity_type);
+    const totals = calculateCompositeNetBreakdown(totalCA, config);
+    const currentMonth = year === new Date().getFullYear() ? new Date().getMonth() + 1 : 12;
+    const projection = calculateAnnualProjection(entries, Math.max(currentMonth, 1));
 
-    // Simplified Net: CA - URSSAF - CFE - VL (if selected)
-    let totalNet = totalCA - totalUrssaf - cfeProvision;
+    const recentMonths = [...entries]
+        .sort((a, b) => a.month - b.month)
+        .filter((entry) => entry.ca_amount > 0)
+        .slice(-2);
+    const previousMonth = recentMonths.length > 1 ? recentMonths[recentMonths.length - 2] : null;
+    const currentMonthEntry = recentMonths.length > 0 ? recentMonths[recentMonths.length - 1] : null;
 
-    if (config.versement_liberatoire) {
-        const irResult = calculateIR({
-            ca: totalCA,
-            activityType: config.activity_type,
-            versementLiberatoire: true,
-            situationFamiliale: 'celibataire', // baseline default for quick calc
-            parts: 1,
-            autresRevenus: 0
-        });
-        totalNet -= irResult.irEstime;
-    }
-
-    const currentMonth = new Date().getMonth() + 1; // 1-12
-    const projection = calculateAnnualProjection(entries, currentMonth);
+    const previousNet = previousMonth ? calculateCompositeNetBreakdown(previousMonth.ca_amount, config).netReel : 0;
+    const currentNet = currentMonthEntry ? calculateCompositeNetBreakdown(currentMonthEntry.ca_amount, config).netReel : 0;
+    const netTrend = previousNet > 0 ? Math.round(((currentNet - previousNet) / previousNet) * 100) : 0;
+    const previousUrssaf = previousMonth ? calculateCompositeNetBreakdown(previousMonth.ca_amount, config).urssaf : 0;
+    const currentUrssaf = currentMonthEntry ? calculateCompositeNetBreakdown(currentMonthEntry.ca_amount, config).urssaf : 0;
+    const urssafTrend = previousUrssaf > 0 ? Math.round(((currentUrssaf - previousUrssaf) / previousUrssaf) * 100) : 0;
 
     return (
-        <div className="max-w-7xl mx-auto p-6 space-y-6">
+        <div className="mx-auto max-w-7xl space-y-5 p-6">
             <OnboardingModal />
             <AlertBanner
                 id="dashboard_welcome"
                 type="info"
-                message="Bienvenue sur la nouvelle version de NetEnPoche ! Vos données sont sauvegardées automatiquement."
+                message="Bienvenue sur la nouvelle version de NetEnPoche ! Vos donnees sont sauvegardees automatiquement."
                 dismissable
             />
 
-            {/* KPI Bar */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                <KPICard title="URSSAF à payer" value={totalUrssaf} colorType="urssaf" />
-                <KPICard title="Net en poche" value={totalNet} colorType="net" />
-                <KPICard title="CFE Provision" value={cfeProvision} colorType="cfe" />
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+                <KPICard title="URSSAF a payer" value={totals.urssaf} colorType="urssaf" trend={urssafTrend} />
+                <KPICard title="Net en poche" value={totals.netReel} colorType="net" trend={netTrend} />
+                <KPICard title="CFE Provision" value={totals.cfe} colorType="cfe" />
                 <KPICard title="Projection Annuelle" value={projection} colorType="projection" />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                {/* Left Column (Main Data Entry) - Takes up approx 7/12 (58%) scale */}
-                <div className="lg:col-span-7 flex flex-col space-y-6">
+            <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
+                <HealthScoreCard />
+                <ReservePlannerCard />
+            </div>
+
+            <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-12">
+                <div className="space-y-5 xl:col-span-7">
                     <ActivityConfigPanel />
                     <MonthlyEntryTable />
                     <TableActions />
                 </div>
 
-                {/* Right Flexible Column (Charts, Ads, Extra info) - Takes up approx 5/12 (42%) scale */}
-                <div className="lg:col-span-5 flex flex-col space-y-6">
+                <div className="space-y-5 xl:col-span-5">
                     <InvoiceDashboardWidget />
+                    <DecisionTimelineCard />
                     <TVAProgressCard />
-                    <MonthlyChargesChart />
-                    <URSSAFCalendarCard />
-                    <ScenarioSimulatorCard />
                 </div>
+            </div>
+
+            <div className="grid grid-cols-1 items-stretch gap-5 xl:grid-cols-12">
+                <div className="xl:col-span-7">
+                    <NetChangeExplainerCard />
+                </div>
+                <div className="xl:col-span-5">
+                    <URSSAFCalendarCard />
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-5">
+                <ScenarioSimulatorCard />
+                <MonthlyChargesChart />
             </div>
         </div>
     );

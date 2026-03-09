@@ -1,6 +1,6 @@
 import { createServerClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
-import { ensureAccountProfile } from '@/lib/account/profile';
+import { resolveAccountProfileWithSessionClient } from '@/lib/account/profile';
 
 export type RequiredTier = 'pro' | 'expert';
 
@@ -19,7 +19,7 @@ export async function requireSubscription(requiredTier: RequiredTier) {
         };
     }
 
-    const profile = await ensureAccountProfile(session.user);
+    const profile = await resolveAccountProfileWithSessionClient(supabase, session.user);
     const userTier = profile.subscription_tier;
 
     const tierRanks = {

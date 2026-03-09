@@ -7,36 +7,37 @@ import { PieChart as PieIcon } from 'lucide-react';
 const COLORS = ['#0d1b35', '#00c875', '#6366f1', '#f5a623', '#22d3ee', '#f43f5e', '#a855f7'];
 
 export function ClientRevenuePieChart({ clients }: { clients: ClientData[] }) {
-    // Transform clients into [ { name: ClientA, value: 5000 }, { name: ClientB, value: 2500 } ]
-    const data = clients.map(c => {
-        const total = c.invoices?.reduce((acc, inv) => acc + Number(inv.amount_ht), 0) || 0;
-        return { name: c.name, value: total };
-    }).filter(d => d.value > 0).sort((a, b) => b.value - a.value);
+    const data = clients
+        .map((client) => {
+            const total = client.invoices?.reduce((acc, invoice) => acc + Number(invoice.amount_ht), 0) || 0;
+            return { name: client.name, value: total };
+        })
+        .filter((item) => item.value > 0)
+        .sort((a, b) => b.value - a.value);
 
-    // Group long tails into "Divers" if there are many clients
     let finalData = data;
     if (data.length > 6) {
         const top5 = data.slice(0, 5);
-        const rest = data.slice(5).reduce((sum, d) => sum + d.value, 0);
+        const rest = data.slice(5).reduce((sum, item) => sum + item.value, 0);
         finalData = [...top5, { name: 'Divers (Autres)', value: rest }];
     }
 
     if (finalData.length === 0) {
         return (
-            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col items-center justify-center h-80">
-                <PieIcon className="w-12 h-12 text-slate-200 mb-2" />
-                <p className="text-slate-400 font-medium text-sm">Répartition non disponible</p>
+            <div className="flex h-full min-h-[320px] flex-col items-center justify-center rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                <PieIcon className="mb-2 h-12 w-12 text-slate-200" />
+                <p className="text-sm font-medium text-slate-400">Répartition non disponible</p>
             </div>
         );
     }
 
     return (
-        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col h-80">
-            <h3 className="font-syne font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <PieIcon className="w-4 h-4 text-slate-400" />
+        <div className="flex h-full min-h-[320px] flex-col rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h3 className="mb-4 flex items-center gap-2 font-syne font-bold text-slate-800">
+                <PieIcon className="h-4 w-4 text-slate-400" />
                 Concentration des Revenus
             </h3>
-            <div className="flex-1 w-full relative">
+            <div className="relative w-full flex-1">
                 <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                         <Pie
