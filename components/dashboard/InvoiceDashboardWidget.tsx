@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import { useSubscription } from '@/hooks/useSubscription';
@@ -23,69 +23,70 @@ export function InvoiceDashboardWidget() {
                 const data = await res.json();
 
                 if (Array.isArray(data)) {
-                    const pending = data.filter(inv => inv.status === 'sent' || inv.status === 'draft'); // 'sent' usually means pending payment
-                    const overdue = data.filter(inv => inv.status === 'overdue');
-
-                    const pendingAmt = pending.reduce((acc, inv) => acc + Number(inv.amount_ht), 0);
+                    const pending = data.filter((invoice) => invoice.status === 'sent' || invoice.status === 'draft');
+                    const overdue = data.filter((invoice) => invoice.status === 'overdue');
+                    const pendingAmount = pending.reduce((sum, invoice) => sum + Number(invoice.amount_ht), 0);
 
                     setStats({
                         pendingCount: pending.length,
-                        pendingAmount: pendingAmt,
+                        pendingAmount,
                         overdueCount: overdue.length,
-                        topOverdue: overdue.slice(0, 3) as any[]
+                        topOverdue: overdue.slice(0, 3) as any[],
                     });
                 }
-            } catch (e) {
-                console.error(e);
+            } catch (error) {
+                console.error(error);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchStats();
+        void fetchStats();
     }, [tier]);
 
     if (tier !== 'expert' || loading) return null;
 
     return (
-        <div className="bg-white border text-left border-slate-200 rounded-3xl p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-                <h3 className="font-syne font-bold text-lg text-[#0d1b35] flex items-center gap-2">
-                    <FileStack className="w-5 h-5 text-indigo-500" />
-                    En attente d'encaissement
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 text-left shadow-sm">
+            <div className="mb-4 flex items-center justify-between">
+                <h3 className="flex items-center gap-2 font-syne text-lg font-bold text-[#0d1b35]">
+                    <FileStack className="h-5 w-5 text-indigo-500" />
+                    En attente d’encaissement
                 </h3>
                 <Link href="/dashboard/expert" className="text-xs font-bold text-indigo-600 hover:underline">
                     Gérer →
                 </Link>
             </div>
 
-            <div className="flex items-baseline gap-2 mb-2">
+            <div className="mb-2 flex items-baseline gap-2">
                 <span className="text-3xl font-black text-slate-800">
                     {new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(stats.pendingAmount)}
                 </span>
-                <span className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
-                    / {stats.pendingCount} Factures
+                <span className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+                    / {stats.pendingCount} facture{stats.pendingCount > 1 ? 's' : ''}
                 </span>
             </div>
 
             {stats.overdueCount > 0 ? (
-                <div className="mt-4 pt-4 border-t border-slate-100">
-                    <div className="text-sm font-bold text-red-600 flex items-center gap-2 mb-3">
-                        <AlertCircle className="w-4 h-4" />
-                        Alerte : {stats.overdueCount} Facture{stats.overdueCount > 1 ? 's' : ''} en retard
+                <div className="mt-4 border-t border-slate-100 pt-4">
+                    <div className="mb-3 flex items-center gap-2 text-sm font-bold text-red-600">
+                        <AlertCircle className="h-4 w-4" />
+                        Alerte : {stats.overdueCount} facture{stats.overdueCount > 1 ? 's' : ''} en retard
                     </div>
                     <div className="space-y-2">
-                        {stats.topOverdue.map((inv, i) => (
-                            <div key={i} className="flex items-center justify-between bg-red-50 p-2 rounded-lg text-sm border border-red-100">
-                                <span className="font-medium text-red-800">{inv.client?.name || 'Client Inconnu'}</span>
-                                <span className="font-bold text-red-700">{new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(Number(inv.amount_ht))}</span>
+                        {stats.topOverdue.map((invoice, index) => (
+                            <div key={index} className="flex items-center justify-between rounded-lg border border-red-100 bg-red-50 p-2 text-sm">
+                                <span className="font-medium text-red-800">{invoice.client?.name || 'Client inconnu'}</span>
+                                <span className="font-bold text-red-700">
+                                    {new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(Number(invoice.amount_ht))}
+                                </span>
                             </div>
                         ))}
                     </div>
                 </div>
             ) : (
-                <div className="mt-4 pt-4 border-t border-slate-100 text-sm font-bold text-emerald-600 flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                <div className="mt-4 flex items-center gap-2 border-t border-slate-100 pt-4 text-sm font-bold text-emerald-600">
+                    <div className="h-2 w-2 rounded-full bg-emerald-500" />
                     Zéro retard de paiement
                 </div>
             )}

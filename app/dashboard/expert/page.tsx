@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { DashboardProvider, useDashboard } from '@/contexts/DashboardContext';
 import { FeatureLock } from '@/components/dashboard/FeatureLock';
@@ -50,7 +50,7 @@ function ExpertDashboardContent() {
     return (
         <main className="mx-auto flex-1 w-full max-w-7xl overflow-x-hidden p-6">
             <FeatureLock featureName="Clients et facturation automatisee" requiredTier="expert">
-                <div className="mb-8 flex items-center gap-3">
+                <div data-tour="expert-hero" className="mb-8 flex items-center gap-3">
                     <div className="rounded-xl bg-[#0d1b35] p-3 shadow-sm">
                         <BriefcaseBusiness className="h-6 w-6 text-white" />
                     </div>
@@ -62,16 +62,22 @@ function ExpertDashboardContent() {
 
                 <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-12">
                     <div className="space-y-5 xl:col-span-4">
-                        <ClientForm onSuccess={fetchCRMData} />
-                        <InvoiceForm clients={clients as any} onSuccess={fetchCRMData} />
-                        <AdminPackCard year={year} />
+                        <div data-tour="expert-client-form">
+                            <ClientForm onSuccess={fetchCRMData} />
+                        </div>
+                        <div data-tour="expert-invoice-form">
+                            <InvoiceForm clients={clients as any} onSuccess={fetchCRMData} />
+                        </div>
+                        <div data-tour="expert-admin-pack">
+                            <AdminPackCard year={year} />
+                        </div>
                     </div>
 
                     <div className="space-y-5 xl:col-span-8">
-                        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                        <div data-tour="expert-portfolio" className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
                             <h3 className="mb-4 font-syne text-lg font-bold text-[#0d1b35]">Portefeuille clients</h3>
                             {loading ? (
-                                <div className="space-y-4 animate-pulse">
+                                <div className="animate-pulse space-y-4">
                                     <div className="h-20 w-full rounded-2xl bg-slate-100"></div>
                                     <div className="h-20 w-full rounded-2xl bg-slate-100"></div>
                                 </div>
@@ -81,8 +87,12 @@ function ExpertDashboardContent() {
                         </div>
 
                         <div className="grid grid-cols-1 gap-5 2xl:grid-cols-2">
-                            <CollectionsCockpitCard invoices={invoices} onRefresh={fetchCRMData} />
-                            <ClientInsightsCard clients={clients} invoices={invoices} />
+                            <div data-tour="expert-collections">
+                                <CollectionsCockpitCard invoices={invoices} onRefresh={fetchCRMData} />
+                            </div>
+                            <div data-tour="expert-insights">
+                                <ClientInsightsCard clients={clients} invoices={invoices} />
+                            </div>
                             <ClientRevenuePieChart clients={clients as any} />
                             <HealthScoreCard clients={clients} />
                         </div>

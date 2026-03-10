@@ -12,7 +12,7 @@ import { MonthlyChargesChart } from '@/components/dashboard/MonthlyChargesChart'
 import { ScenarioSimulatorCard } from '@/components/dashboard/ScenarioSimulatorCard';
 import { InvoiceDashboardWidget } from '@/components/dashboard/InvoiceDashboardWidget';
 import { OnboardingModal } from '@/components/dashboard/OnboardingModal';
-import { DecisionTimelineCard, HealthScoreCard, NetChangeExplainerCard, ReservePlannerCard } from '@/components/dashboard/InsightCards';
+import { DecisionTimelineCard, HealthScoreCard, NetChangeExplainerCard, PriorityActionCenterCard, ReservePlannerCard } from '@/components/dashboard/InsightCards';
 import { calculateAnnualProjection } from '@/lib/calculations';
 import { calculateCompositeNetBreakdown } from '@/lib/dashboard-insights';
 import { Loader2 } from 'lucide-react';
@@ -53,44 +53,64 @@ function DashboardContent() {
                 dismissable
             />
 
-            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+            <div data-tour="dashboard-priorities">
+                <PriorityActionCenterCard />
+            </div>
+
+            <div data-tour="dashboard-kpis" className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
                 <KPICard title="URSSAF a payer" value={totals.urssaf} colorType="urssaf" trend={urssafTrend} />
                 <KPICard title="Net en poche" value={totals.netReel} colorType="net" trend={netTrend} />
                 <KPICard title="CFE Provision" value={totals.cfe} colorType="cfe" />
                 <KPICard title="Projection Annuelle" value={projection} colorType="projection" />
             </div>
 
-            <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
-                <HealthScoreCard />
-                <ReservePlannerCard />
+            <div className="grid grid-cols-1 gap-5 xl:grid-cols-2 xl:auto-rows-fr">
+                <div id="health-score-card" className="h-full">
+                    <HealthScoreCard />
+                </div>
+                <div id="reserve-card" className="h-full">
+                    <ReservePlannerCard />
+                </div>
             </div>
 
             <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-12">
                 <div className="space-y-5 xl:col-span-7">
-                    <ActivityConfigPanel />
-                    <MonthlyEntryTable />
+                    <div id="activity-config" data-tour="activity-config">
+                        <ActivityConfigPanel />
+                    </div>
+                    <div id="monthly-entries" data-tour="monthly-entries">
+                        <MonthlyEntryTable />
+                    </div>
                     <TableActions />
                 </div>
 
                 <div className="space-y-5 xl:col-span-5">
                     <InvoiceDashboardWidget />
-                    <DecisionTimelineCard />
-                    <TVAProgressCard />
+                    <div id="actions-timeline" data-tour="actions-timeline">
+                        <DecisionTimelineCard />
+                    </div>
+                    <div id="tva-card" data-tour="tva-card">
+                        <TVAProgressCard />
+                    </div>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 items-stretch gap-5 xl:grid-cols-12">
-                <div className="xl:col-span-7">
+            <div className="grid grid-cols-1 items-stretch gap-5 xl:grid-cols-12 xl:auto-rows-fr">
+                <div id="why-net" className="h-full xl:col-span-7">
                     <NetChangeExplainerCard />
                 </div>
-                <div className="xl:col-span-5">
+                <div id="urssaf-calendar" className="h-full xl:col-span-5">
                     <URSSAFCalendarCard />
                 </div>
             </div>
 
             <div className="grid grid-cols-1 gap-5">
-                <ScenarioSimulatorCard />
-                <MonthlyChargesChart />
+                <div id="scenario-lab" data-tour="scenario-lab">
+                    <ScenarioSimulatorCard />
+                </div>
+                <div id="revenue-chart" data-tour="revenue-chart">
+                    <MonthlyChargesChart />
+                </div>
             </div>
         </div>
     );

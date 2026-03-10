@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { Lock } from 'lucide-react';
@@ -13,8 +13,8 @@ export interface FeatureLockProps {
 
 const LABELS = {
     unlockCopy: 'Passez au plan',
-    unlockMiddle: 'pour d\u00e9bloquer cette fonctionnalit\u00e9 exclusive.',
-    unlockButton: 'D\u00e9bloquer',
+    unlockMiddle: 'pour debloquer cette fonctionnalite exclusive.',
+    unlockButton: 'Debloquer',
 };
 
 export function FeatureLock({ children, featureName, requiredTier }: FeatureLockProps) {
@@ -30,18 +30,18 @@ export function FeatureLock({ children, featureName, requiredTier }: FeatureLock
     if (hasAccess) return <>{children}</>;
 
     return (
-        <div className="group relative overflow-hidden rounded-2xl border border-slate-200">
-            <div className="pointer-events-none select-none blur-[6px] opacity-40 filter">
+        <div className="group relative h-full overflow-hidden rounded-2xl border border-slate-200 bg-white">
+            <div className="pointer-events-none h-full select-none blur-[6px] opacity-40 filter">
                 {children}
             </div>
 
-            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/40 p-6 backdrop-blur-[2px]">
-                <div className="flex transform flex-col items-center rounded-3xl bg-white px-8 py-6 text-center shadow-xl transition-transform duration-300 group-hover:scale-105">
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/40 p-6 backdrop-blur-[2px]">
+                <div className="flex w-full max-w-[340px] transform flex-col items-center rounded-3xl bg-white px-8 py-6 text-center shadow-xl transition-transform duration-300 group-hover:scale-105">
                     <div className="mb-4 rounded-2xl bg-[#0d1b35] p-3 shadow-md">
                         <Lock className="h-8 w-8 text-white" />
                     </div>
                     <h3 className="mb-2 font-syne text-xl font-bold text-[#0d1b35]">{featureName}</h3>
-                    <p className="mb-6 max-w-[250px] text-sm text-slate-500">
+                    <p className="mb-6 max-w-[250px] text-sm leading-6 text-slate-500">
                         {LABELS.unlockCopy} <strong className="capitalize text-slate-800">{requiredTier}</strong> {LABELS.unlockMiddle}
                     </p>
                     <button
