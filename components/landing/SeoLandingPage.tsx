@@ -1,10 +1,19 @@
-import type { Metadata } from 'next';
+﻿import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import Script from 'next/script';
 import { createAppUrl, getConfiguredAppUrl } from '@/lib/app-url';
 import { getSeoLandingPage, seoLandingPages, type SeoLandingPage } from '@/lib/seo-pages';
 import '@/app/landing.css';
+
+function formatUpdatedDate(value: string) {
+  return new Intl.DateTimeFormat('fr-FR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(`${value}T00:00:00.000Z`));
+}
 
 export function buildSeoLandingMetadata(page: SeoLandingPage): Metadata {
   const pageUrl = createAppUrl(`/${page.slug}`);
@@ -55,7 +64,8 @@ export function buildSeoLandingMetadata(page: SeoLandingPage): Metadata {
 export function SeoLandingPageView({ page }: { page: SeoLandingPage }) {
   const appUrl = getConfiguredAppUrl();
   const pageUrl = createAppUrl(`/${page.slug}`, appUrl);
-  const relatedPages = seoLandingPages.filter((entry) => entry.slug !== page.slug);
+  const relatedPages = seoLandingPages.filter((entry) => entry.slug !== page.slug).slice(0, 3);
+  const formattedUpdatedDate = formatUpdatedDate(page.updatedAt);
 
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
@@ -83,6 +93,7 @@ export function SeoLandingPageView({ page }: { page: SeoLandingPage }) {
     description: page.description,
     url: pageUrl,
     inLanguage: 'fr-FR',
+    dateModified: page.updatedAt,
     isPartOf: {
       '@type': 'WebSite',
       name: 'NetEnPoche',
@@ -143,6 +154,26 @@ export function SeoLandingPageView({ page }: { page: SeoLandingPage }) {
       </section>
 
       <section className="section seo-section-tight">
+        <div className="seo-meta-grid">
+          <article className="seo-meta-card">
+            <div className="seo-meta-label">Mis a jour</div>
+            <div className="seo-meta-value">{formattedUpdatedDate}</div>
+            <p>Contenu SEO revu avec les regles et parcours utilisateur de mars 2026.</p>
+          </article>
+          <article className="seo-meta-card">
+            <div className="seo-meta-label">Positionnement</div>
+            <div className="seo-meta-value">Guide explicatif</div>
+            <p>NetEnPoche explique, projette et aide a piloter. La declaration se fait toujours sur les sites officiels.</p>
+          </article>
+          <article className="seo-meta-card">
+            <div className="seo-meta-label">Sources citees</div>
+            <div className="seo-meta-value">{page.officialSources.length} references</div>
+            <p>Chaque page renvoie vers les ressources publiques pertinentes avant la FAQ et les CTAs produit.</p>
+          </article>
+        </div>
+      </section>
+
+      <section className="section seo-section-tight">
         <div className="section-eyebrow">Ce que la page couvre</div>
         <h2 className="section-title">Les points que Google attend de voir sur cette requete</h2>
         <div className="seo-highlights-grid">
@@ -163,6 +194,20 @@ export function SeoLandingPageView({ page }: { page: SeoLandingPage }) {
             <article key={section.title} className="seo-copy-card">
               <h3>{section.title}</h3>
               <p>{section.text}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="section seo-section-tight" id="sources">
+        <div className="section-eyebrow">Sources officielles</div>
+        <h2 className="section-title">Les references publiques utiles pour verifier la regle</h2>
+        <div className="seo-sources-grid">
+          {page.officialSources.map((source) => (
+            <article key={source.url} className="seo-source-card">
+              <div className="seo-source-publisher">{source.publisher}</div>
+              <h3>{source.title}</h3>
+              <a href={source.url} target="_blank" rel="noopener noreferrer">Ouvrir la source officielle</a>
             </article>
           ))}
         </div>
@@ -215,8 +260,8 @@ export function SeoLandingPageView({ page }: { page: SeoLandingPage }) {
         </Link>
         <div className="footer-links">
           <Link href="/calcul-urssaf" className="footer-link">Calcul URSSAF</Link>
-          <Link href="/calcul-urssaf-auto-entrepreneur" className="footer-link">Auto-entrepreneur</Link>
-          <Link href="/calcul-net-auto-entrepreneur" className="footer-link">Net auto-entrepreneur</Link>
+          <Link href="/tva-micro-entreprise" className="footer-link">TVA micro-entreprise</Link>
+          <Link href="/versement-liberatoire-auto-entrepreneur" className="footer-link">Versement liberatoire</Link>
           <Link href="/auth/login" className="footer-link">Connexion</Link>
         </div>
         <span>Copyright 2026 NetEnPoche. Tous droits reserves.</span>
