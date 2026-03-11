@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useDashboard } from '@/contexts/DashboardContext';
 import { calculateCompositeNetBreakdown, formatCurrency } from '@/lib/dashboard-insights';
@@ -23,20 +23,26 @@ export function URSSAFCalendarCard() {
             .reduce((sum, entry) => sum + entry.ca_amount, 0);
         const amount = calculateCompositeNetBreakdown(quarterCA, config).urssaf;
         const status = quarter.dueDate < today ? 'paid' : quarter.dueDate.getTime() - today.getTime() <= 45 * 86400000 ? 'upcoming' : 'future';
+
         return {
             ...quarter,
             amount,
+            quarterCA,
+            hasData: quarterCA > 0,
             status,
         };
     });
 
-    const nextPayment = quarters.find((quarter) => quarter.status !== 'paid') || quarters[quarters.length - 1];
+    const nextPayment = quarters.find((quarter) => quarter.status !== 'paid' && quarter.hasData) || quarters.find((quarter) => quarter.status !== 'paid') || quarters[quarters.length - 1];
     const daysLeft = Math.max(0, Math.ceil((nextPayment.dueDate.getTime() - today.getTime()) / 86400000));
 
-    const StatusBadge = ({ status }: { status: string }) => {
-        if (status === 'paid') return <span className="flex items-center gap-1 rounded bg-[#00c875]/10 px-2 py-0.5 text-[10px] font-bold uppercase text-[#00c875]"><CheckCircle2 className="h-3 w-3" /> Payé</span>;
-        if (status === 'upcoming') return <span className="flex items-center gap-1 rounded bg-[#f5a623]/10 px-2 py-0.5 text-[10px] font-bold uppercase text-[#f5a623]"><Clock className="h-3 w-3" /> À venir</span>;
-        return <span className="rounded bg-slate-100 px-2 py-0.5 text-[10px] font-bold uppercase text-slate-400">Estimé</span>;
+    const StatusBadge = ({ status, hasData }: { status: string; hasData: boolean }) => {
+        if (!hasData && status !== 'paid') {
+            return <span className="rounded bg-slate-100 px-2 py-0.5 text-[10px] font-bold uppercase text-slate-400">CA manquant</span>;
+        }
+        if (status === 'paid') return <span className="flex items-center gap-1 rounded bg-[#00c875]/10 px-2 py-0.5 text-[10px] font-bold uppercase text-[#00c875]"><CheckCircle2 className="h-3 w-3" /> Paye</span>;
+        if (status === 'upcoming') return <span className="flex items-center gap-1 rounded bg-[#f5a623]/10 px-2 py-0.5 text-[10px] font-bold uppercase text-[#f5a623]"><Clock className="h-3 w-3" /> A venir</span>;
+        return <span className="rounded bg-slate-100 px-2 py-0.5 text-[10px] font-bold uppercase text-slate-400">Estime</span>;
     };
 
     return (
@@ -47,9 +53,9 @@ export function URSSAFCalendarCard() {
                 <div className="relative z-10 mb-4 flex items-start justify-between gap-4">
                     <div>
                         <h3 className="mb-1 flex items-center gap-2 text-sm font-medium text-slate-300">
-                            <CalendarDays className="h-4 w-4" /> Prochaine échéance
+                            <CalendarDays className="h-4 w-4" /> Prochaine echeance
                         </h3>
-                        <p className="font-syne text-3xl font-bold tracking-tight">{formatCurrency(nextPayment.amount)}</p>
+                        <p className="font-syne text-3xl font-bold tracking-tight">{nextPayment.hasData ? formatCurrency(nextPayment.amount) : 'A completer'}</p>
                     </div>
                     <div className="shrink-0 rounded-xl border border-white/10 bg-white/10 p-3 text-center backdrop-blur-md">
                         <span className="mb-1 block text-2xl font-black leading-none text-[#00c875]">{daysLeft}</span>
@@ -70,11 +76,15 @@ export function URSSAFCalendarCard() {
                                     {quarter.label}
                                 </div>
                                 <div className="flex flex-col">
-                                    <span className="text-sm font-bold text-slate-800">{formatCurrency(quarter.amount)}</span>
-                                    <span className="text-xs text-slate-400">{quarter.dueDate.toLocaleDateString('fr-FR')}</span>
+                                    <span className={`text-sm font-bold ${quarter.hasData ? 'text-slate-800' : 'text-slate-500'}`}>
+                                        {quarter.hasData ? formatCurrency(quarter.amount) : 'Non calculable'}
+                                    </span>
+                                    <span className="text-xs text-slate-400">
+                                        {quarter.hasData ? quarter.dueDate.toLocaleDateString('fr-FR') : 'Saisissez votre CA pour estimer'}
+                                    </span>
                                 </div>
                             </div>
-                            <StatusBadge status={quarter.status} />
+                            <StatusBadge status={quarter.status} hasData={quarter.hasData} />
                         </li>
                     ))}
                 </ul>

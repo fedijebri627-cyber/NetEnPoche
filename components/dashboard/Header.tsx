@@ -19,7 +19,7 @@ export function Header() {
         if (tier === 'pro') {
             return <span className="rounded-full bg-gradient-to-r from-[#00c875] to-teal-400 px-3 py-1 text-xs font-bold uppercase tracking-wide text-white shadow-sm">Pro</span>;
         }
-        return <span className="rounded-full bg-slate-600 px-3 py-1 text-xs font-bold uppercase tracking-wide text-slate-300">Essai libre</span>;
+        return <span className="rounded-full bg-slate-600 px-3 py-1 text-xs font-bold uppercase tracking-wide text-slate-300">Essai gratuit 14j</span>;
     };
 
     return (
@@ -57,3 +57,4 @@ export function Header() {
         </header>
     );
 }
+

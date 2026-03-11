@@ -12,7 +12,7 @@ import { MonthlyChargesChart } from '@/components/dashboard/MonthlyChargesChart'
 import { ScenarioSimulatorCard } from '@/components/dashboard/ScenarioSimulatorCard';
 import { InvoiceDashboardWidget } from '@/components/dashboard/InvoiceDashboardWidget';
 import { OnboardingModal } from '@/components/dashboard/OnboardingModal';
-import { DecisionTimelineCard, HealthScoreCard, NetChangeExplainerCard, PriorityActionCenterCard, ReservePlannerCard } from '@/components/dashboard/InsightCards';
+import { DecisionTimelineCard, HealthScoreCard, NetChangeExplainerCard, PriorityActionCenterCard, ReservePlannerCard, UpgradeOverviewBanner } from '@/components/dashboard/InsightCards';
 import { calculateAnnualProjection } from '@/lib/calculations';
 import { calculateCompositeNetBreakdown } from '@/lib/dashboard-insights';
 import { Loader2 } from 'lucide-react';
@@ -63,6 +63,8 @@ function DashboardContent() {
                 <KPICard title="CFE Provision" value={totals.cfe} colorType="cfe" />
                 <KPICard title="Projection Annuelle" value={projection} colorType="projection" />
             </div>
+
+            <UpgradeOverviewBanner />
 
             <div className="grid grid-cols-1 gap-5 xl:grid-cols-2 xl:auto-rows-fr">
                 <div id="health-score-card" className="h-full">

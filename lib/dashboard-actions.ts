@@ -1,4 +1,4 @@
-import {
+﻿import {
     buildDecisionTimeline,
     buildHealthScoreInsight,
     buildReservePlan,
@@ -156,8 +156,8 @@ export function buildPriorityActions(entries: InsightMonthlyEntry[], config: Ins
     if (actions.length < 3) {
         actions.push({
             id: 'onboarding-refresh',
-            title: "Refaites l'onboarding si votre situation a change",
-            detail: 'En deux minutes, vous remettez a jour activite, foyer fiscal, objectif et premier CA.',
+            title: "Votre situation a change ?",
+            detail: 'Mettez a jour votre profil fiscal en 2 minutes pour garder des priorites fiables.',
             value: 'Rapide',
             ctaLabel: "Relancer l'onboarding",
             severity: 'good',

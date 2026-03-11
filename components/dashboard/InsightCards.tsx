@@ -15,6 +15,7 @@ import {
 } from '@/lib/dashboard-insights';
 import { buildPriorityActions, type PriorityAction } from '@/lib/dashboard-actions';
 import { FeatureLock } from '@/components/dashboard/FeatureLock';
+import { UpgradeModal } from '@/components/dashboard/UpgradeModal';
 import { useSubscription } from '@/hooks/useSubscription';
 import { BarChart3, CalendarClock, ChevronRight, Loader2, PiggyBank, ShieldCheck, Sparkles, TrendingUpDown } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
@@ -159,18 +160,18 @@ export function PriorityActionCenterCard() {
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:min-w-[520px] xl:min-w-[560px]">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:min-w-[600px] xl:min-w-[680px]">
                         <div className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-sm">
                             <div className="text-xs font-semibold uppercase tracking-wide text-slate-300">Reserve</div>
-                            <div className="mt-2 overflow-hidden text-ellipsis font-syne text-[clamp(1.05rem,1.8vw,1.6rem)] font-black leading-none tracking-tight whitespace-nowrap">{formatCurrency(reserve.totalReserve)}</div>
+                            <div className="mt-2 font-syne text-[clamp(0.92rem,1.35vw,1.42rem)] font-black leading-tight tracking-tight tabular-nums">{formatCurrency(reserve.totalReserve)}</div>
                         </div>
                         <div className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-sm">
                             <div className="text-xs font-semibold uppercase tracking-wide text-slate-300">Sante</div>
-                            <div className="mt-2 overflow-hidden text-ellipsis font-syne text-[clamp(1.05rem,1.8vw,1.6rem)] font-black leading-none tracking-tight whitespace-nowrap">{health.score}/100</div>
+                            <div className="mt-2 font-syne text-[clamp(0.92rem,1.35vw,1.42rem)] font-black leading-tight tracking-tight tabular-nums">{health.score}/100</div>
                         </div>
                         <div className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-sm">
                             <div className="text-xs font-semibold uppercase tracking-wide text-slate-300">TVA</div>
-                            <div className="mt-2 overflow-hidden text-ellipsis font-syne text-[clamp(1.05rem,1.8vw,1.6rem)] font-black leading-none tracking-tight whitespace-nowrap">{tva.percentage.toFixed(0)}%</div>
+                            <div className="mt-2 font-syne text-[clamp(0.92rem,1.35vw,1.42rem)] font-black leading-tight tracking-tight tabular-nums">{tva.percentage.toFixed(0)}%</div>
                         </div>
                     </div>
                 </div>
@@ -216,6 +217,40 @@ export function PriorityActionCenterCard() {
                 </button>
             </div>
         </div>
+    );
+}
+
+export function UpgradeOverviewBanner() {
+    const { tier, loading } = useSubscription();
+    const [showModal, setShowModal] = useState(false);
+
+    if (loading || tier !== 'free') return null;
+
+    return (
+        <>
+            <div className="rounded-3xl border border-emerald-200 bg-emerald-50/80 p-5 shadow-sm">
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                    <div>
+                        <div className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
+                            Premium
+                        </div>
+                        <h3 className="mt-3 font-syne text-xl font-bold text-[#0d1b35]">Passez a Pro pour debloquer le cockpit complet</h3>
+                        <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
+                            Debloquez d'un coup le Score de sante, la Reserve intelligente, l'Analyse de votre net reel, le Scenario Lab v2 et la Timeline de decisions.
+                        </p>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => setShowModal(true)}
+                        className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#00c875] px-5 py-3 text-sm font-bold text-white shadow-lg shadow-[#00c875]/20 transition hover:bg-[#00b56a]"
+                    >
+                        Passer a Pro
+                        <ChevronRight className="h-4 w-4" />
+                    </button>
+                </div>
+            </div>
+            <UpgradeModal isOpen={showModal} onClose={() => setShowModal(false)} />
+        </>
     );
 }
 
@@ -375,7 +410,7 @@ export function NetChangeExplainerCard() {
     if (loading) return <div className="h-64 animate-pulse rounded-3xl bg-slate-100" />;
 
     return (
-        <FeatureLock featureName="Explication du net" requiredTier="pro">
+        <FeatureLock featureName="Analyse de votre net reel" requiredTier="pro">
             <div className="h-full rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div className="mb-5 flex items-start justify-between gap-4">
                     <div>
