@@ -81,7 +81,7 @@ export const seoCalculatorPages: SeoCalculatorPage[] = [
     cardDescription:
       'Convertissez votre chiffre d’affaires en vrai net freelance et comparez-le à un salarié sans créer de compte.',
     heroEyebrow: 'Simulateur freelance 2026',
-    heroTitle: 'De votre CA mensuel à un vrai net comparable à un salaire',
+    heroTitle: 'Simulateur Brut Net Auto-Entrepreneur : votre vrai net après URSSAF et impôt',
     heroSubtitle:
       'Entrez votre CA mensuel et voyez exactement ce que vous gardez après URSSAF et impôt, puis à quel salaire cela correspond vraiment côté salarié.',
     updatedAt: '2026-03-11',
@@ -475,6 +475,7 @@ export function getSeoCalculatorPageOrThrow(slug: string) {
 
   return page;
 }
+
 
 
 

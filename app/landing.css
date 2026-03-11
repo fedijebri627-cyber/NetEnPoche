@@ -2325,6 +2325,7 @@ th.comp-me {
 
 .seo-tool-slider {
   width: 100%;
+  accent-color: var(--primary-green);
 }
 
 .seo-tool-days-card ul {
@@ -2492,5 +2493,8 @@ th.comp-me {
     padding: 18px;
   }
 }
+
+
+
 
 
