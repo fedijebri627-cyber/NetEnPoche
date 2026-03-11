@@ -37,6 +37,7 @@ export type SeoCalculatorPage = {
   heroTitle: string;
   heroSubtitle: string;
   updatedAt: string;
+  updateNote: string;
   introPoints: string[];
   sections: SeoCalculatorSection[];
   faq: SeoCalculatorFaq[];
@@ -82,8 +83,9 @@ export const seoCalculatorPages: SeoCalculatorPage[] = [
     heroEyebrow: 'Simulateur freelance 2026',
     heroTitle: 'De votre CA mensuel à un vrai net comparable à un salaire',
     heroSubtitle:
-      'Cette page vise les recherches où les simulateurs salarials ne répondent pas. Vous saisissez un chiffre d’affaires mensuel, NetEnPoche le transforme en net après URSSAF et impôt, puis vous montre à quoi cela correspond côté salarié.',
+      'Entrez votre CA mensuel et voyez exactement ce que vous gardez après URSSAF et impôt, puis à quel salaire cela correspond vraiment côté salarié.',
     updatedAt: '2026-03-11',
+    updateNote: 'Simulation relue pour la comparaison brut/net freelance et le passage du CA au salaire equivalent.',
     introPoints: [
       'Calculez votre net freelance sans jargon ni écran de connexion.',
       'Comparez votre résultat à un salaire salarié pour rendre la réponse parlante.',
@@ -128,7 +130,7 @@ export const seoCalculatorPages: SeoCalculatorPage[] = [
         ],
       },
       {
-        title: 'Différences fondamentales entre salarié et micro-entrepreneur',
+        title: 'Brut net auto-entrepreneur : lire les résultats face à un salarié',
         paragraphs: [
           "Comparer un CA freelance à un salaire brut sans méthode mène presque toujours à une mauvaise décision. Le salarié voit un brut mensuel, puis un net avant impôt ou après impôt selon la fiche de paie. Le micro-entrepreneur voit surtout un chiffre d’affaires encaissé, auquel il doit mentalement retirer plusieurs couches. Les deux réalités ne parlent donc pas la même langue au départ.",
           "Le bon réflexe consiste à comparer deux chiffres interprétables : d’un côté le net freelance après URSSAF et impôt, de l’autre le net salarié sur une base cohérente. À partir de là, on peut remonter à un salaire brut équivalent. Cette traduction est très utile pour un indépendant qui veut négocier, benchmarker une proposition de CDI ou simplement répondre à la question que lui posent ses proches : 'oui, mais ça fait combien en vrai par rapport à un salaire ?'",
@@ -238,6 +240,7 @@ export const seoCalculatorPages: SeoCalculatorPage[] = [
     heroSubtitle:
       'Cette page prend les deux points de départ les plus fréquents — un salaire brut mensuel et un chiffre d’affaires freelance — puis les traduit dans la même langue : le revenu net. Vous voyez ensuite le point d’équilibre où le freelance passe devant.',
     updatedAt: '2026-03-11',
+    updateNote: 'Comparatif revu pour mieux lire le point d equilibre entre CDI et micro-entreprise.',
     introPoints: [
       'Comparez le net salarié au net freelance sur le même écran.',
       'Repérez le CA à partir duquel l’indépendance devient réellement plus rentable.',
@@ -245,7 +248,7 @@ export const seoCalculatorPages: SeoCalculatorPage[] = [
     ],
     sections: [
       {
-        title: 'La vraie comparaison freelance vs salarié ne se joue pas sur les apparences',
+        title: 'Freelance vs salarié : comment interpréter la comparaison',
         paragraphs: [
           "Beaucoup de comparatifs rapides opposent un salaire net à un chiffre d’affaires freelance. C’est le raccourci le plus fréquent et aussi le plus trompeur. Le salarié voit un revenu déjà filtré par la mécanique de la paie. Le freelance voit un montant encaissé qui reste à transformer. Tant que cette traduction n’est pas faite correctement, la comparaison donne un faux sentiment de supériorité ou de perte selon le cas.",
           "Le bon comparatif part donc de deux bases lisibles : un salaire brut transformé en net salarié d’un côté, un CA transformé en net freelance après URSSAF, impôt et provision CFE de l’autre. À ce moment seulement, on peut parler de différence mensuelle réelle. C’est la logique de cette page : sortir du débat théorique pour revenir à ce que vous pouvez vraiment garder.",
@@ -351,6 +354,7 @@ export const seoCalculatorPages: SeoCalculatorPage[] = [
     heroSubtitle:
       'Cette page répond à la question qui arrive avant même la première mission : combien facturer par jour pour sortir le bon net à la fin du mois ? Le calculateur part de votre objectif net, intègre URSSAF et fiscalité, puis remonte vers un TJM cohérent.',
     updatedAt: '2026-03-11',
+    updateNote: 'Calculateur ajusté pour partir d’un net cible et remonter vers un TJM crédible en 2026.',
     introPoints: [
       'Transformez un objectif de revenu net en TJM minimum concret.',
       'Intégrez les jours non facturables au lieu de raisonner sur un mois irréaliste.',
@@ -358,7 +362,7 @@ export const seoCalculatorPages: SeoCalculatorPage[] = [
     ],
     sections: [
       {
-        title: 'Comment calculer son TJM en auto-entreprise',
+        title: 'Comment utiliser ce calculateur TJM freelance',
         paragraphs: [
           "Le TJM ne se calcule pas en divisant un revenu annuel rêvé par 20 jours facturables théoriques tous les mois. Cette méthode oublie l’essentiel : les jours de prospection, l’administratif, les congés, les périodes sans mission et le poids réel des charges. Un TJM sérieux part d’un objectif de net, remonte au chiffre d’affaires nécessaire puis convertit ce montant en tarif journalier à partir d’un nombre de jours facturables réaliste.",
           "C’est exactement ce que fait le calculateur de cette page. Vous entrez le net mensuel que vous souhaitez réellement garder. NetEnPoche calcule le CA qu’il faut générer pour atteindre ce résultat après URSSAF, impôt et provision CFE, puis le divise par votre volume de jours facturables. Le TJM obtenu n’est pas un fantasme de commercial. C’est un seuil de survie ou de confort selon le niveau retenu.",
@@ -471,5 +475,8 @@ export function getSeoCalculatorPageOrThrow(slug: string) {
 
   return page;
 }
+
+
+
 
 

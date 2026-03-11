@@ -41,6 +41,20 @@ function formatPercent(value: number) {
   return `${value.toFixed(1)} %`;
 }
 
+function describeTvaStatus(percentage: number) {
+  const rounded = Math.round(percentage);
+
+  if (percentage >= 100) {
+    return `Seuil depasse - TVA obligatoire (${rounded} %)`;
+  }
+
+  if (percentage >= 85) {
+    return `Alerte TVA (${rounded} % du seuil)`;
+  }
+
+  return `${rounded} % du seuil`;
+}
+
 function BarComparison({
   leftLabel,
   leftValue,
@@ -122,7 +136,7 @@ function ToggleField({ checked, onChange, label }: { checked: boolean; onChange:
 }
 
 function BrutNetCalculator() {
-  const [monthlyCA, setMonthlyCA] = useState(5200);
+  const [monthlyCA, setMonthlyCA] = useState(2800);
   const [activityType, setActivityType] = useState<ActivityType>('services_bnc');
   const [familyStatus, setFamilyStatus] = useState<PublicFamilyStatus>('celibataire');
   const [versementLiberatoire, setVersementLiberatoire] = useState(false);
@@ -220,7 +234,7 @@ function BrutNetCalculator() {
             </div>
             <div className="seo-tool-data-row is-muted">
               <span>TVA surveillée</span>
-              <strong>{numberFormatter.format(Math.round(snapshot.tvaPercentage))}% du seuil</strong>
+              <strong>{describeTvaStatus(snapshot.tvaPercentage)}</strong>
             </div>
           </div>
         </div>
@@ -242,7 +256,7 @@ function BrutNetCalculator() {
 
 function FreelanceVsSalarieCalculator() {
   const [salaryGross, setSalaryGross] = useState(3500);
-  const [monthlyCA, setMonthlyCA] = useState(5200);
+  const [monthlyCA, setMonthlyCA] = useState(2800);
   const [activityType, setActivityType] = useState<ActivityType>('services_bnc');
   const [familyStatus, setFamilyStatus] = useState<PublicFamilyStatus>('celibataire');
   const [versementLiberatoire, setVersementLiberatoire] = useState(false);
@@ -359,7 +373,7 @@ function FreelanceVsSalarieCalculator() {
           </div>
           <div>
             <span className="seo-tool-data-label">TVA projetée</span>
-            <strong>{numberFormatter.format(Math.round(snapshot.tvaPercentage))}%</strong>
+            <strong>{describeTvaStatus(snapshot.tvaPercentage)}</strong>
           </div>
           <div>
             <span className="seo-tool-data-label">CFE mensuelle</span>
@@ -514,3 +528,4 @@ export function PublicSeoCalculator({ variant }: { variant: CalculatorVariant })
 
   return <BrutNetCalculator />;
 }
+

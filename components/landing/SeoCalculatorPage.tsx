@@ -226,7 +226,7 @@ export function SeoCalculatorPageView({ page }: { page: SeoCalculatorPage }) {
           <article className="seo-meta-card">
             <div className="seo-meta-label">Mis à jour</div>
             <div className="seo-meta-value">{formattedUpdatedDate}</div>
-            <p>Contenu relu pour les règles 2026 et pour les requêtes freelances visées.</p>
+            <p>{page.updateNote}</p>
           </article>
           <article className="seo-meta-card">
             <div className="seo-meta-label">Ce que fait la page</div>
@@ -398,3 +398,4 @@ export function SeoCalculatorPageView({ page }: { page: SeoCalculatorPage }) {
     </div>
   );
 }
+
