@@ -1499,6 +1499,13 @@ th.comp-me {
   line-height: 1.15;
 }
 
+.seo-meta-value--long {
+  font-family: var(--font-dm-sans), sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
 .seo-meta-card p,
 .seo-source-card a {
   margin-top: 14px;
@@ -2485,3 +2492,5 @@ th.comp-me {
     padding: 18px;
   }
 }
+
+

@@ -136,7 +136,7 @@ function ToggleField({ checked, onChange, label }: { checked: boolean; onChange:
 }
 
 function BrutNetCalculator() {
-  const [monthlyCA, setMonthlyCA] = useState(2800);
+  const [monthlyCA, setMonthlyCA] = useState(3200);
   const [activityType, setActivityType] = useState<ActivityType>('services_bnc');
   const [familyStatus, setFamilyStatus] = useState<PublicFamilyStatus>('celibataire');
   const [versementLiberatoire, setVersementLiberatoire] = useState(false);
@@ -256,7 +256,7 @@ function BrutNetCalculator() {
 
 function FreelanceVsSalarieCalculator() {
   const [salaryGross, setSalaryGross] = useState(3500);
-  const [monthlyCA, setMonthlyCA] = useState(2800);
+  const [monthlyCA, setMonthlyCA] = useState(3000);
   const [activityType, setActivityType] = useState<ActivityType>('services_bnc');
   const [familyStatus, setFamilyStatus] = useState<PublicFamilyStatus>('celibataire');
   const [versementLiberatoire, setVersementLiberatoire] = useState(false);
@@ -423,7 +423,7 @@ function TjmCalculator() {
             min={0}
             step={100}
             autoFocus
-            value={targetNet}
+            defaultValue={3500}
             onChange={(event) => setTargetNet(Math.max(0, Number(event.target.value || 0)))}
             className="seo-tool-input"
           />

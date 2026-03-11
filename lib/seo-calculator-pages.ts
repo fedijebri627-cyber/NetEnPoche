@@ -85,7 +85,7 @@ export const seoCalculatorPages: SeoCalculatorPage[] = [
     heroSubtitle:
       'Entrez votre CA mensuel et voyez exactement ce que vous gardez après URSSAF et impôt, puis à quel salaire cela correspond vraiment côté salarié.',
     updatedAt: '2026-03-11',
-    updateNote: 'Simulation relue pour la comparaison brut/net freelance et le passage du CA au salaire equivalent.',
+    updateNote: 'Mis à jour le 11 mars 2026 — calcul brut/net revu pour les taux micro-entrepreneur 2026.',
     introPoints: [
       'Calculez votre net freelance sans jargon ni écran de connexion.',
       'Comparez votre résultat à un salaire salarié pour rendre la réponse parlante.',
@@ -240,7 +240,7 @@ export const seoCalculatorPages: SeoCalculatorPage[] = [
     heroSubtitle:
       'Cette page prend les deux points de départ les plus fréquents — un salaire brut mensuel et un chiffre d’affaires freelance — puis les traduit dans la même langue : le revenu net. Vous voyez ensuite le point d’équilibre où le freelance passe devant.',
     updatedAt: '2026-03-11',
-    updateNote: 'Comparatif revu pour mieux lire le point d equilibre entre CDI et micro-entreprise.',
+    updateNote: 'Mis à jour le 11 mars 2026 — coefficients salarié et barème fiscal 2026 actualisés.',
     introPoints: [
       'Comparez le net salarié au net freelance sur le même écran.',
       'Repérez le CA à partir duquel l’indépendance devient réellement plus rentable.',
@@ -354,7 +354,7 @@ export const seoCalculatorPages: SeoCalculatorPage[] = [
     heroSubtitle:
       'Cette page répond à la question qui arrive avant même la première mission : combien facturer par jour pour sortir le bon net à la fin du mois ? Le calculateur part de votre objectif net, intègre URSSAF et fiscalité, puis remonte vers un TJM cohérent.',
     updatedAt: '2026-03-11',
-    updateNote: 'Calculateur ajusté pour partir d’un net cible et remonter vers un TJM crédible en 2026.',
+    updateNote: 'Mis à jour le 11 mars 2026 — taux URSSAF et barème IR 2026 vérifiés.',
     introPoints: [
       'Transformez un objectif de revenu net en TJM minimum concret.',
       'Intégrez les jours non facturables au lieu de raisonner sur un mois irréaliste.',
@@ -475,6 +475,7 @@ export function getSeoCalculatorPageOrThrow(slug: string) {
 
   return page;
 }
+
 
 
 

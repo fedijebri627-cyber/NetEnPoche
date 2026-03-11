@@ -35,15 +35,6 @@ const mandatoryLinks = [
   },
 ] as const;
 
-function formatUpdatedDate(value: string) {
-  return new Intl.DateTimeFormat('fr-FR', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    timeZone: 'UTC',
-  }).format(new Date(`${value}T00:00:00.000Z`));
-}
-
 export function buildSeoCalculatorMetadata(page: SeoCalculatorPage): Metadata {
   const pageUrl = createAppUrl(`/${page.slug}`);
 
@@ -97,8 +88,6 @@ export function buildSeoCalculatorMetadata(page: SeoCalculatorPage): Metadata {
 export function SeoCalculatorPageView({ page }: { page: SeoCalculatorPage }) {
   const appUrl = getConfiguredAppUrl();
   const pageUrl = createAppUrl(`/${page.slug}`, appUrl);
-  const formattedUpdatedDate = formatUpdatedDate(page.updatedAt);
-
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -225,8 +214,8 @@ export function SeoCalculatorPageView({ page }: { page: SeoCalculatorPage }) {
         <div className="seo-meta-grid">
           <article className="seo-meta-card">
             <div className="seo-meta-label">Mis à jour</div>
-            <div className="seo-meta-value">{formattedUpdatedDate}</div>
-            <p>{page.updateNote}</p>
+            <div className="seo-meta-value seo-meta-value--long">{page.updateNote}</div>
+
           </article>
           <article className="seo-meta-card">
             <div className="seo-meta-label">Ce que fait la page</div>
@@ -398,4 +387,7 @@ export function SeoCalculatorPageView({ page }: { page: SeoCalculatorPage }) {
     </div>
   );
 }
+
+
+
 
