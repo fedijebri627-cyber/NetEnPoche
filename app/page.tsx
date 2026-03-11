@@ -12,6 +12,7 @@ import { getConfiguredAppUrl } from '@/lib/app-url';
 import { NETENPOCHE_CONTACT_EMAIL } from '@/lib/contact';
 import { getLandingStats } from '@/lib/landing-stats';
 import { seoLandingPages } from '@/lib/seo-pages';
+import { seoCalculatorPages } from '@/lib/seo-calculator-pages';
 import './landing.css';
 
 const appUrl = getConfiguredAppUrl();
@@ -26,7 +27,12 @@ const guideDescriptions: Record<string, string> = {
   'tva-micro-entreprise': 'Comprendre quand la TVA change vraiment votre prix, vos factures et votre trésorerie.',
   'plafond-tva-auto-entrepreneur': 'Anticiper le moment où le seuil TVA approche et préparer la suite sans surprise.',
   'versement-liberatoire-auto-entrepreneur': 'Comparer votre situation avec ou sans versement libératoire avant de choisir.',
+  'simulateur-brut-net-auto-entrepreneur': 'Comparer votre net freelance à un salaire salarié sans ouvrir un tableur.',
+  'freelance-vs-salarie': 'Voir à partir de quel CA le freelance devient plus rentable qu’un salarié.',
+  'calculateur-tjm': 'Calculer le TJM minimum pour atteindre un objectif de net réaliste.',
 };
+
+const guidePages = [...seoLandingPages, ...seoCalculatorPages];
 
 export const metadata: Metadata = {
   title: homeTitle,
@@ -488,7 +494,7 @@ export default async function LandingPage() {
           Des guides clairs pour comprendre la TVA, l'impôt, le vrai net et les choix fiscaux sans devoir traduire une documentation administrative.
         </p>
         <div className="seo-guides-grid">
-          {seoLandingPages.map((page) => (
+          {guidePages.map((page) => (
             <Link key={page.slug} href={`/${page.slug}`} className="seo-guide-card">
               <div className="seo-guide-title">{page.cardTitle}</div>
               <p>{guideDescriptions[page.slug] || page.cardDescription}</p>
@@ -556,4 +562,6 @@ export default async function LandingPage() {
     </div>
   );
 }
+
+
 

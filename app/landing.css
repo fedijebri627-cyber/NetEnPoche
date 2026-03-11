@@ -1935,3 +1935,553 @@ th.comp-me {
   }
 }
 
+
+/* SEO calculator pages */
+.seo-tool-hero {
+  padding: 150px 60px 90px;
+  max-width: 1280px;
+  margin: 0 auto;
+  display: grid;
+  gap: 36px;
+}
+
+.seo-tool-hero-copy {
+  text-align: left;
+}
+
+.seo-tool-shell {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--gray-line);
+  border-radius: 24px;
+  padding: 22px;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.35);
+}
+
+.seo-tool-card-grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 1.1fr) minmax(320px, 0.9fr);
+  gap: 22px;
+}
+
+.seo-tool-card-grid.is-compare,
+.seo-tool-card-grid.is-tjm {
+  grid-template-columns: minmax(320px, 1fr) minmax(300px, 0.95fr);
+}
+
+.seo-tool-input-column,
+.seo-tool-output-column {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.seo-tool-input-column h2 {
+  font-family: var(--font-syne), sans-serif;
+  font-size: clamp(26px, 2.3vw, 34px);
+  line-height: 1.12;
+  color: white;
+}
+
+.seo-tool-input-column p,
+.seo-tool-output-panel p,
+.seo-tool-verdict-card p,
+.seo-tool-point-card p,
+.seo-example-card p,
+.seo-calculator-copy-card p,
+.seo-example-value span,
+.seo-tool-days-card li {
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.65;
+}
+
+.seo-tool-kicker {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 7px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 200, 117, 0.28);
+  background: rgba(0, 200, 117, 0.1);
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.seo-tool-points {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 28px;
+}
+
+.seo-tool-point-card {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.seo-tool-point-mark {
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 200, 117, 0.16);
+  color: var(--green);
+  font-weight: 700;
+}
+
+.seo-tool-label {
+  display: block;
+  margin-bottom: 8px;
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.seo-tool-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.seo-tool-input-wrap span {
+  color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+}
+
+.seo-tool-input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: white;
+  font-size: 28px;
+  font-weight: 700;
+  outline: none;
+}
+
+.seo-tool-chip-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.seo-tool-chip-grid.is-compact {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.seo-tool-chip {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.78);
+  border-radius: 14px;
+  padding: 13px 16px;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, transform 0.2s;
+}
+
+.seo-tool-chip:hover {
+  transform: translateY(-1px);
+}
+
+.seo-tool-chip.is-active {
+  border-color: rgba(0, 200, 117, 0.55);
+  background: rgba(0, 200, 117, 0.12);
+  color: white;
+}
+
+.seo-tool-field-group,
+.seo-tool-field-row {
+  display: grid;
+  gap: 12px;
+}
+
+.seo-tool-field-row {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.seo-tool-toggle {
+  width: 100%;
+  min-height: 50px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 0 14px;
+  color: rgba(255, 255, 255, 0.82);
+  cursor: pointer;
+}
+
+.seo-tool-toggle.is-active {
+  border-color: rgba(0, 200, 117, 0.45);
+  background: rgba(0, 200, 117, 0.12);
+}
+
+.seo-tool-toggle-knob {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  background: transparent;
+}
+
+.seo-tool-toggle.is-active .seo-tool-toggle-knob {
+  border-color: var(--green);
+  background: var(--green);
+  box-shadow: 0 0 18px rgba(0, 200, 117, 0.25);
+}
+
+.seo-tool-output-panel,
+.seo-tool-verdict-card,
+.seo-tool-mini-panel,
+.seo-tool-days-card {
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 20px;
+}
+
+.seo-tool-panel-title {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 14px;
+}
+
+.seo-tool-data-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.seo-tool-data-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.seo-tool-data-row strong,
+.seo-tool-result-box strong,
+.seo-tool-big-number,
+.seo-example-value strong {
+  font-family: var(--font-syne), sans-serif;
+  color: white;
+}
+
+.seo-tool-data-row.is-highlight strong,
+.seo-tool-big-number,
+.seo-tool-result-box strong,
+.seo-tool-verdict-badge.is-positive {
+  color: var(--green);
+}
+
+.seo-tool-data-row.is-muted {
+  color: rgba(255, 255, 255, 0.52);
+}
+
+.seo-tool-result-box {
+  margin-top: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.seo-tool-verdict-card {
+  background: linear-gradient(180deg, rgba(22, 40, 72, 0.96), rgba(13, 27, 53, 0.96));
+}
+
+.seo-tool-verdict-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.seo-tool-verdict-badge.is-negative {
+  color: #ff9b9b;
+}
+
+.seo-tool-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.seo-tool-bar-row {
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+}
+
+.seo-tool-bar-copy {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.seo-tool-bar-track {
+  height: 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.seo-tool-bar-fill {
+  height: 100%;
+  border-radius: inherit;
+}
+
+.seo-tool-bar-fill.is-green {
+  background: linear-gradient(90deg, #00c875, #62f4b6);
+}
+
+.seo-tool-bar-fill.is-navy {
+  background: linear-gradient(90deg, #2e4877, #6f8fca);
+}
+
+.seo-tool-compare-panels {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.seo-tool-big-number {
+  font-size: clamp(34px, 4vw, 52px);
+  line-height: 1;
+}
+
+.seo-tool-panel-copy {
+  margin-top: 10px;
+}
+
+.seo-tool-output-panel.is-split,
+.seo-tool-output-panel.is-highlight-panel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.seo-tool-output-panel.is-highlight-panel {
+  background: rgba(0, 200, 117, 0.08);
+  border-color: rgba(0, 200, 117, 0.18);
+}
+
+.seo-tool-data-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.52);
+}
+
+.seo-tool-slider-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+}
+
+.seo-tool-slider {
+  width: 100%;
+}
+
+.seo-tool-days-card ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.seo-tool-cta-row {
+  margin-top: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: rgba(0, 200, 117, 0.08);
+  border: 1px solid rgba(0, 200, 117, 0.18);
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.seo-example-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.seo-example-card,
+.seo-calculator-copy-card {
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 24px;
+}
+
+.seo-example-card h3,
+.seo-calculator-copy-card h3,
+.seo-guide-card.is-current .seo-guide-title {
+  color: white;
+}
+
+.seo-example-values {
+  margin-top: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.seo-example-value {
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.seo-calculator-section-title {
+  max-width: 900px;
+}
+
+.seo-calculator-copy-card {
+  display: grid;
+  gap: 16px;
+}
+
+.seo-calculator-bullets {
+  padding-left: 22px;
+  display: grid;
+  gap: 10px;
+  color: rgba(255, 255, 255, 0.76);
+}
+
+.seo-calculator-table-wrap {
+  overflow-x: auto;
+}
+
+.seo-calculator-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.seo-calculator-table th,
+.seo-calculator-table td {
+  text-align: left;
+  padding: 14px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.seo-calculator-table th {
+  color: white;
+}
+
+.seo-calculator-table td {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.seo-inline-cta {
+  margin-top: 18px;
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+  padding: 24px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(13, 27, 53, 0.96), rgba(22, 40, 72, 0.96));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.seo-inline-cta h3 {
+  font-family: var(--font-syne), sans-serif;
+  color: white;
+  margin-bottom: 6px;
+}
+
+.seo-guide-card.is-current {
+  cursor: default;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+@media (max-width: 1080px) {
+  .seo-tool-points,
+  .seo-example-grid,
+  .seo-tool-card-grid,
+  .seo-tool-card-grid.is-compare,
+  .seo-tool-card-grid.is-tjm,
+  .seo-tool-field-row,
+  .seo-tool-compare-panels,
+  .seo-tool-output-panel.is-split,
+  .seo-tool-output-panel.is-highlight-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .seo-tool-bar-row {
+    grid-template-columns: 1fr;
+  }
+
+  .seo-tool-cta-row,
+  .seo-inline-cta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 768px) {
+  .seo-tool-hero {
+    padding: 120px 20px 72px;
+  }
+
+  .seo-tool-shell {
+    padding: 16px;
+  }
+
+  .seo-tool-input {
+    font-size: 22px;
+  }
+
+  .seo-tool-point-card,
+  .seo-example-card,
+  .seo-calculator-copy-card,
+  .seo-tool-output-panel,
+  .seo-tool-verdict-card,
+  .seo-tool-mini-panel,
+  .seo-tool-days-card {
+    padding: 18px;
+  }
+}
