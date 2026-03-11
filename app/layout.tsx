@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+﻿import type { Metadata } from 'next';
 import { Syne, DM_Sans } from 'next/font/google';
 import Script from 'next/script';
 import { CookieBanner } from '@/components/global/CookieBanner';
@@ -92,6 +92,7 @@ export default function RootLayout({
   return (
     <html lang="fr" className={`${syne.variable} ${dmSans.variable}`}>
       <head>
+        <meta charSet="utf-8" />
         <meta name="google-site-verification" content="gvmIkCjUPyqOS58IJ_J12s-W05ZaZwy-tevTC2pCqhc" />
         <Script defer data-domain="netenpoche.fr" src="https://plausible.io/js/script.js" strategy="afterInteractive" />
       </head>
@@ -102,5 +103,4 @@ export default function RootLayout({
     </html>
   );
 }
-
 

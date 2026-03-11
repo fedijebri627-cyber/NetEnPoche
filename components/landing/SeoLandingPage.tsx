@@ -134,10 +134,10 @@ export function SeoLandingPageView({ page }: { page: SeoLandingPage }) {
           />
         </Link>
         <div className="nav-links">
-          <Link href="/#features" className="nav-link">Fonctionnalites</Link>
+          <Link href="/#features" className="nav-link">Fonctionnalités</Link>
           <Link href="/#pricing" className="nav-link">Tarifs</Link>
           <Link href="/#faq" className="nav-link">FAQ</Link>
-          <Link href="/auth/register" className="nav-cta">Creer mon compte</Link>
+          <Link href="/auth/register" className="nav-cta">Créer mon compte</Link>
         </div>
       </nav>
 
@@ -148,7 +148,7 @@ export function SeoLandingPageView({ page }: { page: SeoLandingPage }) {
           <p className="hero-sub seo-hero-sub">{page.heroSubtitle}</p>
           <div className="hero-actions seo-hero-actions">
             <Link href="/auth/register" className="btn-hero-primary">Essayer le simulateur</Link>
-            <Link href="/" className="btn-hero-secondary">Retour a l accueil</Link>
+            <Link href="/" className="btn-hero-secondary">Retour à l’accueil</Link>
           </div>
         </div>
       </section>
@@ -156,26 +156,26 @@ export function SeoLandingPageView({ page }: { page: SeoLandingPage }) {
       <section className="section seo-section-tight">
         <div className="seo-meta-grid">
           <article className="seo-meta-card">
-            <div className="seo-meta-label">Mis a jour</div>
+            <div className="seo-meta-label">Mis à jour</div>
             <div className="seo-meta-value">{formattedUpdatedDate}</div>
-            <p>Contenu SEO revu avec les regles et parcours utilisateur de mars 2026.</p>
+            <p>Contenu revu avec les règles et parcours utilisateur de mars 2026.</p>
           </article>
           <article className="seo-meta-card">
             <div className="seo-meta-label">Positionnement</div>
             <div className="seo-meta-value">Guide explicatif</div>
-            <p>NetEnPoche explique, projette et aide a piloter. La declaration se fait toujours sur les sites officiels.</p>
+            <p>NetEnPoche explique, projette et aide à piloter. La déclaration se fait toujours sur les sites officiels.</p>
           </article>
           <article className="seo-meta-card">
-            <div className="seo-meta-label">Sources citees</div>
-            <div className="seo-meta-value">{page.officialSources.length} references</div>
-            <p>Chaque page renvoie vers les ressources publiques pertinentes avant la FAQ et les CTAs produit.</p>
+            <div className="seo-meta-label">Sources citées</div>
+            <div className="seo-meta-value">{page.officialSources.length} références</div>
+            <p>Chaque page renvoie vers les ressources publiques pertinentes avant la FAQ et les appels à l’action produit.</p>
           </article>
         </div>
       </section>
 
       <section className="section seo-section-tight">
         <div className="section-eyebrow">Ce que la page couvre</div>
-        <h2 className="section-title">Les points que Google attend de voir sur cette requete</h2>
+        <h2 className="section-title">Les points que Google attend de voir sur cette requête</h2>
         <div className="seo-highlights-grid">
           {page.highlights.map((item) => (
             <div key={item} className="seo-highlight-card">
@@ -187,8 +187,8 @@ export function SeoLandingPageView({ page }: { page: SeoLandingPage }) {
       </section>
 
       <section className="section seo-section-tight">
-        <div className="section-eyebrow">Reponse editoriale</div>
-        <h2 className="section-title">Un contenu plus precis que le SERP actuel</h2>
+        <div className="section-eyebrow">Réponse éditoriale</div>
+        <h2 className="section-title">Un contenu plus précis que le SERP actuel</h2>
         <div className="seo-copy-grid">
           {page.sections.map((section) => (
             <article key={section.title} className="seo-copy-card">
@@ -201,7 +201,7 @@ export function SeoLandingPageView({ page }: { page: SeoLandingPage }) {
 
       <section className="section seo-section-tight" id="sources">
         <div className="section-eyebrow">Sources officielles</div>
-        <h2 className="section-title">Les references publiques utiles pour verifier la regle</h2>
+        <h2 className="section-title">Les références publiques utiles pour vérifier la règle</h2>
         <div className="seo-sources-grid">
           {page.officialSources.map((source) => (
             <article key={source.url} className="seo-source-card">
@@ -214,8 +214,8 @@ export function SeoLandingPageView({ page }: { page: SeoLandingPage }) {
       </section>
 
       <section className="section seo-section-tight" id="faq">
-        <div className="section-eyebrow">Questions frequentes</div>
-        <h2 className="section-title">FAQ liee a cette intention de recherche</h2>
+        <div className="section-eyebrow">Questions fréquentes</div>
+        <h2 className="section-title">FAQ liée à cette intention de recherche</h2>
         <div className="seo-faq-list">
           {page.faq.map((item) => (
             <article key={item.question} className="seo-faq-card">
@@ -227,25 +227,25 @@ export function SeoLandingPageView({ page }: { page: SeoLandingPage }) {
       </section>
 
       <section className="section seo-section-tight">
-        <div className="section-eyebrow">Autres entrees SEO</div>
-        <h2 className="section-title">Poursuivre vers des requetes plus ciblees</h2>
+        <div className="section-eyebrow">Autres guides utiles</div>
+        <h2 className="section-title">Poursuivre vers des questions plus ciblées</h2>
         <div className="seo-guides-grid">
           {relatedPages.map((relatedPage) => (
             <Link key={relatedPage.slug} href={`/${relatedPage.slug}`} className="seo-guide-card">
               <div className="seo-guide-title">{relatedPage.cardTitle}</div>
               <p>{relatedPage.cardDescription}</p>
-              <span>Voir la page</span>
+              <span>Voir le guide</span>
             </Link>
           ))}
         </div>
       </section>
 
       <section className="final-cta seo-final-cta">
-        <h2 className="final-cta-title">Passez du calcul theorique a une vision exploitable.</h2>
+        <h2 className="final-cta-title">Passez du calcul théorique à une vision exploitable.</h2>
         <p className="final-cta-sub">
-          Creez un compte gratuit pour visualiser vos cotisations URSSAF, la TVA et votre net apres impot sur la meme interface.
+          Créez un compte gratuit pour visualiser vos cotisations URSSAF, la TVA et votre net après impôt sur la même interface.
         </p>
-        <Link href="/auth/register" className="btn-hero-primary">Creer mon compte gratuit</Link>
+        <Link href="/auth/register" className="btn-hero-primary">Créer mon compte gratuit</Link>
       </section>
 
       <footer>
@@ -261,10 +261,13 @@ export function SeoLandingPageView({ page }: { page: SeoLandingPage }) {
         <div className="footer-links">
           <Link href="/calcul-urssaf" className="footer-link">Calcul URSSAF</Link>
           <Link href="/tva-micro-entreprise" className="footer-link">TVA micro-entreprise</Link>
-          <Link href="/versement-liberatoire-auto-entrepreneur" className="footer-link">Versement liberatoire</Link>
+          <Link href="/versement-liberatoire-auto-entrepreneur" className="footer-link">Versement libératoire</Link>
+          <Link href="/cgu" className="footer-link">CGU</Link>
+          <Link href="/rgpd" className="footer-link">RGPD</Link>
+          <Link href="/contact" className="footer-link">Contact</Link>
           <Link href="/auth/login" className="footer-link">Connexion</Link>
         </div>
-        <span>Copyright 2026 NetEnPoche. Tous droits reserves.</span>
+        <span>Copyright 2026 NetEnPoche. Tous droits réservés.</span>
       </footer>
     </div>
   );
