@@ -11,6 +11,7 @@ import { WaitlistSection } from '@/components/landing/WaitlistSection';
 import { getConfiguredAppUrl } from '@/lib/app-url';
 import { NETENPOCHE_CONTACT_EMAIL } from '@/lib/contact';
 import { getLandingStats } from '@/lib/landing-stats';
+import { getLatestPosts } from '@/lib/blog';
 import { seoLandingPages } from '@/lib/seo-pages';
 import { seoCalculatorPages } from '@/lib/seo-calculator-pages';
 import './landing.css';
@@ -87,6 +88,7 @@ export const metadata: Metadata = {
 
 export default async function LandingPage() {
   const stats = await getLandingStats();
+  const latestBlogPosts = getLatestPosts();
 
   const organizationJsonLd = {
     '@context': 'https://schema.org',
@@ -184,6 +186,7 @@ export default async function LandingPage() {
         <div className="nav-links">
           <a href="#features" className="nav-link">Fonctionnalités</a>
           <a href="#pricing" className="nav-link">Tarifs</a>
+          <Link href="/blog" className="nav-link">Blog</Link>
           <a href="#guides" className="nav-link">Guides</a>
           <a href="#faq" className="nav-link">FAQ</a>
           <Link href="/auth/register" className="nav-cta">Créer mon compte</Link>
@@ -504,25 +507,24 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      <section className="section" id="ressources">
-        <div className="section-eyebrow">Sources officielles</div>
-        <h2 className="section-title">Comparer NetEnPoche avec les références publiques</h2>
+      <section className="section" id="blog">
+        <div className="section-eyebrow">Blog</div>
+        <h2 className="section-title">Des articles publiés directement sur NetEnPoche</h2>
+        <p className="section-sub">
+          Des analyses écrites pour attirer du trafic utile puis renvoyer vers les simulateurs et le compte gratuit.
+        </p>
         <div className="blog-grid">
-          <div className="blog-card">
-            <div className="blog-date">Guide officiel</div>
-            <div className="blog-title">Taux de cotisations sociales des micro-entrepreneurs (URSSAF)</div>
-            <a href="https://www.autoentrepreneur.urssaf.fr/portail/accueil/sinformer-sur-le-statut/lessentiel-du-statut.html" target="_blank" rel="noopener noreferrer" className="blog-link">Lire sur urssaf.fr -&gt;</a>
-          </div>
-          <div className="blog-card">
-            <div className="blog-date">Guide officiel</div>
-            <div className="blog-title">Franchise en base de TVA : seuils et obligations pour les micro-entreprises</div>
-            <a href="https://www.service-public.fr/professionnels-entreprises/vosdroits/F21746" target="_blank" rel="noopener noreferrer" className="blog-link">Lire sur service-public.fr -&gt;</a>
-          </div>
-          <div className="blog-card">
-            <div className="blog-date">Guide officiel</div>
-            <div className="blog-title">Versement libératoire de l'impôt sur le revenu : conditions et calcul</div>
-            <a href="https://www.impots.gouv.fr/professionnel/le-versement-liberatoire" target="_blank" rel="noopener noreferrer" className="blog-link">Lire sur impots.gouv.fr -&gt;</a>
-          </div>
+          {latestBlogPosts.map((post) => (
+            <Link key={post.slug} href={`/blog/${post.slug}`} className="blog-card">
+              <div className="blog-date">{post.category} • {post.readTime}</div>
+              <div className="blog-title">{post.title}</div>
+              <p className="blog-copy">{post.excerpt || post.description}</p>
+              <span className="blog-link">Lire l'article -&gt;</span>
+            </Link>
+          ))}
+        </div>
+        <div className="blog-section-cta-row">
+          <Link href="/blog" className="btn-hero-secondary">Voir tous les articles</Link>
         </div>
       </section>
 
@@ -551,6 +553,7 @@ export default async function LandingPage() {
         <div className="footer-links">
           <a href="#features" className="footer-link">Fonctionnalités</a>
           <a href="#pricing" className="footer-link">Tarifs</a>
+          <Link href="/blog" className="footer-link">Blog</Link>
           <a href="#faq" className="footer-link">FAQ</a>
           <Link href="/cgu" className="footer-link">CGU</Link>
           <Link href="/rgpd" className="footer-link">RGPD</Link>
@@ -562,6 +565,8 @@ export default async function LandingPage() {
     </div>
   );
 }
+
+
 
 
 
