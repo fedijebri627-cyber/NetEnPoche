@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   --navy: #0d1b35;
   --navy-2: #162848;
   --navy-3: #1f3660;
@@ -2666,9 +2666,11 @@ th.comp-me {
 
 .blog-article-card table {
   width: 100%;
+  display: block;
+  overflow-x: auto;
   border-collapse: collapse;
   margin-top: 20px;
-  overflow: hidden;
+  overflow-y: hidden;
   border-radius: 16px;
 }
 

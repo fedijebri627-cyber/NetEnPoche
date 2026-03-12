@@ -1,8 +1,9 @@
-﻿import type { Metadata } from 'next';
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import Script from 'next/script';
 import { MDXRemote } from 'next-mdx-remote/rsc';
+import remarkGfm from 'remark-gfm';
 import { createAppUrl, getConfiguredAppUrl } from '@/lib/app-url';
 import type { BlogPost, BlogPostPreview } from '@/lib/blog';
 import '@/app/landing.css';
@@ -277,7 +278,7 @@ export function BlogPostPageView({ post, relatedPosts }: { post: BlogPost; relat
 
       <section className="section seo-section-tight blog-article-shell">
         <article className="blog-article-card">
-          <MDXRemote source={post.content} />
+          <MDXRemote source={post.content} options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }} />
         </article>
       </section>
 
