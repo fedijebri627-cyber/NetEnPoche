@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { DashboardProvider } from '@/contexts/DashboardContext';
 import { IRConfigForm } from '@/components/dashboard/optimisation/IRConfigForm';
 import { VLComparisonCard } from '@/components/dashboard/optimisation/VLComparisonCard';
@@ -12,12 +11,11 @@ import { MultiYearReviewCard, NetChangeExplainerCard } from '@/components/dashbo
 import { ScenarioSimulatorCard } from '@/components/dashboard/ScenarioSimulatorCard';
 
 function OptimisationContent() {
-    const searchParams = useSearchParams();
-
     useEffect(() => {
         if (typeof window === 'undefined') return;
 
-        const focusTargetId = searchParams.get('focus');
+        const currentUrl = new URL(window.location.href);
+        const focusTargetId = currentUrl.searchParams.get('focus');
         if (!focusTargetId) return;
 
         const target = document.getElementById(focusTargetId);
@@ -57,10 +55,9 @@ function OptimisationContent() {
 
             liveTarget.setAttribute('data-tour-pulse', 'true');
 
-            const url = new URL(window.location.href);
-            url.searchParams.delete('focus');
-            url.hash = '';
-            window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+            currentUrl.searchParams.delete('focus');
+            currentUrl.hash = '';
+            window.history.replaceState({}, '', `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`);
 
             const cleanupTimeout = window.setTimeout(() => {
                 liveTarget.removeAttribute('data-tour-pulse');
@@ -73,7 +70,7 @@ function OptimisationContent() {
         return () => {
             timeouts.forEach((timeoutId) => window.clearTimeout(timeoutId));
         };
-    }, [searchParams]);
+    }, []);
 
     return (
         <div data-tour="optimisation-hero" className="mx-auto max-w-7xl space-y-5 p-6">
