@@ -1,97 +1,88 @@
 'use client';
 
+import { useState } from 'react';
+import { Wallet } from 'lucide-react';
 import { useDashboard } from '@/contexts/DashboardContext';
 import { calculateCompositeNetBreakdown, formatCurrency } from '@/lib/dashboard-insights';
-import { useEffect, useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell } from 'recharts';
-import { Wallet } from 'lucide-react';
 import { useSubscription } from '@/hooks/useSubscription';
 import { UpgradeModal } from '@/components/dashboard/UpgradeModal';
 
-export function IRWaterfallChart() {
-    const { entries, config, loading } = useDashboard();
-    const { tier } = useSubscription();
-    const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-    const [mounted, setMounted] = useState(false);
-
-    useEffect(() => setMounted(true), []);
-
-    if (loading || !mounted) return <div className="animate-pulse h-[500px] bg-slate-100 rounded-3xl" />;
-
-    const isFreeTier = tier === 'free';
+function WaterfallContent() {
+    const { entries, config } = useDashboard();
     const totalCA = entries.reduce((acc, curr) => acc + curr.ca_amount, 0);
     const totals = calculateCompositeNetBreakdown(totalCA, config);
 
-    const data = [
-        { name: 'CA Brut', value: totalCA, fill: '#0d1b35', padding: 0 },
-        { name: 'URSSAF', value: totals.urssaf, fill: '#f5a623', padding: totalCA - totals.urssaf },
-        { name: 'IR', value: totals.ir, fill: '#e84040', padding: totalCA - totals.urssaf - totals.ir },
-        { name: 'Net Final', value: totals.netReel > 0 ? totals.netReel : 0, fill: '#00c875', padding: 0 },
-    ];
-
-    const ChartContent = () => (
-        <div className="relative border border-slate-200 bg-white rounded-3xl p-6 shadow-sm overflow-hidden min-h-[500px] flex flex-col">
-            <div className="flex items-center space-x-2 mb-8">
-                <div className="bg-[#00c875]/10 p-2 rounded-lg"><Wallet className="w-5 h-5 text-[#00c875]" /></div>
-                <h2 className="text-xl font-bold font-syne text-[#0d1b35]">De votre CA Brut a votre poche</h2>
+    return (
+        <div className="rounded-[12px] border border-slate-200 bg-white p-4">
+            <div className="mb-4 flex items-center gap-2">
+                <div className="rounded-lg bg-slate-100 p-2">
+                    <Wallet className="h-4 w-4 text-slate-500" />
+                </div>
+                <h2 className="text-lg font-medium text-slate-900">De votre CA brut à votre poche</h2>
             </div>
 
-            <div className="flex-1 w-full relative z-10">
-                <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={data} layout="vertical" margin={{ top: 0, right: 30, left: 10, bottom: 0 }}>
-                        <XAxis type="number" hide />
-                        <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fill: '#0d1b35', fontSize: 13, fontWeight: 700 }} width={80} />
-                        <Bar dataKey="padding" stackId="a" fill="transparent" />
-                        <Bar dataKey="value" stackId="a" radius={4} animationDuration={1500} isAnimationActive={!isFreeTier}>
-                            {data.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={entry.fill} />
-                            ))}
-                        </Bar>
-                    </BarChart>
-                </ResponsiveContainer>
-
-                <div className="absolute top-0 right-0 h-full flex flex-col justify-around py-4 w-32 items-end pointer-events-none pr-8">
-                    <span className="font-bold text-[#0d1b35] text-lg font-syne bg-white/50 px-2 rounded">{formatCurrency(totalCA)}</span>
-                    <span className="font-bold text-[#f5a623] text-lg font-syne bg-white/50 px-2 rounded">-{formatCurrency(totals.urssaf)}</span>
-                    <span className="font-bold text-[#e84040] text-lg font-syne bg-white/50 px-2 rounded">-{formatCurrency(totals.ir)}</span>
-                    <span className="font-black text-[#00c875] text-2xl font-syne bg-white/50 px-2 rounded">{formatCurrency(totals.netReel)}</span>
+            <div className="space-y-2">
+                <div className="flex items-center justify-between rounded-[8px] bg-slate-50 px-4 py-3 text-[13px]">
+                    <span className="text-slate-700">CA annuel brut</span>
+                    <span className="font-medium text-slate-900">{formatCurrency(totalCA)}</span>
+                </div>
+                <div className="flex items-center justify-between rounded-[8px] border border-slate-200 px-4 py-3 text-[13px]">
+                    <span className="text-slate-700">- URSSAF</span>
+                    <span className="font-medium text-[#791f1f]">-{formatCurrency(totals.urssaf)}</span>
+                </div>
+                <div className="flex items-center justify-between rounded-[8px] border border-slate-200 px-4 py-3 text-[13px]">
+                    <span className="text-slate-700">- Impôt estimé</span>
+                    <span className="font-medium text-[#791f1f]">-{formatCurrency(totals.ir)}</span>
+                </div>
+                <div className="flex items-center justify-between rounded-[8px] border border-slate-200 px-4 py-3 text-[13px]">
+                    <span className="text-slate-700">- CFE provision</span>
+                    <span className="font-medium text-[#791f1f]">-{formatCurrency(totals.cfe)}</span>
                 </div>
             </div>
 
-            <div className="mt-8 pt-6 border-t border-slate-100 flex items-center justify-between">
+            <div className="my-4 h-px bg-slate-200" />
+
+            <div className="flex items-center justify-between rounded-[8px] border border-[#b5dfc7] bg-[#eaf3de] px-4 py-4">
                 <div>
-                    <span className="text-slate-500 text-sm font-medium">Taux global d'imposition</span>
-                    <div className="text-2xl font-black text-[#0d1b35] font-syne">{(totals.tauxGlobal * 100).toFixed(1)}%</div>
+                    <div className="text-[12px] uppercase tracking-[0.04em] text-[#27500a]">Net réel en poche</div>
+                    <div className="mt-1 text-[22px] font-medium text-[#1d9e75]">{formatCurrency(totals.netReel)}</div>
                 </div>
-                <div className="text-right">
-                    <span className="text-slate-500 text-sm font-medium">Net reel en poche</span>
-                    <div className="text-3xl font-black text-[#00c875] font-syne bg-[#00c875]/10 px-4 py-2 rounded-xl mt-1">{formatCurrency(totals.netReel)}</div>
+                <div className="text-right text-[11px] text-slate-500">
+                    Taux global d&apos;imposition : {(totals.tauxGlobal * 100).toFixed(1)}%
                 </div>
             </div>
         </div>
     );
+}
 
-    if (!isFreeTier) return <ChartContent />;
+export function IRWaterfallChart() {
+    const { loading } = useDashboard();
+    const { tier } = useSubscription();
+    const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+
+    if (loading) return <div className="h-[320px] animate-pulse rounded-xl bg-slate-100" />;
+
+    if (tier !== 'free') {
+        return <WaterfallContent />;
+    }
 
     return (
-        <div className="relative group min-h-[500px] flex items-center justify-center">
-            <div className="absolute inset-0 filter blur-[8px] opacity-30 select-none pointer-events-none scale-[0.98] transition-all duration-300">
-                <ChartContent />
+        <div className="group relative">
+            <div className="pointer-events-none blur-[6px] opacity-45">
+                <WaterfallContent />
             </div>
 
-            <div className="relative z-20 bg-white/80 backdrop-blur-md border border-slate-200 p-8 rounded-3xl shadow-xl max-w-md text-center transform group-hover:scale-105 transition-transform duration-500">
-                <div className="w-16 h-16 bg-gradient-to-r from-[#00c875] to-teal-400 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-[#00c875]/20 rotate-12 group-hover:rotate-0 transition-transform">
-                    <Wallet className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold font-syne text-[#0d1b35] mb-3">Decouvrez votre vrai net</h3>
-                <p className="text-slate-600 mb-8 max-w-[280px] mx-auto text-sm">
-                    L'URSSAF n'est qu'une etape. Calculez exactement ce qu'il vous restera dans la poche apres impot et reserve.
-                </p>
+            <div className="absolute inset-0 flex items-center justify-center bg-white/35 p-6 backdrop-blur-[2px]">
                 <button
+                    type="button"
                     onClick={() => setShowUpgradeModal(true)}
-                    className="w-full bg-[#162848] text-white py-4 rounded-xl font-bold hover:bg-[#0d1b35] hover:shadow-xl transition-all flex justify-center items-center group-hover:bg-[#00c875]"
+                    className="rounded-[12px] bg-white px-6 py-5 text-center shadow-xl"
                 >
-                    Debloquer le simulateur <span className="ml-2">-&gt;</span>
+                    <div className="mb-3 text-lg font-medium text-slate-900">Découvrez votre vrai net</div>
+                    <div className="text-sm text-slate-600">Débloquez le détail complet URSSAF, impôt et CFE.</div>
+                    <div className="mt-4 inline-flex items-center gap-2 text-[12px] font-medium text-slate-700">
+                        Passer à Pro
+                    </div>
                 </button>
             </div>
 

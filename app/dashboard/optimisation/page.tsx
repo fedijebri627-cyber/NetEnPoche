@@ -1,67 +1,113 @@
-﻿'use client';
+'use client';
 
+import { useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { DashboardProvider } from '@/contexts/DashboardContext';
 import { IRConfigForm } from '@/components/dashboard/optimisation/IRConfigForm';
 import { VLComparisonCard } from '@/components/dashboard/optimisation/VLComparisonCard';
 import { IRWaterfallChart } from '@/components/dashboard/optimisation/IRWaterfallChart';
 import { FeatureLock } from '@/components/dashboard/FeatureLock';
-import { DecisionTimelineCard, MultiYearReviewCard, NetChangeExplainerCard, ReservePlannerCard } from '@/components/dashboard/InsightCards';
+import { FiscalActionsCard } from '@/components/dashboard/SurfaceCards';
+import { MultiYearReviewCard, NetChangeExplainerCard } from '@/components/dashboard/InsightCards';
 import { ScenarioSimulatorCard } from '@/components/dashboard/ScenarioSimulatorCard';
-import { Lightbulb, Info } from 'lucide-react';
 
 function OptimisationContent() {
+    const searchParams = useSearchParams();
+
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+
+        const focusTargetId = searchParams.get('focus');
+        if (!focusTargetId) return;
+
+        const target = document.getElementById(focusTargetId);
+        if (!target) return;
+
+        const existingOverlay = document.getElementById('nep-dashboard-focus-overlay');
+        existingOverlay?.remove();
+        const timeouts: number[] = [];
+        const topOffset = 116;
+
+        const scrollTargetIntoView = (behavior: ScrollBehavior) => {
+            const liveTarget = document.getElementById(focusTargetId);
+            if (!liveTarget) return;
+
+            const targetTop = liveTarget.getBoundingClientRect().top + window.scrollY;
+            const destination = Math.max(0, targetTop - topOffset);
+            window.scrollTo({ top: destination, behavior });
+        };
+
+        [80, 260, 520, 900].forEach((delay, index) => {
+            const timeoutId = window.setTimeout(() => {
+                scrollTargetIntoView(index === 0 ? 'auto' : 'smooth');
+            }, delay);
+            timeouts.push(timeoutId);
+        });
+
+        const spotlightTimeout = window.setTimeout(() => {
+            const liveTarget = document.getElementById(focusTargetId);
+            if (!liveTarget) return;
+
+            scrollTargetIntoView('smooth');
+
+            const overlay = document.createElement('div');
+            overlay.id = 'nep-dashboard-focus-overlay';
+            overlay.className = 'pointer-events-none fixed inset-0 z-[70] bg-slate-950/50 backdrop-blur-[1px]';
+            document.body.appendChild(overlay);
+
+            liveTarget.setAttribute('data-tour-pulse', 'true');
+
+            const url = new URL(window.location.href);
+            url.searchParams.delete('focus');
+            url.hash = '';
+            window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+
+            const cleanupTimeout = window.setTimeout(() => {
+                liveTarget.removeAttribute('data-tour-pulse');
+                overlay.remove();
+            }, 1800);
+            timeouts.push(cleanupTimeout);
+        }, 1150);
+        timeouts.push(spotlightTimeout);
+
+        return () => {
+            timeouts.forEach((timeoutId) => window.clearTimeout(timeoutId));
+        };
+    }, [searchParams]);
+
     return (
-        <div className="mx-auto max-w-7xl space-y-8 p-6">
-            <div data-tour="optimisation-hero" className="flex items-start gap-4 rounded-2xl border border-indigo-100 bg-indigo-50 p-6 shadow-sm">
-                <div className="shrink-0 rounded-xl bg-white p-2 shadow-sm">
-                    <Lightbulb className="h-6 w-6 text-indigo-500" />
+        <div data-tour="optimisation-hero" className="mx-auto max-w-7xl space-y-5 p-6">
+            <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
+                <div data-tour="optimisation-waterfall">
+                    <IRWaterfallChart />
                 </div>
-                <div>
-                    <h1 className="mb-1 font-syne text-xl font-bold text-indigo-950">Optimisation et bilan fiscal</h1>
-                    <p className="text-sm text-indigo-800/80">
-                        Simulez l'impact reel de votre fiscalite, voyez ce qu'il faut reserver et testez vos scenarios avant de facturer.
-                    </p>
+                <div id="why-net">
+                    <NetChangeExplainerCard />
                 </div>
             </div>
 
-            <div data-tour="optimisation-reserve" className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-                <ReservePlannerCard />
-                <NetChangeExplainerCard />
-            </div>
+            <FeatureLock featureName="Projet Fiscal Complet" requiredTier="pro">
+                <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-2">
+                    <div data-tour="optimisation-profile">
+                        <IRConfigForm />
+                    </div>
+                    <div>
+                        <VLComparisonCard />
+                    </div>
+                </div>
+            </FeatureLock>
 
-            <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
-                <div className="flex flex-col space-y-6 lg:col-span-5">
-                    <FeatureLock featureName="Projet Fiscal Complet" requiredTier="pro">
-                        <>
-                            <div data-tour="optimisation-profile">
-                                <IRConfigForm />
-                            </div>
-                            <DecisionTimelineCard />
-                            <div className="relative overflow-hidden rounded-2xl border border-[#f5a623]/30 bg-[#fff8e6] p-5">
-                                <div className="absolute -right-4 -top-4 text-[#f5a623]/10">
-                                    <Info className="h-24 w-24" />
-                                </div>
-                                <h3 className="relative z-10 mb-2 flex items-center gap-2 font-bold text-[#8c5600]">
-                                    Le saviez-vous ?
-                                </h3>
-                                <p className="relative z-10 text-sm text-[#a66a00]">
-                                    En micro-entreprise, la cle n'est pas seulement le taux. Ce qui compte est la combinaison revenus, rythme, TVA et option fiscale.
-                                </p>
-                            </div>
-                            <VLComparisonCard />
-                        </>
-                    </FeatureLock>
+            <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
+                <div data-tour="optimisation-scenario" id="scenario-lab">
+                    <ScenarioSimulatorCard />
                 </div>
 
-                <div className="flex flex-col space-y-6 lg:col-span-7">
-                    <div data-tour="optimisation-waterfall">
-                        <IRWaterfallChart />
-                    </div>
-                    <div data-tour="optimisation-scenario">
-                        <ScenarioSimulatorCard />
-                    </div>
+                <div className="space-y-5">
                     <div data-tour="optimisation-history">
                         <MultiYearReviewCard />
+                    </div>
+                    <div id="optimisation-actions-fiscales">
+                        <FiscalActionsCard />
                     </div>
                 </div>
             </div>

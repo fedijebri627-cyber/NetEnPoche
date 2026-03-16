@@ -24,6 +24,117 @@ function clamp(value: number, min: number, max: number) {
     return Math.min(Math.max(value, min), max);
 }
 
+function getNumericRadius(element: HTMLElement) {
+    const computedRadius = window.getComputedStyle(element).borderTopLeftRadius;
+    const parsed = Number.parseFloat(computedRadius);
+    return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function getDepthFromRoot(root: HTMLElement, candidate: HTMLElement) {
+    let depth = 0;
+    let current = candidate.parentElement;
+
+    while (current && current !== root) {
+        depth += 1;
+        current = current.parentElement;
+    }
+
+    return depth;
+}
+
+function hasCardLikeSurface(candidate: HTMLElement) {
+    const styles = window.getComputedStyle(candidate);
+    const background = styles.backgroundColor;
+    const borderWidth = Number.parseFloat(styles.borderTopWidth);
+    const borderStyle = styles.borderTopStyle;
+    const radius = getNumericRadius(candidate);
+
+    return (
+        radius >= 8
+        || (Number.isFinite(borderWidth) && borderWidth > 0 && borderStyle !== 'none')
+        || (background !== 'rgba(0, 0, 0, 0)' && background !== 'transparent')
+    );
+}
+
+function findBestCardDescendant(root: HTMLElement) {
+    const rootRect = root.getBoundingClientRect();
+    const rootRadius = getNumericRadius(root);
+    const descendants = Array.from(root.querySelectorAll<HTMLElement>('*'));
+
+    let bestTarget = root;
+    let bestScore = rootRadius >= 8 ? rootRadius * 2 : Number.NEGATIVE_INFINITY;
+
+    for (const candidate of descendants) {
+        if (candidate.dataset.tourGroup) continue;
+        if (!hasCardLikeSurface(candidate)) continue;
+
+        const rect = candidate.getBoundingClientRect();
+        const widthRatio = rect.width / Math.max(rootRect.width, 1);
+        const heightRatio = rect.height / Math.max(rootRect.height, 1);
+
+        if (widthRatio < 0.72 || heightRatio < 0.72) continue;
+        if (rect.width > rootRect.width + 8 || rect.height > rootRect.height + 8) continue;
+
+        const radius = getNumericRadius(candidate);
+        const depth = getDepthFromRoot(root, candidate);
+        const widthDelta = Math.abs(rootRect.width - rect.width);
+        const heightDelta = Math.abs(rootRect.height - rect.height);
+        const score =
+            (radius > rootRadius ? 48 : 0)
+            + radius * 2
+            - widthDelta
+            - heightDelta
+            - depth * 4;
+
+        if (score > bestScore) {
+            bestScore = score;
+            bestTarget = candidate;
+        }
+    }
+
+    return bestTarget;
+}
+
+function resolveHighlightTarget(element: HTMLElement) {
+    if (typeof window === 'undefined') return element;
+    if (element.dataset.tourGroup) return element;
+
+    let current = element;
+
+    for (let depth = 0; depth < 3; depth += 1) {
+        const children = Array.from(current.children).filter(
+            (child): child is HTMLElement => child instanceof HTMLElement
+        );
+
+        if (children.length !== 1) break;
+
+        const [child] = children;
+        const currentRect = current.getBoundingClientRect();
+        const childRect = child.getBoundingClientRect();
+        const widthClose = Math.abs(currentRect.width - childRect.width) <= 6;
+        const heightClose = Math.abs(currentRect.height - childRect.height) <= 6;
+
+        if (!widthClose || !heightClose) break;
+
+        const currentRadius = getNumericRadius(current);
+        const childRadius = getNumericRadius(child);
+
+        if (childRadius > currentRadius) {
+            current = child;
+            continue;
+        }
+
+        if (currentRadius === 0 && childRadius === 0) {
+            current = child;
+            continue;
+        }
+
+        break;
+    }
+
+    return findBestCardDescendant(current);
+}
+
 function computeTooltipStyle(targetRect: DOMRect | null, placement: TourPlacement | undefined): TooltipStyle {
     if (typeof window === 'undefined') {
         return { top: 24, left: 24 };
@@ -91,6 +202,7 @@ export function DashboardTourProvider({ children }: { children: React.ReactNode 
     const clearActiveTarget = () => {
         if (activeElementRef.current) {
             activeElementRef.current.removeAttribute('data-tour-active');
+            activeElementRef.current.style.removeProperty('--nep-tour-radius');
             activeElementRef.current = null;
         }
     };
@@ -140,31 +252,39 @@ export function DashboardTourProvider({ children }: { children: React.ReactNode 
         let frame = 0;
 
         const updateTarget = () => {
-            const nextTarget = document.querySelector(`[data-tour="${currentStep.target}"]`) as HTMLElement | null;
-            clearActiveTarget();
+            const nextTarget =
+                (document.querySelector(`[data-tour="${currentStep.target}"]`) as HTMLElement | null)
+                ?? document.getElementById(currentStep.target);
 
             if (!nextTarget) {
+                clearActiveTarget();
                 setTargetRect(null);
                 return;
             }
 
-            nextTarget.setAttribute('data-tour-active', 'true');
-            activeElementRef.current = nextTarget;
-            nextTarget.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+            const resolvedTarget = resolveHighlightTarget(nextTarget);
+
+            if (activeElementRef.current !== resolvedTarget) {
+                clearActiveTarget();
+                const computedRadius = window.getComputedStyle(resolvedTarget).borderRadius;
+                resolvedTarget.style.setProperty('--nep-tour-radius', computedRadius || '24px');
+                resolvedTarget.setAttribute('data-tour-active', 'true');
+                activeElementRef.current = resolvedTarget;
+                resolvedTarget.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+            }
+
             frame = window.requestAnimationFrame(() => {
-                setTargetRect(nextTarget.getBoundingClientRect());
+                setTargetRect(resolvedTarget.getBoundingClientRect());
             });
         };
 
         updateTarget();
         const handleViewportChange = () => updateTarget();
-        const interval = window.setInterval(updateTarget, 400);
         window.addEventListener('resize', handleViewportChange);
         window.addEventListener('scroll', handleViewportChange, true);
 
         return () => {
             window.cancelAnimationFrame(frame);
-            window.clearInterval(interval);
             window.removeEventListener('resize', handleViewportChange);
             window.removeEventListener('scroll', handleViewportChange, true);
             clearActiveTarget();
@@ -222,7 +342,7 @@ export function DashboardTourProvider({ children }: { children: React.ReactNode 
                                     <Sparkles className="h-4 w-4 text-emerald-500" />
                                     {currentTour.label}
                                 </span>
-                                <span>Etape {stepIndex + 1} / {currentTour.steps.length}</span>
+                                <span>Étape {stepIndex + 1} / {currentTour.steps.length}</span>
                             </div>
 
                             <div className="h-1.5 overflow-hidden rounded-full bg-slate-100">
@@ -240,7 +360,7 @@ export function DashboardTourProvider({ children }: { children: React.ReactNode 
                                     className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-[13px] font-semibold text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
                                 >
                                     <ChevronLeft className="h-4 w-4" />
-                                    Precedent
+                                    Précédent
                                 </button>
 
                                 {stepIndex === currentTour.steps.length - 1 ? (
@@ -273,7 +393,7 @@ export function DashboardTourProvider({ children }: { children: React.ReactNode 
                 [data-tour-pulse='true'] {
                     position: relative !important;
                     z-index: 80 !important;
-                    border-radius: 24px !important;
+                    border-radius: var(--nep-tour-radius, 24px) !important;
                 }
 
                 [data-tour-active='true'] {
@@ -281,6 +401,21 @@ export function DashboardTourProvider({ children }: { children: React.ReactNode 
                         0 0 0 3px rgba(16, 185, 129, 0.9),
                         0 24px 60px rgba(15, 23, 42, 0.45) !important;
                     transition: box-shadow 180ms ease;
+                }
+
+                [data-tour-active='true'][data-tour-group='stat-bar'] {
+                    box-shadow: none !important;
+                    border-radius: 0 !important;
+                    background: transparent !important;
+                }
+
+                [data-tour-active='true'][data-tour-group='stat-bar'] > div {
+                    position: relative;
+                    z-index: 80;
+                    border-radius: 10px !important;
+                    box-shadow:
+                        0 0 0 3px rgba(16, 185, 129, 0.9),
+                        0 24px 60px rgba(15, 23, 42, 0.24) !important;
                 }
 
                 [data-tour-pulse='true'] {

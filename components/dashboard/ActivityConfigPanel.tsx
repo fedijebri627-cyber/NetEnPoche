@@ -80,13 +80,13 @@ export function ActivityConfigPanel() {
 
     return (
         <>
-            <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm mb-6">
+            <div className="mb-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div className="flex items-center justify-between gap-4 mb-4 border-b border-slate-100 pb-4">
                     <div className="flex items-center space-x-2">
                         <div className="bg-slate-100 p-2 rounded-lg"><Settings2 className="w-5 h-5 text-slate-600" /></div>
                         <div>
-                            <h2 className="text-lg font-bold font-syne text-[#0d1b35]">Configuration d'activite</h2>
-                            <p className="text-xs text-slate-500 mt-1">Le cockpit fiscal et les projections s'appuient sur ce profil d'activite.</p>
+                            <h2 className="text-lg font-medium text-slate-900">Configuration d'activite</h2>
+                            <p className="mt-1 text-[12px] text-slate-500">Le cockpit fiscal et les projections s'appuient sur ce profil d'activite.</p>
                         </div>
                     </div>
                     <button
@@ -95,14 +95,14 @@ export function ActivityConfigPanel() {
                         className={`inline-flex items-center gap-3 rounded-full border px-4 py-2 transition ${mixedModeEnabled ? 'border-indigo-200 bg-indigo-50 text-indigo-700' : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'}`}
                     >
                         {isExpert ? <Layers3 className="w-4 h-4 text-indigo-500" /> : <Lock className="w-4 h-4 text-slate-400" />}
-                        <span className="text-sm font-semibold">Mix d'activites</span>
-                        {!isExpert && <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-600">Expert</span>}
+                        <span className="text-[12px] font-medium">Mix d'activites</span>
+                        {!isExpert && <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[11px] font-medium uppercase tracking-[0.04em] text-slate-600">Expert</span>}
                     </button>
                 </div>
 
                 <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
                     <div className="xl:col-span-4 space-y-2">
-                        <label className="text-sm font-medium text-slate-700">Activite principale</label>
+                        <label className="text-[12px] font-medium text-slate-700">Activite principale</label>
                         <select
                             value={config.activity_type}
                             onChange={(event) => handlePrimaryTypeChange(event.target.value as ActivityType)}
@@ -117,7 +117,7 @@ export function ActivityConfigPanel() {
                     {mixedModeEnabled && (
                         <>
                             <div className="xl:col-span-4 space-y-2">
-                                <label className="text-sm font-medium text-slate-700">Activite secondaire</label>
+                                <label className="text-[12px] font-medium text-slate-700">Activite secondaire</label>
                                 <select
                                     value={config.secondary_activity_type || ''}
                                     onChange={(event) => void updateConfig({ secondary_activity_type: event.target.value as ActivityType })}
@@ -131,7 +131,7 @@ export function ActivityConfigPanel() {
                                 </select>
                             </div>
                             <div className="xl:col-span-4 space-y-2">
-                                <label className="text-sm font-medium text-slate-700">Part de l'activite secondaire</label>
+                                <label className="text-[12px] font-medium text-slate-700">Part de l'activite secondaire</label>
                                 <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                                     <input
                                         type="range"
@@ -142,7 +142,7 @@ export function ActivityConfigPanel() {
                                         onChange={(event) => void updateConfig({ secondary_activity_share: Number(event.target.value) / 100 })}
                                         className="w-full accent-indigo-600"
                                     />
-                                    <div className="mt-3 flex items-center justify-between text-xs font-semibold text-slate-500">
+                                    <div className="mt-3 flex items-center justify-between text-[11px] font-medium text-slate-500">
                                         <span>Principale {primaryShare}%</span>
                                         <span>Secondaire {secondaryShare}%</span>
                                     </div>
@@ -159,7 +159,7 @@ export function ActivityConfigPanel() {
                                 onChange={(event) => void updateConfig({ acre_enabled: event.target.checked })}
                                 className="w-4 h-4 text-[#00c875] rounded focus:ring-[#00c875]"
                             />
-                            <span className="text-sm font-medium text-slate-700">Beneficiaire ACRE</span>
+                            <span className="text-[12px] font-medium text-slate-700">Bénéficiaire ACRE</span>
                         </label>
 
                         <label className="flex items-center space-x-3 bg-slate-50 border border-slate-200 px-4 py-2.5 rounded-xl cursor-pointer hover:bg-slate-100 transition flex-1">
@@ -169,24 +169,24 @@ export function ActivityConfigPanel() {
                                 onChange={(event) => void updateConfig({ versement_liberatoire: event.target.checked })}
                                 className="w-4 h-4 text-[#00c875] rounded focus:ring-[#00c875]"
                             />
-                            <span className="text-sm font-medium text-slate-700">Versement liberatoire (IR)</span>
+                            <span className="text-[12px] font-medium text-slate-700">Versement libératoire (IR)</span>
                         </label>
                     </div>
                 </div>
 
                 <div className="mt-6 pt-4 border-t border-slate-100 flex flex-wrap gap-3">
-                    <div className="flex items-center space-x-1.5 bg-[#e84040]/10 text-red-800 px-3 py-1 rounded-full text-xs font-bold border border-[#e84040]/20">
+                    <div className="flex items-center space-x-1.5 rounded-full border border-[#f09595] bg-[#fcebeb] px-3 py-1 text-[11px] font-medium text-[#791f1f]">
                         <Percent className="w-3.5 h-3.5" />
                         <span>URSSAF principal: {currentUrssafRate.toFixed(1)}%</span>
                     </div>
                     {config.versement_liberatoire && (
-                        <div className="flex items-center space-x-1.5 bg-blue-50 text-blue-800 px-3 py-1 rounded-full text-xs font-bold border border-blue-200">
+                        <div className="flex items-center space-x-1.5 rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-[11px] font-medium text-sky-900">
                             <Percent className="w-3.5 h-3.5" />
-                            <span>IR liberatoire: {currentIrVLRate.toFixed(1)}%</span>
+                            <span>IR libératoire : {currentIrVLRate.toFixed(1)}%</span>
                         </div>
                     )}
                     {mixedModeEnabled && config.secondary_activity_type && (
-                        <div className="flex items-center space-x-1.5 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold border border-indigo-200">
+                        <div className="flex items-center space-x-1.5 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-[11px] font-medium text-indigo-700">
                             <Layers3 className="w-3.5 h-3.5" />
                             <span>Mix: {primaryShare}% / {secondaryShare}%</span>
                         </div>

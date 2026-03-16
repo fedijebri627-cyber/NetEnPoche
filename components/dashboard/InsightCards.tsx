@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useMemo, useState } from 'react';
+import { BarChart3, CalendarClock, ChevronRight, Loader2, PiggyBank, ShieldCheck, Sparkles, TrendingUpDown } from 'lucide-react';
 import { useDashboard } from '@/contexts/DashboardContext';
 import {
     buildDecisionTimeline,
@@ -17,8 +19,6 @@ import { buildPriorityActions, type PriorityAction } from '@/lib/dashboard-actio
 import { FeatureLock } from '@/components/dashboard/FeatureLock';
 import { UpgradeModal } from '@/components/dashboard/UpgradeModal';
 import { useSubscription } from '@/hooks/useSubscription';
-import { BarChart3, CalendarClock, ChevronRight, Loader2, PiggyBank, ShieldCheck, Sparkles, TrendingUpDown } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
 
 function SeverityDot({ level }: { level: 'good' | 'watch' | 'critical' }) {
     const color = level === 'critical' ? 'bg-red-500' : level === 'watch' ? 'bg-amber-400' : 'bg-emerald-500';
@@ -66,12 +66,12 @@ function TrustFooter({
     return (
         <div className="mt-5 border-t border-slate-100 pt-4">
             <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-slate-500">
-                <span className="rounded-full bg-slate-100 px-2.5 py-1">Bareme 2026</span>
-                <span className="rounded-full bg-slate-100 px-2.5 py-1">Mis a jour le {updatedAt}</span>
+                <span className="rounded-full bg-slate-100 px-2.5 py-1">Barème 2026</span>
+                <span className="rounded-full bg-slate-100 px-2.5 py-1">Mis à jour le {updatedAt}</span>
                 <span>{basis}</span>
             </div>
             <details className="group mt-3 rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3">
-                <summary className="cursor-pointer list-none text-sm font-semibold text-slate-700 marker:hidden">
+                <summary className="marker:hidden list-none cursor-pointer text-sm font-medium text-slate-700">
                     <span className="inline-flex items-center gap-2">
                         {detailTitle}
                         <ChevronRight className="h-4 w-4 transition group-open:rotate-90" />
@@ -150,28 +150,28 @@ export function PriorityActionCenterCard() {
             <div className="border-b border-slate-100 bg-[radial-gradient(circle_at_top_left,_rgba(0,200,117,0.14),_transparent_35%),linear-gradient(135deg,#0d1b35_0%,#12244a_100%)] px-6 py-6 text-white sm:px-8">
                 <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
                     <div className="max-w-2xl">
-                        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-100">
+                        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.2em] text-slate-100">
                             <Sparkles className="h-3.5 w-3.5" />
-                            Priorites du moment
+                            Priorit?s du moment
                         </div>
-                        <h2 className="font-syne text-2xl font-bold sm:text-3xl">NetEnPoche vous dit quoi faire ensuite.</h2>
+                        <h2 className="text-[24px] font-medium sm:text-[32px]">NetEnPoche vous dit quoi faire ensuite.</h2>
                         <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-200">
-                            Vos trois prochaines actions sont triees selon votre tresorerie, votre rythme annuel et votre exposition fiscale.
+                            Vos trois prochaines actions sont tri?es selon votre tr?sorerie, votre rythme annuel et votre exposition fiscale.
                         </p>
                     </div>
 
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:min-w-[600px] xl:min-w-[680px]">
                         <div className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-sm">
-                            <div className="text-xs font-semibold uppercase tracking-wide text-slate-300">Reserve</div>
-                            <div className="mt-2 font-syne text-[clamp(0.92rem,1.35vw,1.42rem)] font-black leading-tight tracking-tight tabular-nums">{formatCurrency(reserve.totalReserve)}</div>
+                            <div className="text-[11px] font-medium uppercase tracking-[0.04em] text-slate-300">R?serve</div>
+                            <div className="mt-2 text-[22px] font-medium leading-tight tracking-tight tabular-nums">{formatCurrency(reserve.totalReserve)}</div>
                         </div>
                         <div className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-sm">
-                            <div className="text-xs font-semibold uppercase tracking-wide text-slate-300">Sante</div>
-                            <div className="mt-2 font-syne text-[clamp(0.92rem,1.35vw,1.42rem)] font-black leading-tight tracking-tight tabular-nums">{health.score}/100</div>
+                            <div className="text-[11px] font-medium uppercase tracking-[0.04em] text-slate-300">Sant?</div>
+                            <div className="mt-2 text-[22px] font-medium leading-tight tracking-tight tabular-nums">{health.score}/100</div>
                         </div>
                         <div className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-sm">
-                            <div className="text-xs font-semibold uppercase tracking-wide text-slate-300">TVA</div>
-                            <div className="mt-2 font-syne text-[clamp(0.92rem,1.35vw,1.42rem)] font-black leading-tight tracking-tight tabular-nums">{tva.percentage.toFixed(0)}%</div>
+                            <div className="text-[11px] font-medium uppercase tracking-[0.04em] text-slate-300">TVA</div>
+                            <div className="mt-2 text-[22px] font-medium leading-tight tracking-tight tabular-nums">{tva.percentage.toFixed(0)}%</div>
                         </div>
                     </div>
                 </div>
@@ -183,17 +183,17 @@ export function PriorityActionCenterCard() {
                     return (
                         <div key={action.id} className={`flex h-full flex-col rounded-3xl border p-5 ${tone.wrapper}`}>
                             <div className="mb-4 flex items-start justify-between gap-3">
-                                <div className={`rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide ${tone.badge}`}>
-                                    {action.severity === 'critical' ? 'Priorite elevee' : action.severity === 'watch' ? 'A suivre' : 'Stable'}
+                                <div className={`rounded-full px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.04em] ${tone.badge}`}>
+                                    {action.severity === 'critical' ? 'Priorit? ?lev?e' : action.severity === 'watch' ? '? suivre' : 'Stable'}
                                 </div>
-                                <div className="text-sm font-bold text-slate-700">{action.value}</div>
+                                <div className="text-[14px] font-medium text-slate-700">{action.value}</div>
                             </div>
-                            <h3 className="font-syne text-lg font-bold leading-tight text-[#0d1b35]">{action.title}</h3>
+                            <h3 className="text-lg font-medium leading-tight text-slate-900">{action.title}</h3>
                             <p className="mt-2 flex-1 break-words text-sm leading-6 text-slate-600">{action.detail}</p>
                             <button
                                 type="button"
                                 onClick={() => handlePriorityAction(action)}
-                                className={`mt-5 inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-bold text-white transition ${tone.button}`}
+                                className={`mt-5 inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium text-white transition ${tone.button}`}
                             >
                                 {action.ctaLabel}
                                 <ChevronRight className="h-4 w-4" />
@@ -205,14 +205,14 @@ export function PriorityActionCenterCard() {
 
             <div className="flex flex-col gap-3 border-t border-slate-100 bg-slate-50 px-6 py-4 text-sm text-slate-600 sm:flex-row sm:items-center sm:justify-between xl:px-8">
                 <p>
-                    Plan actuel : <span className="font-semibold capitalize text-slate-800">{tier}</span>. Les cartes detaillees plus bas donnent le calcul complet derriere chaque action.
+                    Plan actuel : <span className="font-medium capitalize text-slate-800">{tier}</span>. Les cartes d?taill?es plus bas donnent le calcul complet derri?re chaque action.
                 </p>
                 <button
                     type="button"
                     onClick={dispatchOnboardingOpen}
-                    className="inline-flex items-center gap-2 self-start font-semibold text-indigo-600 hover:text-indigo-700"
+                    className="inline-flex items-center gap-2 self-start text-[12px] font-medium text-indigo-600 hover:text-indigo-700"
                 >
-                    Revoir l'onboarding guide
+                    Revoir l'onboarding guid?
                     <ChevronRight className="h-4 w-4" />
                 </button>
             </div>
@@ -231,20 +231,20 @@ export function UpgradeOverviewBanner() {
             <div className="rounded-3xl border border-emerald-200 bg-emerald-50/80 p-5 shadow-sm">
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                     <div>
-                        <div className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
+                        <div className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-emerald-700">
                             Premium
                         </div>
-                        <h3 className="mt-3 font-syne text-xl font-bold text-[#0d1b35]">Passez a Pro pour debloquer le cockpit complet</h3>
+                        <h3 className="mt-3 text-lg font-medium text-slate-900">Passez ? Pro pour d?bloquer le cockpit complet</h3>
                         <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-                            Debloquez d'un coup le Score de sante, la Reserve intelligente, l'Analyse de votre net reel, le Scenario Lab v2 et la Timeline de decisions.
+                            D?bloquez d'un coup le Score de sant?, la R?serve intelligente, l'Analyse de votre net r?el, le Scenario Lab v2 et la Timeline de d?cisions.
                         </p>
                     </div>
                     <button
                         type="button"
                         onClick={() => setShowModal(true)}
-                        className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#00c875] px-5 py-3 text-sm font-bold text-white shadow-lg shadow-[#00c875]/20 transition hover:bg-[#00b56a]"
+                        className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#00c875] px-5 py-3 text-sm font-medium text-white shadow-lg shadow-[#00c875]/20 transition hover:bg-[#00b56a]"
                     >
-                        Passer a Pro
+                        Passer ? Pro
                         <ChevronRight className="h-4 w-4" />
                     </button>
                 </div>
@@ -265,28 +265,28 @@ export function HealthScoreCard({ clients = [], previousYearSummary = null }: { 
     if (loading) return <div className="h-72 animate-pulse rounded-3xl bg-slate-100" />;
 
     return (
-        <FeatureLock featureName="Score de sante financiere" requiredTier="pro">
-            <div className="h-full rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-                <div className="mb-6 flex items-start justify-between gap-4">
+        <FeatureLock featureName="Score de santé financière" requiredTier="pro">
+            <div className="h-full rounded-[12px] border border-slate-200 bg-white p-4">
+                <div className="mb-3 flex items-start justify-between gap-3">
                     <div>
-                        <h3 className="flex items-center gap-2 font-syne text-lg font-bold text-[#0d1b35]">
+                        <h3 className="flex items-center gap-2 text-[18px] font-medium text-slate-900">
                             <ShieldCheck className="h-5 w-5 text-emerald-500" />
-                            Score de sante financiere
+                            Score de santé financière
                         </h3>
-                        <p className="mt-1 text-sm text-slate-500">Vue d'ensemble de votre regularite, marge, diversification et exposition fiscale.</p>
+                        <p className="mt-1 text-[12px] text-slate-500">Régularité, marge, diversification et exposition fiscale.</p>
                     </div>
-                    <div className="rounded-2xl bg-emerald-50 px-4 py-3 text-right">
-                        <div className="font-syne text-3xl font-black text-emerald-600">{insight.score}/100</div>
-                        <div className={`text-xs font-semibold ${insight.trend >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                    <div className="rounded-[10px] bg-[#eaf3de] px-3 py-2 text-right">
+                        <div className="text-[22px] font-medium text-[#27500a]">{insight.score}/100</div>
+                        <div className={`text-[11px] font-medium ${insight.trend >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
                             {insight.trend >= 0 ? '+' : ''}{insight.trend} vs N-1
                         </div>
                     </div>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-2.5">
                     {insight.breakdown.map((item) => (
                         <div key={item.label}>
-                            <div className="mb-1 flex items-center justify-between text-sm font-medium text-slate-600">
+                            <div className="mb-1 flex items-center justify-between text-[12px] font-medium text-slate-600">
                                 <span>{item.label}</span>
                                 <span>{item.value}/{item.max}</span>
                             </div>
@@ -297,15 +297,14 @@ export function HealthScoreCard({ clients = [], previousYearSummary = null }: { 
                     ))}
                 </div>
 
-                <div className="mt-5 rounded-2xl border border-slate-100 bg-slate-50 p-4 text-sm text-slate-600">
-                    <span className="font-semibold text-slate-800">Levier prioritaire :</span> {insight.recommendation}
+                <div className="mt-3 rounded-[10px] border border-slate-100 bg-slate-50 p-3 text-[13px] text-slate-600">
+                    <span className="font-medium text-slate-800">Levier prioritaire :</span> {insight.recommendation}
                 </div>
 
-                <TrustFooter
-                    basis="Base sur vos mois saisis, vos revenus clients et votre trajectoire fiscale actuelle."
-                    detailTitle="Comprendre le score"
-                    detailCopy="Le score combine la regularite de vos saisies, votre marge nette, votre diversification client, votre exposition au seuil TVA et la prise en compte de la CFE. Plus vos donnees sont completes, plus la note est utile."
-                />
+                <div className="mt-3 text-[12px] text-slate-500">
+                    Basé sur vos mois saisis, vos revenus clients et votre trajectoire fiscale actuelle.{' '}
+                    <button type="button" className="font-medium text-slate-600 underline underline-offset-2">Comprendre le score</button>
+                </div>
             </div>
         </FeatureLock>
     );
@@ -318,48 +317,47 @@ export function ReservePlannerCard() {
     if (loading) return <div className="h-72 animate-pulse rounded-3xl bg-slate-100" />;
 
     return (
-        <FeatureLock featureName="Reserve intelligente" requiredTier="pro">
-            <div className="h-full rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-                <div className="mb-5 flex items-start justify-between gap-4">
+        <FeatureLock featureName="Réserve intelligente" requiredTier="pro">
+            <div className="h-full rounded-[12px] border border-slate-200 bg-white p-4">
+                <div className="mb-3 flex items-start justify-between gap-3">
                     <div>
-                        <h3 className="flex items-center gap-2 font-syne text-lg font-bold text-[#0d1b35]">
+                        <h3 className="flex items-center gap-2 text-[18px] font-medium text-slate-900">
                             <PiggyBank className="h-5 w-5 text-indigo-500" />
-                            A mettre de cote maintenant
+                            À mettre de côté maintenant
                         </h3>
-                        <p className="mt-1 text-sm text-slate-500">Montant recommande pour rester serein sur URSSAF, IR et CFE.</p>
+                        <p className="mt-1 text-[12px] text-slate-500">Montant recommandé pour rester serein sur URSSAF, IR et CFE.</p>
                     </div>
-                    <div className="rounded-2xl bg-indigo-50 px-4 py-3 text-right">
-                        <div className="text-sm font-semibold uppercase tracking-wide text-indigo-500">Total reserve</div>
-                        <div className="font-syne text-2xl font-black text-indigo-700">{formatCurrency(reserve.totalReserve)}</div>
+                    <div className="rounded-[10px] bg-slate-50 px-3 py-2 text-right">
+                        <div className="text-[11px] font-medium uppercase tracking-[0.04em] text-indigo-500">Total réserve</div>
+                        <div className="text-[22px] font-medium text-slate-900">{formatCurrency(reserve.totalReserve)}</div>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                    <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                        <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">URSSAF</div>
-                        <div className="mt-2 font-syne text-xl font-bold text-[#0d1b35]">{formatCurrency(reserve.urssaf)}</div>
+                    <div className="rounded-[10px] border border-slate-100 bg-slate-50 p-3">
+                        <div className="text-[11px] font-medium uppercase tracking-[0.04em] text-slate-500">URSSAF</div>
+                        <div className="mt-1 text-[16px] font-medium text-slate-900">{formatCurrency(reserve.urssaf)}</div>
                     </div>
-                    <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                        <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Impot</div>
-                        <div className="mt-2 font-syne text-xl font-bold text-[#0d1b35]">{formatCurrency(reserve.impots)}</div>
+                    <div className="rounded-[10px] border border-slate-100 bg-slate-50 p-3">
+                        <div className="text-[11px] font-medium uppercase tracking-[0.04em] text-slate-500">Impôt</div>
+                        <div className="mt-1 text-[16px] font-medium text-slate-900">{formatCurrency(reserve.impots)}</div>
                     </div>
-                    <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                        <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">CFE</div>
-                        <div className="mt-2 font-syne text-xl font-bold text-[#0d1b35]">{formatCurrency(reserve.cfe)}</div>
+                    <div className="rounded-[10px] border border-slate-100 bg-slate-50 p-3">
+                        <div className="text-[11px] font-medium uppercase tracking-[0.04em] text-slate-500">CFE</div>
+                        <div className="mt-1 text-[16px] font-medium text-slate-900">{formatCurrency(reserve.cfe)}</div>
                     </div>
                 </div>
 
-                <div className="mt-5 rounded-2xl bg-emerald-50 p-4">
-                    <div className="text-xs font-semibold uppercase tracking-wide text-emerald-600">Disponible a depenser</div>
-                    <div className="mt-2 font-syne text-3xl font-black text-emerald-600">{formatCurrency(reserve.safeToSpend)}</div>
-                    <div className="mt-1 text-sm text-emerald-700">Taux de reserve recommande : {(reserve.reserveRate * 100).toFixed(1)}%</div>
+                <div className="mt-3 rounded-[10px] border border-slate-100 bg-slate-50 p-3">
+                    <div className="text-[11px] font-medium uppercase tracking-[0.04em] text-slate-500">Disponible à dépenser</div>
+                    <div className="mt-1 text-[22px] font-medium text-slate-900">{formatCurrency(reserve.safeToSpend)}</div>
+                    <div className="mt-1 text-[12px] text-slate-600">Taux de réserve recommandé : {(reserve.reserveRate * 100).toFixed(1)}%</div>
                 </div>
 
-                <TrustFooter
-                    basis="Calcule sur votre CA cumule, votre option fiscale, votre statut ACRE et la provision CFE."
-                    detailTitle="Comment la reserve est calculee"
-                    detailCopy="La reserve additionne l'URSSAF estimee, l'impot calcule selon votre mode actuel et une provision CFE. Le disponible a depenser correspond a votre CA encaisse diminue de cette enveloppe de securite."
-                />
+                <div className="mt-3 text-[12px] text-slate-500">
+                    Calculé sur votre CA cumulé, votre option fiscale, votre statut ACRE et la provision CFE.{' '}
+                    <button type="button" className="font-medium text-slate-600 underline underline-offset-2">Comment la réserve est calculée</button>
+                </div>
             </div>
         </FeatureLock>
     );
@@ -372,9 +370,9 @@ export function DecisionTimelineCard({ invoices = [] }: { invoices?: InsightInvo
     if (loading) return <div className="h-72 animate-pulse rounded-3xl bg-slate-100" />;
 
     return (
-        <FeatureLock featureName="Timeline de decisions" requiredTier="pro">
+        <FeatureLock featureName="Timeline de d?cisions" requiredTier="pro">
             <div className="h-full rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-                <h3 className="mb-5 flex items-center gap-2 font-syne text-lg font-bold text-[#0d1b35]">
+                <h3 className="mb-5 flex items-center gap-2 text-lg font-medium text-slate-900">
                     <CalendarClock className="h-5 w-5 text-amber-500" />
                     Prochaines actions utiles
                 </h3>
@@ -384,8 +382,8 @@ export function DecisionTimelineCard({ invoices = [] }: { invoices?: InsightInvo
                             <SeverityDot level={item.severity} />
                             <div className="min-w-0 flex-1">
                                 <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                                    <p className="font-semibold text-slate-900">{item.title}</p>
-                                    <span className="text-sm font-bold text-slate-700">{item.value}</span>
+                                    <p className="text-[14px] font-medium text-slate-900">{item.title}</p>
+                                    <span className="text-[14px] font-medium text-slate-700">{item.value}</span>
                                 </div>
                                 <p className="mt-1 text-sm text-slate-500">{item.detail}</p>
                             </div>
@@ -394,9 +392,9 @@ export function DecisionTimelineCard({ invoices = [] }: { invoices?: InsightInvo
                 </div>
 
                 <TrustFooter
-                    basis="Rafraichi selon votre annee active, vos echeances trimestrielles et le niveau de risque TVA."
-                    detailTitle="D'ou viennent ces priorites"
-                    detailCopy="La timeline croise votre CA saisi, votre objectif annuel, le prochain appel URSSAF et la progression vers le seuil TVA. Des qu'une situation devient urgente, elle remonte automatiquement dans cette liste."
+                    basis="Rafra?chi selon votre ann?e active, vos ?ch?ances trimestrielles et le niveau de risque TVA."
+                    detailTitle="D'o? viennent ces priorit?s"
+                    detailCopy="La timeline croise votre CA saisi, votre objectif annuel, le prochain appel URSSAF et la progression vers le seuil TVA. D?s qu'une situation devient urgente, elle remonte automatiquement dans cette liste."
                 />
             </div>
         </FeatureLock>
@@ -410,19 +408,19 @@ export function NetChangeExplainerCard() {
     if (loading) return <div className="h-64 animate-pulse rounded-3xl bg-slate-100" />;
 
     return (
-        <FeatureLock featureName="Analyse de votre net reel" requiredTier="pro">
+        <FeatureLock featureName="Analyse de votre net réel" requiredTier="pro">
             <div className="h-full rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div className="mb-5 flex items-start justify-between gap-4">
                     <div>
-                        <h3 className="flex items-center gap-2 font-syne text-lg font-bold text-[#0d1b35]">
+                        <h3 className="flex items-center gap-2 text-lg font-medium text-slate-900">
                             <TrendingUpDown className="h-5 w-5 text-indigo-500" />
                             Pourquoi votre net change
                         </h3>
-                        <p className="mt-1 text-sm text-slate-500">Lecture simple de l'evolution recente de votre poche nette.</p>
+                        <p className="mt-1 text-sm text-slate-500">Lecture simple de l'évolution récente de votre poche nette.</p>
                     </div>
-                    <div className={`rounded-2xl px-4 py-3 text-right ${insight.deltaNet >= 0 ? 'bg-emerald-50' : 'bg-red-50'}`}>
-                        <div className={`text-xs font-semibold uppercase tracking-wide ${insight.deltaNet >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>{insight.label}</div>
-                        <div className={`font-syne text-2xl font-black ${insight.deltaNet >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                    <div className={`rounded-2xl px-4 py-3 text-right ${insight.deltaNet >= 0 ? 'bg-slate-50' : 'bg-red-50'}`}>
+                        <div className={`text-[11px] font-medium uppercase tracking-[0.04em] ${insight.deltaNet >= 0 ? 'text-slate-500' : 'text-red-500'}`}>{insight.label}</div>
+                        <div className={`text-[22px] font-medium ${insight.deltaNet >= 0 ? 'text-slate-900' : 'text-red-600'}`}>
                             {insight.deltaNet >= 0 ? '+' : ''}{formatCurrency(insight.deltaNet)}
                         </div>
                     </div>
@@ -430,12 +428,12 @@ export function NetChangeExplainerCard() {
 
                 <div className="mb-5 grid gap-3 sm:grid-cols-2">
                     <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                        <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Delta CA</div>
-                        <div className="mt-2 font-syne text-xl font-bold text-[#0d1b35]">{insight.deltaCa >= 0 ? '+' : ''}{formatCurrency(insight.deltaCa)}</div>
+                        <div className="text-[11px] font-medium uppercase tracking-[0.04em] text-slate-500">Delta CA</div>
+                        <div className="mt-2 text-lg font-medium text-slate-900">{insight.deltaCa >= 0 ? '+' : ''}{formatCurrency(insight.deltaCa)}</div>
                     </div>
                     <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                        <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Delta charges</div>
-                        <div className="mt-2 font-syne text-xl font-bold text-[#0d1b35]">{insight.deltaCharges >= 0 ? '+' : ''}{formatCurrency(insight.deltaCharges)}</div>
+                        <div className="text-[11px] font-medium uppercase tracking-[0.04em] text-slate-500">Delta charges</div>
+                        <div className="mt-2 text-lg font-medium text-slate-900">{insight.deltaCharges >= 0 ? '+' : ''}{formatCurrency(insight.deltaCharges)}</div>
                     </div>
                 </div>
 
@@ -446,9 +444,9 @@ export function NetChangeExplainerCard() {
                 </ul>
 
                 <TrustFooter
-                    basis="Analyse glissante construite sur vos deux derniers mois reellement saisis."
+                    basis="Analyse glissante construite sur vos deux derniers mois réellement saisis."
                     detailTitle="Comment lire cette carte"
-                    detailCopy="La carte compare vos deux derniers mois avec encaissement. Elle isole l'effet du CA, puis celui des charges estimees pour expliquer en langage simple pourquoi votre net final a monte ou baisse."
+                    detailCopy="La carte compare vos deux derniers mois avec encaissement. Elle isole l'effet du CA, puis celui des charges estimées pour expliquer en langage simple pourquoi votre net final a monté ou baissé."
                 />
             </div>
         </FeatureLock>
@@ -503,22 +501,22 @@ export function MultiYearReviewCard() {
     if (loading) return <div className="h-80 animate-pulse rounded-3xl bg-slate-100" />;
 
     return (
-        <FeatureLock featureName="Historique multi-annees" requiredTier="pro">
+        <FeatureLock featureName="Historique multi-années" requiredTier="pro">
             <div className="h-full rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                        <h3 className="flex items-center gap-2 font-syne text-lg font-bold text-[#0d1b35]">
+                        <h3 className="flex items-center gap-2 text-lg font-medium text-slate-900">
                             <BarChart3 className="h-5 w-5 text-indigo-500" />
-                            Revue multi-annees
+                            Revue multi-années
                         </h3>
-                        <p className="mt-1 text-sm text-slate-500">Consultez un exercice a la fois et basculez rapidement entre les annees disponibles.</p>
+                        <p className="mt-1 text-sm text-slate-500">Consultez un exercice à la fois et basculez rapidement entre les années disponibles.</p>
                     </div>
                     <div className="flex items-center gap-3">
                         {loading && <Loader2 className="h-5 w-5 animate-spin text-slate-400" />}
                         <select
                             value={selectedSummary?.year ?? ''}
                             onChange={(event) => setSelectedYear(Number(event.target.value))}
-                            className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+                            className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
                         >
                             {availableYears.map((availableYear) => (
                                 <option key={availableYear} value={availableYear}>
@@ -537,10 +535,10 @@ export function MultiYearReviewCard() {
                     <div className="rounded-2xl border border-slate-100 bg-slate-50 p-5">
                         <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                             <div>
-                                <div className="font-syne text-lg font-bold text-[#0d1b35]">Exercice {selectedSummary.year}</div>
+                                <div className="text-lg font-medium text-slate-900">Exercice {selectedSummary.year}</div>
                                 <div className="text-sm text-slate-500">CA {formatCurrency(selectedSummary.totalCA)} - Net {formatCurrency(selectedSummary.netReel)}</div>
                             </div>
-                            <div className="text-sm font-semibold text-slate-600">
+                                <div className="text-sm font-medium text-slate-600">
                                 {selectedSummary.goal && selectedSummary.goalProgress !== null
                                     ? `Objectif ${(selectedSummary.goalProgress * 100).toFixed(0)}%`
                                     : 'Sans objectif annuel'}
@@ -549,25 +547,25 @@ export function MultiYearReviewCard() {
 
                         <div className="grid gap-3 sm:grid-cols-3">
                             <div className="rounded-xl bg-white p-4">
-                                <div className="text-xs uppercase tracking-wide text-slate-500">URSSAF</div>
-                                <div className="mt-1 font-bold text-slate-800">{formatCurrency(selectedSummary.urssaf)}</div>
+                                <div className="text-[11px] uppercase tracking-[0.04em] text-slate-500">URSSAF</div>
+                                <div className="mt-1 text-[14px] font-medium text-slate-800">{formatCurrency(selectedSummary.urssaf)}</div>
                             </div>
                             <div className="rounded-xl bg-white p-4">
-                                <div className="text-xs uppercase tracking-wide text-slate-500">IR estime</div>
-                                <div className="mt-1 font-bold text-slate-800">{formatCurrency(selectedSummary.ir)}</div>
+                                <div className="text-[11px] uppercase tracking-[0.04em] text-slate-500">IR estimé</div>
+                                <div className="mt-1 text-[14px] font-medium text-slate-800">{formatCurrency(selectedSummary.ir)}</div>
                             </div>
                             <div className="rounded-xl bg-white p-4">
-                                <div className="text-xs uppercase tracking-wide text-slate-500">CFE</div>
-                                <div className="mt-1 font-bold text-slate-800">{formatCurrency(selectedSummary.cfe)}</div>
+                                <div className="text-[11px] uppercase tracking-[0.04em] text-slate-500">CFE</div>
+                                <div className="mt-1 text-[14px] font-medium text-slate-800">{formatCurrency(selectedSummary.cfe)}</div>
                             </div>
                         </div>
                     </div>
                 )}
 
                 <TrustFooter
-                    basis="Historique calcule annee par annee avec la configuration fiscale enregistree pour chaque exercice."
+                    basis="Historique calculé année par année avec la configuration fiscale enregistrée pour chaque exercice."
                     detailTitle="Comment lire la revue annuelle"
-                    detailCopy="Chaque exercice reprend le CA reellement saisi, puis recalcule URSSAF, IR et CFE avec la configuration active de cette annee. Le selecteur permet de comparer les millesimes sans surcharger l'ecran."
+                    detailCopy="Chaque exercice reprend le CA réellement saisi, puis recalcule URSSAF, IR et CFE avec la configuration active de cette année. Le sélecteur permet de comparer les millésimes sans surcharger l'écran."
                 />
             </div>
         </FeatureLock>

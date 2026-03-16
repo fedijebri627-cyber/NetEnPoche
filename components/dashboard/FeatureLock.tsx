@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import { ChevronRight, Lock } from 'lucide-react';
@@ -38,11 +38,11 @@ export function FeatureLock({ children, featureName, requiredTier }: FeatureLock
                     <div className="mb-4 rounded-2xl bg-[#0d1b35] p-3 shadow-md">
                         <Lock className="h-8 w-8 text-white" />
                     </div>
-                    <h3 className="mb-2 font-syne text-xl font-bold text-[#0d1b35]">{featureName}</h3>
+                    <h3 className="mb-2 text-lg font-medium text-slate-900">{featureName}</h3>
                     <p className="mb-5 max-w-[260px] text-sm leading-6 text-slate-500">
-                        Disponible avec le plan <strong className="capitalize text-slate-800">{requiredTier}</strong>. La mise a niveau globale debloque toutes les cartes premium d'un coup.
+                        Disponible avec le plan <strong className="font-medium capitalize text-slate-800">{requiredTier}</strong>. La mise a niveau globale debloque toutes les cartes premium d'un coup.
                     </p>
-                    <span className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500">
+                    <span className="inline-flex items-center gap-2 text-[12px] font-medium text-slate-500">
                         Voir l'offre
                         <ChevronRight className="h-4 w-4" />
                     </span>

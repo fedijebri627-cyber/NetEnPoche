@@ -15,7 +15,7 @@ export function TableActions() {
 
     const generateCSV = () => {
         let csvContent = 'data:text/csv;charset=utf-8,';
-        csvContent += 'Mois,CA Encaisse (EUR),URSSAF Estime (EUR),Net Estime (EUR)\n';
+        csvContent += 'Mois,CA Encaissé (EUR),URSSAF Estimé (EUR),Net Estimé (EUR)\n';
 
         const sortedEntries = [...entries].sort((a, b) => a.month - b.month);
         sortedEntries.forEach((entry) => {
@@ -43,7 +43,7 @@ export function TableActions() {
 
             if (!response.ok) {
                 const payload = await response.json().catch(() => null);
-                throw new Error(payload?.error || 'Erreur de generation PDF');
+                throw new Error(payload?.error || 'Erreur de génération PDF');
             }
 
             const arrayBuffer = await response.arrayBuffer();
@@ -61,7 +61,7 @@ export function TableActions() {
             link.click();
         } catch (error) {
             console.error(error);
-            alert(error instanceof Error ? error.message : 'Erreur lors de la generation du PDF.');
+            alert(error instanceof Error ? error.message : 'Erreur lors de la génération du PDF.');
         } finally {
             setIsGenerating(false);
         }
@@ -83,7 +83,7 @@ export function TableActions() {
                 className="w-full sm:w-auto flex items-center justify-center space-x-2 bg-white border border-slate-200 text-slate-700 px-6 py-3 rounded-xl hover:bg-slate-50 hover:border-slate-300 transition font-medium shadow-sm active:scale-[0.98] disabled:opacity-50"
             >
                 <FileText className="w-4 h-4" />
-                <span>{isGenerating ? 'Generation...' : `Bilan PDF (${tier === 'free' ? 'Basique' : 'Complet'})`}</span>
+                <span>{isGenerating ? 'Génération...' : `Bilan PDF (${tier === 'free' ? 'Basique' : 'Complet'})`}</span>
             </button>
 
             <button

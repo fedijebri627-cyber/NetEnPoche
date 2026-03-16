@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useMemo, useState } from 'react';
 import type { ActivityType } from '@/lib/calculations';
@@ -45,7 +45,7 @@ function describeTvaStatus(percentage: number) {
   const rounded = Math.round(percentage);
 
   if (percentage >= 100) {
-    return `Seuil depasse - TVA obligatoire (${rounded} %)`;
+    return `Seuil d?pass? - TVA obligatoire (${rounded} %)`;
   }
 
   if (percentage >= 85) {

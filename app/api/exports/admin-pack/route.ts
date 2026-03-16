@@ -31,13 +31,13 @@ function buildExcelWorkbook(params: {
 
     const summaryRows = [
         makeRow(['Indicateur', 'Valeur']),
-        makeRow(['Chiffre d affaires', formatCurrency(totalCA)]),
-        makeRow(['URSSAF estime', formatCurrency(breakdown.urssaf)]),
-        makeRow(['IR estime', formatCurrency(breakdown.ir)]),
-        makeRow(['CFE provisionnee', formatCurrency(breakdown.cfe)]),
-        makeRow(['Net reel', formatCurrency(breakdown.netReel)]),
-        makeRow(['A mettre de cote', formatCurrency(reserve.totalReserve)]),
-        makeRow(['Disponible a depenser', formatCurrency(reserve.safeToSpend)]),
+        makeRow(["Chiffre d'affaires", formatCurrency(totalCA)]),
+        makeRow(['URSSAF estimé', formatCurrency(breakdown.urssaf)]),
+        makeRow(['IR estimé', formatCurrency(breakdown.ir)]),
+        makeRow(['CFE provisionnée', formatCurrency(breakdown.cfe)]),
+        makeRow(['Net réel', formatCurrency(breakdown.netReel)]),
+        makeRow(['À mettre de côté', formatCurrency(reserve.totalReserve)]),
+        makeRow(['Disponible à dépenser', formatCurrency(reserve.safeToSpend)]),
         makeRow(['Cash en attente', formatCurrency(collections.pendingCash)]),
         makeRow(['Cash en retard', formatCurrency(collections.overdueCash)]),
     ].join('');
@@ -48,7 +48,7 @@ function buildExcelWorkbook(params: {
     ].join('');
 
     const clientRows = [
-        makeRow(['Client', 'Part CA', 'CA total', 'Retard', 'Ticket moyen', 'Delai moyen']),
+        makeRow(['Client', 'Part CA', 'CA total', 'Retard', 'Ticket moyen', 'Délai moyen']),
         ...risks.map((risk) => makeRow([
             risk.name,
             `${Math.round(risk.shareOfRevenue * 100)}%`,
@@ -60,7 +60,7 @@ function buildExcelWorkbook(params: {
     ].join('');
 
     const invoiceRows = [
-        makeRow(['Date', 'Client', 'Montant HT', 'Statut', 'Echeance', 'Paye le']),
+        makeRow(['Date', 'Client', 'Montant HT', 'Statut', 'Échéance', 'Payé le']),
         ...params.invoices.map((invoice) => makeRow([
             invoice.invoice_date,
             invoice.client?.name || '',
@@ -155,7 +155,7 @@ export async function GET(req: Request) {
     if (kind === 'bank') {
         const breakdown = calculateCompositeNetBreakdown(entries.reduce((sum, entry) => sum + Number(entry.ca_amount || 0), 0), config);
         const csv = buildCsv(
-            ['Annee', 'CA', 'Net estime', 'URSSAF', 'IR', 'CFE'],
+            ['Année', 'CA', 'Net estimé', 'URSSAF', 'IR', 'CFE'],
             [[year, breakdown.caBrut, breakdown.netReel, breakdown.urssaf, breakdown.ir, breakdown.cfe]]
         );
         return new NextResponse(csv, {
@@ -187,7 +187,7 @@ export async function GET(req: Request) {
 
     if (kind === 'pennylane') {
         const csv = buildCsv(
-            ['Date facture', 'Client', 'Montant HT', 'Statut', 'Echeance', 'Paye le'],
+            ['Date facture', 'Client', 'Montant HT', 'Statut', 'Échéance', 'Payé le'],
             invoices.map((invoice) => [
                 invoice.invoice_date,
                 invoice.client?.name || '',
@@ -206,7 +206,7 @@ export async function GET(req: Request) {
     }
 
     const accountantCsv = buildCsv(
-        ['Mois', 'CA', 'Client', 'Montant facture', 'Statut', 'Date facture', 'Echeance'],
+        ['Mois', 'CA', 'Client', 'Montant facture', 'Statut', 'Date facture', 'Échéance'],
         invoices.map((invoice) => [
             new Date(invoice.invoice_date).getMonth() + 1,
             entries.find((entry) => entry.month === new Date(invoice.invoice_date).getMonth() + 1)?.ca_amount || 0,

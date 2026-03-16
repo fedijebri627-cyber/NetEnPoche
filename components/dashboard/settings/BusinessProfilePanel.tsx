@@ -32,7 +32,7 @@ export function BusinessProfilePanel() {
                 setBusinessFieldsReady(data.businessFieldsReady !== false);
             } catch (loadError: unknown) {
                 console.error('Error loading profile:', loadError);
-                setError(loadError instanceof Error ? loadError.message : 'Impossible de charger les informations de l entreprise.');
+                setError(loadError instanceof Error ? loadError.message : 'Impossible de charger les informations de l?entreprise.');
             } finally {
                 setLoading(false);
             }
@@ -118,7 +118,7 @@ export function BusinessProfilePanel() {
             <div className="p-6 space-y-5">
                 {!businessFieldsReady && (
                     <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-                        La base de donnees de production n a pas encore la migration SIRET / business_name. Cette section ne pourra pas etre sauvegardee tant que la migration Supabase ne sera pas appliquee.
+                        La base de donn?es de production n?a pas encore la migration SIRET / business_name. Cette section ne pourra pas ?tre sauvegard?e tant que la migration Supabase ne sera pas appliqu?e.
                     </div>
                 )}
 
@@ -160,7 +160,7 @@ export function BusinessProfilePanel() {
 
                 <div className="space-y-1.5">
                     <label className="text-sm font-medium text-slate-700" htmlFor="siret">
-                        Numero SIRET <span className="text-slate-400 font-normal">(14 chiffres)</span>
+                        Num?ro SIRET <span className="text-slate-400 font-normal">(14 chiffres)</span>
                     </label>
                     <input
                         id="siret"
@@ -188,7 +188,7 @@ export function BusinessProfilePanel() {
             <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
                 {saved ? (
                     <span className="text-sm text-green-600 font-medium flex items-center gap-1.5">
-                        <CheckCircle2 className="w-4 h-4" /> Enregistre
+                        <CheckCircle2 className="w-4 h-4" /> Enregistr?
                     </span>
                 ) : <span />}
                 <button
@@ -197,7 +197,7 @@ export function BusinessProfilePanel() {
                     className="flex items-center gap-2 bg-[#162848] text-white px-5 py-2.5 rounded-xl font-medium hover:bg-[#0d1b35] transition disabled:opacity-50"
                 >
                     {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                    Enregistrer
+                    Enregistr?r
                 </button>
             </div>
         </div>

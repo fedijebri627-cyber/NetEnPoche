@@ -144,6 +144,18 @@ export interface ClientRiskInsight {
     averageDelay: number;
 }
 
+export interface UrssafQuarterInsight {
+    label: 'T1' | 'T2' | 'T3' | 'T4';
+    start: number;
+    end: number;
+    dueDate: Date;
+    amount: number;
+    quarterCA: number;
+    hasData: boolean;
+    daysLeft: number;
+    status: 'past' | 'future' | 'watch' | 'critical';
+}
+
 const monthFormatter = new Intl.DateTimeFormat('fr-FR', { month: 'short' });
 const dueDateFormatter = new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short' });
 
@@ -319,6 +331,58 @@ function getTodayForYear(year: number) {
     return now;
 }
 
+export function buildUrssafQuarterSchedule(
+    entries: InsightMonthlyEntry[],
+    config: InsightConfig
+): UrssafQuarterInsight[] {
+    const today = getTodayForYear(config.year);
+    const quarterRanges: Array<{ label: 'T1' | 'T2' | 'T3' | 'T4'; start: number; end: number; dueDate: Date }> = [
+        { label: 'T1', start: 1, end: 3, dueDate: new Date(config.year, 3, 30) },
+        { label: 'T2', start: 4, end: 6, dueDate: new Date(config.year, 6, 31) },
+        { label: 'T3', start: 7, end: 9, dueDate: new Date(config.year, 9, 31) },
+        { label: 'T4', start: 10, end: 12, dueDate: new Date(config.year + 1, 0, 31) },
+    ];
+
+    return quarterRanges.map((quarter) => {
+        const quarterCA = entries
+            .filter((entry) => entry.month >= quarter.start && entry.month <= quarter.end)
+            .reduce((sum, entry) => sum + Number(entry.ca_amount || 0), 0);
+        const amount = calculateCompositeNetBreakdown(quarterCA, config).urssaf;
+        const daysLeft = Math.ceil((quarter.dueDate.getTime() - today.getTime()) / 86400000);
+
+        let status: UrssafQuarterInsight['status'] = 'future';
+        if (daysLeft < 0) status = 'past';
+        else if (daysLeft <= 30) status = 'critical';
+        else if (daysLeft <= 60) status = 'watch';
+
+        return {
+            ...quarter,
+            amount,
+            quarterCA,
+            hasData: quarterCA > 0,
+            daysLeft,
+            status,
+        };
+    });
+}
+
+export function getUpcomingUrssafDeadline(
+    entries: InsightMonthlyEntry[],
+    config: InsightConfig,
+    maxDays = Number.POSITIVE_INFINITY
+) {
+    const schedule = buildUrssafQuarterSchedule(entries, config);
+    const actionable =
+        schedule.find((quarter) => quarter.daysLeft >= 0 && quarter.hasData)
+        ?? schedule.find((quarter) => quarter.daysLeft >= 0);
+
+    if (!actionable || actionable.daysLeft > maxDays) {
+        return null;
+    }
+
+    return actionable;
+}
+
 export function buildDecisionTimeline(
     entries: InsightMonthlyEntry[],
     config: InsightConfig,
@@ -363,16 +427,16 @@ export function buildDecisionTimeline(
     const timeline: TimelineItem[] = [
         {
             id: 'urssaf',
-            title: 'Prochaine echeance URSSAF',
-            detail: `A provisionner avant le ${dueDateFormatter.format(nextDueDate)}`,
+            title: 'Prochaine échéance URSSAF',
+            detail: `À provisionner avant le ${dueDateFormatter.format(nextDueDate)}`,
             value: formatCurrency(nextUrssafAmount),
             severity: nextUrssafAmount > 0 ? 'watch' : 'good',
         },
         {
             id: 'tva',
-            title: tva.status === 'danger' ? 'TVA a regulariser' : 'Surveillance seuil TVA',
+            title: tva.status === 'danger' ? 'TVA à régulariser' : 'Surveillance seuil TVA',
             detail: tva.status === 'danger'
-                ? 'Le seuil est franchi, preparez votre bascule TVA.'
+                ? 'Le seuil est franchi, préparez votre bascule TVA.'
                 : `Projection annuelle: ${formatCurrency(projection)}`,
             value: `${tva.percentage.toFixed(0)}%`,
             severity: tva.status === 'danger' ? 'critical' : tva.status === 'warning' ? 'watch' : 'good',
@@ -381,9 +445,9 @@ export function buildDecisionTimeline(
             id: 'goal',
             title: 'Objectif annuel',
             detail: annualGoal > 0
-                ? (totalCA >= expectedPace ? 'Vous tenez le rythme cible.' : 'Vous etes sous le rythme cible pour la date.')
+                ? (totalCA >= expectedPace ? 'Vous tenez le rythme cible.' : 'Vous êtes sous le rythme cible pour la date.')
                 : 'Ajoutez un objectif annuel pour activer ce suivi.',
-            value: annualGoal > 0 ? `${Math.round((totalCA / annualGoal) * 100)}%` : 'A definir',
+            value: annualGoal > 0 ? `${Math.round((totalCA / annualGoal) * 100)}%` : 'À définir',
             severity: annualGoal === 0 ? 'watch' : totalCA >= expectedPace ? 'good' : 'watch',
         },
     ];
@@ -392,7 +456,7 @@ export function buildDecisionTimeline(
         timeline.push({
             id: 'entries',
             title: 'Saisies mensuelles manquantes',
-            detail: `Mois sans CA renseigne: ${missingMonths.join(', ')}`,
+            detail: `Mois sans CA renseigné: ${missingMonths.join(', ')}`,
             value: `${missingMonths.length} mois`,
             severity: 'watch',
         });
@@ -401,10 +465,10 @@ export function buildDecisionTimeline(
     if (overdueInvoices.length > 0 || dueSoonInvoices.length > 0) {
         timeline.push({
             id: 'collections',
-            title: 'Factures a suivre',
+            title: 'Factures à suivre',
             detail: overdueInvoices.length > 0
                 ? `${overdueInvoices.length} facture(s) en retard`
-                : `${dueSoonInvoices.length} facture(s) arrivent a echeance`,
+                : `${dueSoonInvoices.length} facture(s) arrivent à échéance`,
             value: formatCurrency(
                 [...overdueInvoices, ...dueSoonInvoices].reduce((sum, invoice) => sum + Number(invoice.amount_ht || 0), 0)
             ),
@@ -442,18 +506,18 @@ export function buildHealthScoreInsight(
         : scoreResult.score;
 
     const recommendation = scoreResult.breakdown.diversification <= 10
-        ? 'Diversifiez votre portefeuille client pour reduire votre risque de dependance.'
+        ? 'Diversifiez votre portefeuille client pour réduire votre risque de dépendance.'
         : scoreResult.breakdown.tva <= 7
-            ? 'Le seuil TVA se rapproche. Verifiez votre prix net et votre tresorerie.'
+            ? 'Le seuil TVA se rapproche. Vérifiez votre prix net et votre trésorerie.'
             : scoreResult.breakdown.regularite <= 12
-                ? 'Completer tous les mois vous donnera des projections et alertes plus fiables.'
+                ? 'Compléter tous les mois vous donnera des projections et alertes plus fiables.'
                 : 'Votre pilotage est sain. Le prochain levier se joue surtout sur le cash disponible.';
 
     return {
         score: scoreResult.score,
         trend: scoreResult.score - previousScore,
         breakdown: [
-            { label: 'Regularite', value: scoreResult.breakdown.regularite, max: 20 },
+            { label: 'Régularité', value: scoreResult.breakdown.regularite, max: 20 },
             { label: 'Diversification', value: scoreResult.breakdown.diversification, max: 20 },
             { label: 'Marge', value: scoreResult.breakdown.marge, max: 30 },
             { label: 'TVA', value: scoreResult.breakdown.tva, max: 15 },
@@ -478,11 +542,11 @@ export function buildNetChangeInsight(entries: InsightMonthlyEntry[], config: In
 
     if (monthlySnapshots.length === 0) {
         return {
-            label: 'Pas encore assez de donnees',
+            label: 'Pas encore assez de données',
             deltaNet: 0,
             deltaCa: 0,
             deltaCharges: 0,
-            drivers: ['Ajoutez un premier mois de chiffre d affaires pour activer cette analyse.'],
+            drivers: ['Ajoutez un premier mois de chiffre d’affaires pour activer cette analyse.'],
         };
     }
 
@@ -498,18 +562,18 @@ export function buildNetChangeInsight(entries: InsightMonthlyEntry[], config: In
     const drivers: string[] = [];
     if (Math.abs(deltaCa) >= 1) {
         drivers.push(deltaCa >= 0
-            ? `Le chiffre d affaires progresse de ${formatCurrency(deltaCa)}.`
-            : `Le chiffre d affaires recule de ${formatCurrency(Math.abs(deltaCa))}.`);
+            ? `Le chiffre d’affaires progresse de ${formatCurrency(deltaCa)}.`
+            : `Le chiffre d’affaires recule de ${formatCurrency(Math.abs(deltaCa))}.`);
     }
 
     if (Math.abs(deltaCharges) >= 1) {
         drivers.push(deltaCharges >= 0
-            ? `Les charges provisionnees montent de ${formatCurrency(deltaCharges)}.`
-            : `Les charges provisionnees baissent de ${formatCurrency(Math.abs(deltaCharges))}.`);
+            ? `Les charges provisionnées montent de ${formatCurrency(deltaCharges)}.`
+            : `Les charges provisionnées baissent de ${formatCurrency(Math.abs(deltaCharges))}.`);
     }
 
     if (drivers.length === 0) {
-        drivers.push('Votre net est stable par rapport au mois precedent.');
+        drivers.push('Votre net est stable par rapport au mois précédent.');
     }
 
     return {
@@ -550,12 +614,12 @@ export function simulateScenario(
 
     return {
         label: mode === 'extra_invoice'
-            ? 'Facture supplementaire'
+            ? 'Facture supplémentaire'
             : mode === 'price_increase'
                 ? 'Hausse tarifaire'
                 : mode === 'tva_crossing'
-                    ? 'Passage TVA simule'
-                    : 'Versement liberatoire',
+                    ? 'Passage TVA simulé'
+                    : 'Versement libératoire',
         netDelta: next.netReel - base.netReel,
         urssafDelta: next.urssaf - base.urssaf,
         irDelta: next.ir - base.ir,

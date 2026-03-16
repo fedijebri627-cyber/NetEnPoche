@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --navy: #0d1b35;
   --navy-2: #162848;
   --navy-3: #1f3660;
@@ -28,7 +28,7 @@ html {
 }
 
 
-/* â”€â”€ NAV â”€â”€ */
+/* NAV */
 .landing-nav {
   position: fixed;
   top: 0;
@@ -99,7 +99,7 @@ html {
   box-shadow: 0 6px 20px var(--green-glow);
 }
 
-/* â”€â”€ HERO â”€â”€ */
+/* HERO */
 .hero {
   min-height: 100vh;
   display: flex;
@@ -247,7 +247,7 @@ html {
   font-size: 10px;
 }
 
-/* â”€â”€ HERO DASHBOARD PREVIEW â”€â”€ */
+/* HERO */
 .hero-preview {
   width: 100%;
   max-width: 900px;
@@ -363,7 +363,7 @@ html {
   margin-top: 4px;
 }
 
-/* â”€â”€ PROBLEM SECTION â”€â”€ */
+/* PROBLEM SECTION */
 .section {
   padding: 100px 60px;
   max-width: 1200px;
@@ -396,7 +396,7 @@ html {
   max-width: 560px;
 }
 
-/* â”€â”€ PROBLEM CARDS â”€â”€ */
+/* PROBLEM CARDS */
 .problem-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -434,7 +434,7 @@ html {
   line-height: 1.7;
 }
 
-/* â”€â”€ FEATURES â”€â”€ */
+/* FEATURES */
 .features-section {
   padding: 100px 60px;
   background: linear-gradient(180deg, var(--navy) 0%, var(--navy-2) 100%);
@@ -614,7 +614,7 @@ html {
   color: var(--green);
 }
 
-/* â”€â”€ PRICING â”€â”€ */
+/* PRICING */
 .pricing-section {
   padding: 100px 60px;
   max-width: 1100px;
@@ -640,7 +640,7 @@ html {
   cursor: pointer;
 }
 
-/* toggle knob is rendered by the React PricingSection component */
+/* PRICING */
 
 .annual-badge {
   background: var(--green-dim);
@@ -803,7 +803,7 @@ html {
   border: 1px solid rgba(245, 166, 35, 0.3);
 }
 
-/* â”€â”€ SOCIAL PROOF â”€â”€ */
+/* SOCIAL PROOF */
 .proof-section {
   padding: 80px 60px;
   border-top: 1px solid var(--gray-line);
@@ -839,7 +839,7 @@ html {
   line-height: 1.5;
 }
 
-/* â”€â”€ TESTIMONIALS â”€â”€ */
+/* TESTIMONIALS */
 .testimonials {
   padding: 100px 60px;
   max-width: 1100px;
@@ -904,7 +904,7 @@ html {
   color: var(--gray-text);
 }
 
-/* â”€â”€ FAQ â”€â”€ */
+/* FAQ */
 .faq-section {
   padding: 100px 60px;
   max-width: 800px;
@@ -957,7 +957,7 @@ html {
   color: var(--green);
 }
 
-/* â”€â”€ FINAL CTA â”€â”€ */
+/* FINAL CTA */
 .final-cta {
   padding: 120px 60px;
   text-align: center;
@@ -1003,7 +1003,7 @@ html {
   justify-content: center;
 }
 
-/* â”€â”€ FOOTER â”€â”€ */
+/* FOOTER */
 .landing-page footer {
   border-top: 1px solid var(--gray-line);
   padding: 40px 60px;
@@ -1031,7 +1031,7 @@ html {
   color: white;
 }
 
-/* â”€â”€ ANIMATIONS â”€â”€ */
+/* ANIMATIONS */
 @keyframes fadeUp {
   from {
     opacity: 0;
@@ -2718,4 +2718,6 @@ th.comp-me {
     font-size: 20px;
   }
 }
+
+
 

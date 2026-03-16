@@ -62,10 +62,10 @@ export function buildPriorityActions(entries: InsightMonthlyEntry[], config: Ins
     if (reserve.totalReserve > 0) {
         actions.push({
             id: 'reserve',
-            title: 'Mettez votre tresorerie de securite de cote maintenant',
-            detail: `Gardez ${formatCurrency(reserve.totalReserve)} pour couvrir URSSAF, impot et CFE sans tension.`,
+            title: 'Mettez votre trésorerie de sécurité de côté maintenant',
+            detail: `Gardez ${formatCurrency(reserve.totalReserve)} pour couvrir URSSAF, impôt et CFE sans tension.`,
             value: formatCurrency(reserve.safeToSpend),
-            ctaLabel: 'Voir la reserve',
+            ctaLabel: 'Voir la réserve',
             severity: reserve.reserveRate >= 0.35 ? 'critical' : 'watch',
             kind: 'scroll',
             targetId: 'reserve-card',
@@ -75,49 +75,47 @@ export function buildPriorityActions(entries: InsightMonthlyEntry[], config: Ins
     if (!annualGoal) {
         actions.push({
             id: 'goal-missing',
-            title: 'Definissez un objectif annuel pour piloter votre rythme',
+            title: 'Définissez un objectif annuel pour piloter votre rythme',
             detail: "L'objectif active les alertes de cadence et la lecture de votre avance ou retard.",
-            value: 'A definir',
+            value: 'À définir',
             ctaLabel: 'Renseigner mon objectif',
             severity: 'watch',
-            kind: 'scroll',
-            targetId: 'activity-config',
+            kind: 'onboarding',
         });
     } else if (paceGap > 0) {
         actions.push({
             id: 'goal-gap',
-            title: 'Vous etes sous le rythme de votre objectif annuel',
-            detail: `Il manque ${formatCurrency(paceGap)} pour rester au niveau attendu a date.`,
+            title: 'Vous êtes sous le rythme de votre objectif annuel',
+            detail: `Il manque ${formatCurrency(paceGap)} pour rester au niveau attendu à date.`,
             value: `${Math.round((totalCA / annualGoal) * 100)}%`,
             ctaLabel: 'Revoir mon objectif',
             severity: paceGap > annualGoal * 0.12 ? 'critical' : 'watch',
-            kind: 'scroll',
-            targetId: 'activity-config',
+            kind: 'onboarding',
         });
     }
 
     if (tva.status !== 'safe') {
         actions.push({
             id: 'tva-risk',
-            title: tva.status === 'danger' ? 'Preparez votre bascule TVA' : 'Surveillez de pres votre seuil TVA',
+            title: tva.status === 'danger' ? 'Préparez votre bascule TVA' : 'Surveillez de près votre seuil TVA',
             detail: tva.status === 'danger'
-                ? 'Votre franchise est franchie ou quasiment franchie. Verifiez vos prix et vos prochaines factures.'
-                : 'Votre marge de securite TVA se reduit. Anticipez votre scenario de depassement.',
+                ? 'Votre franchise est franchie ou quasiment franchie. Vérifiez vos prix et vos prochaines factures.'
+                : 'Votre marge de sécurité TVA se réduit. Anticipez votre scénario de dépassement.',
             value: `${tva.percentage.toFixed(0)}%`,
             ctaLabel: 'Voir le suivi TVA',
             severity: tva.status === 'danger' ? 'critical' : tva.status === 'warning' ? 'watch' : 'good',
-            kind: 'scroll',
-            targetId: 'tva-card',
+            kind: 'route',
+            route: '/dashboard/optimisation?focus=optimisation-actions-fiscales#optimisation-actions-fiscales',
         });
     }
 
     if (missingMonths.length > 0 && filledMonths > 0) {
         actions.push({
             id: 'missing-months',
-            title: 'Completez vos mois manquants pour fiabiliser les alertes',
+            title: 'Complétez vos mois manquants pour fiabiliser les alertes',
             detail: `Il vous manque ${missingMonths.length} mois saisis sur l'exercice en cours.`,
             value: `${missingMonths.length} mois`,
-            ctaLabel: 'Completer la table CA',
+            ctaLabel: 'Compléter la table CA',
             severity: missingMonths.length >= 3 ? 'critical' : 'watch',
             kind: 'scroll',
             targetId: 'monthly-entries',
@@ -127,7 +125,7 @@ export function buildPriorityActions(entries: InsightMonthlyEntry[], config: Ins
     if (health.score < 70) {
         actions.push({
             id: 'optimisation',
-            title: 'Votre score de pilotage peut etre ameliore rapidement',
+            title: 'Votre score de pilotage peut être amélioré rapidement',
             detail: "Passez par l'optimisation pour comparer votre poche nette, votre option fiscale et votre trajectoire.",
             value: `${health.score}/100`,
             ctaLabel: "Ouvrir l'optimisation",
@@ -145,10 +143,10 @@ export function buildPriorityActions(entries: InsightMonthlyEntry[], config: Ins
                 title: urssafItem.title,
                 detail: urssafItem.detail,
                 value: urssafItem.value,
-                ctaLabel: "Voir l'echeancier",
+                ctaLabel: "Voir l'échéancier",
                 severity: urssafItem.severity,
                 kind: 'scroll',
-                targetId: 'urssaf-calendar',
+                targetId: 'urssaf-deadline-card',
             });
         }
     }
@@ -156,8 +154,8 @@ export function buildPriorityActions(entries: InsightMonthlyEntry[], config: Ins
     if (actions.length < 3) {
         actions.push({
             id: 'onboarding-refresh',
-            title: "Votre situation a change ?",
-            detail: 'Mettez a jour votre profil fiscal en 2 minutes pour garder des priorites fiables.',
+            title: 'Votre situation a changé ?',
+            detail: 'Mettez à jour votre profil fiscal en 2 minutes pour garder des priorités fiables.',
             value: 'Rapide',
             ctaLabel: "Relancer l'onboarding",
             severity: 'good',

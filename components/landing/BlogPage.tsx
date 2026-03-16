@@ -325,4 +325,3 @@ export function BlogPostPageView({ post, relatedPosts }: { post: BlogPost; relat
     </div>
   );
 }
-

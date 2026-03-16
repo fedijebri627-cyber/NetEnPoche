@@ -6,7 +6,7 @@ import { calculateCompositeNetBreakdown, formatCurrency } from '@/lib/dashboard-
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, ReferenceLine, CartesianGrid } from 'recharts';
 import { BarChart3 } from 'lucide-react';
 
-const shortMonths = ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aou', 'Sep', 'Oct', 'Nov', 'Dec'];
+const shortMonths = ['Jan', 'F?v', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Ao?', 'Sep', 'Oct', 'Nov', 'D?c'];
 
 export function MonthlyChargesChart() {
     const { entries, config, loading, year } = useDashboard();
@@ -51,18 +51,18 @@ export function MonthlyChargesChart() {
     const CustomTooltip = ({ active, payload, label }: any) => {
         if (active && payload && payload.length) {
             return (
-                <div className="bg-white border text-sm border-slate-200 p-3 rounded-xl shadow-lg font-medium">
-                    <p className="font-bold text-[#0d1b35] mb-2 text-base">{label}</p>
+                <div className="rounded-xl border border-slate-200 bg-white p-3 text-sm font-medium shadow-lg">
+                    <p className="mb-2 text-[14px] font-medium text-slate-900">{label}</p>
                     {payload.map((entry: any, index: number) => (
                         <div key={index} className="flex items-center justify-between gap-4 mb-1">
                             <span style={{ color: entry.color }}>{entry.name}:</span>
-                            <span className="font-bold text-slate-800">{formatCurrency(entry.value)}</span>
+                            <span className="text-[13px] font-medium text-slate-800">{formatCurrency(entry.value)}</span>
                         </div>
                     ))}
                     {payload[0].payload['CA global'] !== undefined && (
                         <div className="flex items-center justify-between gap-4 pt-2 mt-2 border-t border-slate-100">
                             <span className="text-slate-500">Encaissement:</span>
-                            <span className="font-bold text-slate-500">{formatCurrency(payload[0].payload['CA global'])}</span>
+                            <span className="text-[13px] font-medium text-slate-500">{formatCurrency(payload[0].payload['CA global'])}</span>
                         </div>
                     )}
                 </div>
@@ -74,23 +74,23 @@ export function MonthlyChargesChart() {
     return (
         <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col min-h-[400px]">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
-                <h3 className="text-lg font-bold font-syne text-[#0d1b35] flex items-center gap-2">
+                <h3 className="flex items-center gap-2 text-lg font-medium text-slate-900">
                     <BarChart3 className="w-5 h-5 text-slate-400" />
-                    Repartition des revenus
+                    R?partition des revenus
                 </h3>
 
                 <div className="bg-slate-100 p-1 rounded-full inline-flex self-start sm:self-auto">
                     <button
                         onClick={() => setViewMode('mensuel')}
-                        className={`px-4 py-1.5 rounded-full text-xs font-bold transition ${viewMode === 'mensuel' ? 'bg-white shadow-sm text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
+                        className={`rounded-full px-4 py-1.5 text-[11px] font-medium transition ${viewMode === 'mensuel' ? 'bg-white shadow-sm text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
                     >
                         Mensuel
                     </button>
                     <button
                         onClick={() => setViewMode('cumule')}
-                        className={`px-4 py-1.5 rounded-full text-xs font-bold transition ${viewMode === 'cumule' ? 'bg-white shadow-sm text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
+                        className={`rounded-full px-4 py-1.5 text-[11px] font-medium transition ${viewMode === 'cumule' ? 'bg-white shadow-sm text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
                     >
-                        Cumule
+                        Cumul?
                     </button>
                 </div>
             </div>
@@ -99,7 +99,7 @@ export function MonthlyChargesChart() {
                 {runningCA === 0 ? (
                     <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 bg-slate-50/50 rounded-2xl border-2 border-dashed border-slate-100">
                         <BarChart3 className="w-12 h-12 mb-3 opacity-20" />
-                        <p className="font-medium text-sm">Vos donnees apparaitront ici</p>
+                        <p className="font-medium text-sm">Vos donn?es appara?tront ici</p>
                     </div>
                 ) : (
                     <ResponsiveContainer width="100%" height={300}>

@@ -1,27 +1,33 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { Loader2 } from 'lucide-react';
 import { FeatureLock } from '@/components/dashboard/FeatureLock';
-import { buildClientRiskInsights, buildCollectionsInsight, formatCurrency, type InsightClient, type InsightInvoice } from '@/lib/dashboard-insights';
-import { BellRing, Download, Loader2, ShieldAlert, WalletCards } from 'lucide-react';
+import { buildCollectionsInsight, formatCurrency, type InsightInvoice } from '@/lib/dashboard-insights';
 
-interface CollectionsCockpitCardProps {
+interface CollectionsListCardProps {
     invoices: InsightInvoice[];
     onRefresh: () => Promise<void> | void;
 }
 
-interface ClientInsightsCardProps {
-    clients: InsightClient[];
-    invoices: InsightInvoice[];
+function MiniStat({ label, value }: { label: string; value: string }) {
+    return (
+        <div className="rounded-[8px] bg-slate-50 px-3 py-3">
+            <div className="text-[11px] uppercase tracking-[0.04em] text-slate-500">{label}</div>
+            <div className="mt-1 text-[16px] font-medium text-slate-900">{value}</div>
+        </div>
+    );
 }
 
-export function CollectionsCockpitCard({ invoices, onRefresh }: CollectionsCockpitCardProps) {
-    const [sendingId, setSendingId] = useState<string | null>(null);
+export function CollectionsListCard({ invoices, onRefresh }: CollectionsListCardProps) {
+    const [busyId, setBusyId] = useState<string | null>(null);
     const [reminderCounts, setReminderCounts] = useState<Record<string, number>>({});
     const collections = useMemo(() => buildCollectionsInsight(invoices), [invoices]);
 
     useEffect(() => {
-        const fetchReminders = async () => {
+        let ignore = false;
+
+        void (async () => {
             try {
                 const response = await fetch('/api/invoice-reminders', { cache: 'no-store' });
                 if (!response.ok) return;
@@ -32,14 +38,30 @@ export function CollectionsCockpitCard({ invoices, onRefresh }: CollectionsCockp
                     }
                     return acc;
                 }, {});
-                setReminderCounts(counts);
+                if (!ignore) {
+                    setReminderCounts(counts);
+                }
             } catch (error) {
                 console.error(error);
             }
-        };
+        })();
 
-        void fetchReminders();
+        return () => {
+            ignore = true;
+        };
     }, [invoices]);
+
+    const visibleInvoices = useMemo(
+        () =>
+            [...invoices]
+                .filter((invoice) => invoice.status !== 'paid')
+                .sort((a, b) => {
+                    if (a.status === 'overdue' && b.status !== 'overdue') return -1;
+                    if (a.status !== 'overdue' && b.status === 'overdue') return 1;
+                    return new Date(a.due_date).getTime() - new Date(b.due_date).getTime();
+                }),
+        [invoices]
+    );
 
     const sendReminder = async (invoice: InsightInvoice) => {
         const email = invoice.client?.email;
@@ -48,9 +70,9 @@ export function CollectionsCockpitCard({ invoices, onRefresh }: CollectionsCockp
             return;
         }
 
-        setSendingId(invoice.id);
+        setBusyId(invoice.id);
         const subject = `Relance facture ${invoice.client?.name || ''}`;
-        const body = `Bonjour,%0D%0A%0D%0ANous vous relancons concernant la facture du ${invoice.invoice_date} arrivee a echeance le ${invoice.due_date}.%0D%0AMontant HT: ${Number(invoice.amount_ht || 0).toFixed(2)} EUR.%0D%0A%0D%0AMerci d avance pour votre retour.%0D%0A%0D%0ACordialement.`;
+        const body = `Bonjour,%0D%0A%0D%0ANous vous relançons concernant la facture du ${invoice.invoice_date} arrivée à échéance le ${invoice.due_date}.%0D%0AMontant HT: ${Number(invoice.amount_ht || 0).toFixed(2)} EUR.%0D%0A%0D%0AMerci d'avance pour votre retour.%0D%0A%0D%0ACordialement.`;
 
         window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${body}`;
 
@@ -63,143 +85,97 @@ export function CollectionsCockpitCard({ invoices, onRefresh }: CollectionsCockp
                     channel: 'email',
                     templateKey: 'friendly',
                     recipient: email,
-                    note: 'Relance manuelle envoyee depuis le cockpit collections.',
+                    note: 'Relance manuelle envoyée depuis la liste collections.',
                 }),
             });
             setReminderCounts((current) => ({ ...current, [invoice.id]: (current[invoice.id] || 0) + 1 }));
         } catch (error) {
             console.error(error);
         } finally {
-            setSendingId(null);
+            setBusyId(null);
         }
     };
 
     const markAsPaid = async (invoice: InsightInvoice) => {
-        setSendingId(invoice.id);
+        setBusyId(invoice.id);
         try {
             const response = await fetch(`/api/invoices/${invoice.id}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: 'paid' }),
             });
-            if (!response.ok) throw new Error('Failed to mark invoice as paid');
+            if (!response.ok) throw new Error('Impossible de mettre la facture à jour.');
             await onRefresh();
         } catch (error) {
             console.error(error);
-            alert('Impossible de mettre la facture a jour.');
+            alert(error instanceof Error ? error.message : 'Impossible de mettre la facture à jour.');
         } finally {
-            setSendingId(null);
+            setBusyId(null);
         }
     };
 
     return (
         <FeatureLock featureName="Cockpit de recouvrement" requiredTier="expert">
-            <div className="h-full rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-                <div className="flex items-center justify-between gap-4 mb-5">
-                    <div>
-                        <h3 className="flex items-center gap-2 text-lg font-bold font-syne text-[#0d1b35]">
-                            <WalletCards className="h-5 w-5 text-indigo-500" />
-                            Collections cockpit
-                        </h3>
-                        <p className="mt-1 text-sm text-slate-500">Pilotage du cash a encaisser, relances et retard client.</p>
-                    </div>
-                    <div className="rounded-2xl bg-indigo-50 px-4 py-3 text-right">
-                        <div className="text-xs font-semibold uppercase tracking-wide text-indigo-500">Cash en attente</div>
-                        <div className="text-2xl font-black font-syne text-indigo-700">{formatCurrency(collections.pendingCash)}</div>
-                    </div>
+            <div className="rounded-[12px] border border-slate-200 bg-white p-4">
+                <div className="mb-3">
+                    <h3 className="text-[18px] font-medium text-slate-900">Collections - factures en cours</h3>
+                    <p className="mt-1 text-[12px] text-slate-500">Vos factures à encaisser, triées par priorité de relance.</p>
                 </div>
 
-                <div className="grid gap-3 sm:grid-cols-3 mb-5">
-                    <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                        <div className="text-xs uppercase tracking-wide text-slate-500">En retard</div>
-                        <div className="mt-2 text-xl font-bold text-[#0d1b35]">{collections.overdueCount} - {formatCurrency(collections.overdueCash)}</div>
-                    </div>
-                    <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                        <div className="text-xs uppercase tracking-wide text-slate-500">A 7 jours</div>
-                        <div className="mt-2 text-xl font-bold text-[#0d1b35]">{collections.dueSoonCount} - {formatCurrency(collections.dueSoonCash)}</div>
-                    </div>
-                    <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                        <div className="text-xs uppercase tracking-wide text-slate-500">Delai moyen paye</div>
-                        <div className="mt-2 text-xl font-bold text-[#0d1b35]">{collections.averagePaymentDelay.toFixed(0)} jours</div>
-                    </div>
+                <div className="mb-3 grid grid-cols-3 gap-2">
+                    <MiniStat label="En retard" value={formatCurrency(collections.overdueCash)} />
+                    <MiniStat label="A 7 jours" value={formatCurrency(collections.dueSoonCash)} />
+                    <MiniStat label="En attente" value={formatCurrency(collections.pendingCash)} />
                 </div>
 
-                <div className="space-y-3">
-                    {collections.topLateInvoices.length === 0 ? (
-                        <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4 text-sm text-emerald-700">Aucune facture en retard. Votre recouvrement est propre.</div>
-                    ) : collections.topLateInvoices.map((invoice) => (
-                        <div key={invoice.id} className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                                <div>
-                                    <div className="font-semibold text-slate-900">{invoice.client?.name || 'Client sans nom'} - {formatCurrency(Number(invoice.amount_ht || 0))}</div>
-                                    <div className="mt-1 text-sm text-slate-500">Echeance {invoice.due_date} - {reminderCounts[invoice.id] || 0} relance(s)</div>
-                                </div>
-                                <div className="flex flex-wrap gap-2">
-                                    <button
-                                        onClick={() => sendReminder(invoice)}
-                                        disabled={sendingId === invoice.id}
-                                        className="inline-flex items-center gap-2 rounded-xl bg-[#0d1b35] px-4 py-2 text-sm font-semibold text-white hover:bg-[#162848] disabled:opacity-50"
-                                    >
-                                        {sendingId === invoice.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <BellRing className="h-4 w-4" />}
-                                        Relancer
-                                    </button>
-                                    <button
-                                        onClick={() => markAsPaid(invoice)}
-                                        disabled={sendingId === invoice.id}
-                                        className="inline-flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 hover:bg-emerald-100 disabled:opacity-50"
-                                    >
-                                        Marquer payee
-                                    </button>
-                                </div>
-                            </div>
+                <div className="space-y-2">
+                    {visibleInvoices.length === 0 ? (
+                        <div className="rounded-[8px] border border-slate-200 bg-slate-50 px-3 py-3 text-[12px] text-slate-500">
+                            Aucune facture ouverte pour le moment.
                         </div>
-                    ))}
-                </div>
-            </div>
-        </FeatureLock>
-    );
-}
-
-export function ClientInsightsCard({ clients, invoices }: ClientInsightsCardProps) {
-    const insights = useMemo(() => buildClientRiskInsights(clients, invoices).slice(0, 5), [clients, invoices]);
-    const topShare = insights[0]?.shareOfRevenue || 0;
-
-    return (
-        <FeatureLock featureName="Rentabilite clients" requiredTier="expert">
-            <div className="h-full rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-                <div className="flex items-center justify-between gap-4 mb-5">
-                    <div>
-                        <h3 className="flex items-center gap-2 text-lg font-bold font-syne text-[#0d1b35]">
-                            <ShieldAlert className="h-5 w-5 text-amber-500" />
-                            Rentabilite et risque client
-                        </h3>
-                        <p className="mt-1 text-sm text-slate-500">Qui paie bien, qui concentre votre CA et ou se situe le vrai risque.</p>
-                    </div>
-                    <div className={`rounded-2xl px-4 py-3 text-right ${topShare >= 0.4 ? 'bg-amber-50' : 'bg-emerald-50'}`}>
-                        <div className={`text-xs font-semibold uppercase tracking-wide ${topShare >= 0.4 ? 'text-amber-500' : 'text-emerald-500'}`}>Concentration</div>
-                        <div className={`text-2xl font-black font-syne ${topShare >= 0.4 ? 'text-amber-700' : 'text-emerald-700'}`}>{Math.round(topShare * 100)}%</div>
-                    </div>
-                </div>
-
-                <div className="space-y-3">
-                    {insights.length === 0 ? (
-                        <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4 text-sm text-slate-500">Ajoutez des clients et des factures pour activer l'analyse de portefeuille.</div>
-                    ) : insights.map((item) => (
-                        <div key={item.clientId} className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                                <div>
-                                    <div className="font-semibold text-slate-900">{item.name}</div>
-                                    <div className="mt-1 text-sm text-slate-500">{item.invoiceCount} facture(s) - ticket moyen {formatCurrency(item.averageTicket)}</div>
+                    ) : (
+                        visibleInvoices.map((invoice) => {
+                            const isOverdue = invoice.status === 'overdue';
+                            return (
+                                <div
+                                    key={invoice.id}
+                                    className={`flex items-center gap-[10px] rounded-[8px] border px-[10px] py-[9px] ${isOverdue ? 'border-[#f09595] bg-[#fcebeb]' : 'border-slate-200 bg-white'}`}
+                                >
+                                    <div className="min-w-0 flex-1">
+                                        <div className={`text-[13px] font-medium ${isOverdue ? 'text-[#791f1f]' : 'text-slate-900'}`}>
+                                            {invoice.client?.name || 'Client sans nom'}
+                                        </div>
+                                        <div className="mt-0.5 text-[11px] text-slate-500">
+                                            Échéance {new Date(invoice.due_date).toLocaleDateString('fr-FR')} - {reminderCounts[invoice.id] || 0} relance(s)
+                                        </div>
+                                    </div>
+                                    <div className={`text-[13px] font-medium whitespace-nowrap ${isOverdue ? 'text-[#791f1f]' : 'text-slate-900'}`}>
+                                        {formatCurrency(Number(invoice.amount_ht || 0))}
+                                    </div>
+                                    <div className="flex gap-[5px]">
+                                        {isOverdue ? (
+                                            <button
+                                                type="button"
+                                                onClick={() => sendReminder(invoice)}
+                                                disabled={busyId === invoice.id}
+                                                className="rounded-[5px] bg-[#e6f1fb] px-[9px] py-[4px] text-[11px] font-medium text-[#0c447c] disabled:opacity-50"
+                                            >
+                                                {busyId === invoice.id ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Relancer'}
+                                            </button>
+                                        ) : null}
+                                        <button
+                                            type="button"
+                                            onClick={() => markAsPaid(invoice)}
+                                            disabled={busyId === invoice.id}
+                                            className="rounded-[5px] border border-slate-200 bg-slate-50 px-[9px] py-[4px] text-[11px] font-medium text-slate-600 disabled:opacity-50"
+                                        >
+                                            Payée
+                                        </button>
+                                    </div>
                                 </div>
-                                <div className="text-sm font-bold text-slate-700">{Math.round(item.shareOfRevenue * 100)}% du CA</div>
-                            </div>
-                            <div className="mt-3 grid gap-3 sm:grid-cols-3 text-sm text-slate-600">
-                                <div className="rounded-xl bg-white p-3">CA: <span className="font-semibold text-slate-900">{formatCurrency(item.totalRevenue)}</span></div>
-                                <div className="rounded-xl bg-white p-3">Retard: <span className="font-semibold text-slate-900">{formatCurrency(item.overdueAmount)}</span></div>
-                                <div className="rounded-xl bg-white p-3">Delai moyen: <span className="font-semibold text-slate-900">{item.averageDelay.toFixed(0)} jours</span></div>
-                            </div>
-                        </div>
-                    ))}
+                            );
+                        })
+                    )}
                 </div>
             </div>
         </FeatureLock>
@@ -209,20 +185,20 @@ export function ClientInsightsCard({ clients, invoices }: ClientInsightsCardProp
 export function AdminPackCard({ year }: { year: number }) {
     const [loadingKind, setLoadingKind] = useState<string | null>(null);
 
-    const download = async (kind: 'excel' | 'bank' | 'accountant' | 'qonto' | 'pennylane') => {
+    const download = async (kind: 'excel' | 'bank' | 'accountant' | 'qonto') => {
         setLoadingKind(kind);
         try {
             const response = await fetch(`/api/exports/admin-pack?year=${year}&kind=${kind}`);
             if (!response.ok) {
                 const payload = await response.json().catch(() => null);
-                throw new Error(payload?.error || 'Export failed');
+                throw new Error(payload?.error || 'Export impossible pour le moment.');
             }
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
             const disposition = response.headers.get('Content-Disposition') || '';
-            const fileNameMatch = disposition.match(/filename="?([^\"]+)"?/);
+            const fileNameMatch = disposition.match(/filename=\"?([^\"]+)\"?/);
             link.download = fileNameMatch?.[1] || `netenpoche-${kind}-${year}`;
             document.body.appendChild(link);
             link.click();
@@ -236,39 +212,33 @@ export function AdminPackCard({ year }: { year: number }) {
         }
     };
 
-    const buttons: Array<{ kind: 'excel' | 'bank' | 'accountant' | 'qonto' | 'pennylane'; label: string; note: string }> = [
-        { kind: 'excel', label: 'Pack Excel', note: 'Synthese, mensuel, clients, factures' },
-        { kind: 'bank', label: 'Pack banque', note: 'Resume annuel simplifie' },
-        { kind: 'accountant', label: 'Pack comptable', note: 'CSV mensuel + factures' },
-        { kind: 'qonto', label: 'Format Qonto', note: 'Mapping CSV v1' },
-        { kind: 'pennylane', label: 'Format Pennylane', note: 'Mapping CSV v1' },
+    const buttons: Array<{ kind: 'excel' | 'bank' | 'accountant' | 'qonto'; label: string; note: string }> = [
+        { kind: 'excel', label: 'Pack Excel', note: 'Synthese annuelle et detail mensuel' },
+        { kind: 'bank', label: 'Pack banque', note: 'Resume clair pour dossier bancaire' },
+        { kind: 'accountant', label: 'Pack comptable', note: 'CSV mensuel et factures' },
+        { kind: 'qonto', label: 'Format Qonto', note: 'Export CSV simplifie' },
     ];
 
     return (
         <FeatureLock featureName="Admin pack" requiredTier="expert">
-            <div className="h-full rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-                <div className="flex items-center justify-between gap-4 mb-5">
-                    <div>
-                        <h3 className="flex items-center gap-2 text-lg font-bold font-syne text-[#0d1b35]">
-                            <Download className="h-5 w-5 text-indigo-500" />
-                            Exports et admin pack
-                        </h3>
-                        <p className="mt-1 text-sm text-slate-500">Exports business-ready pour banque, comptable et migration outillage.</p>
-                    </div>
+            <div className="rounded-[12px] border border-slate-200 bg-white p-4">
+                <div className="mb-3">
+                    <h3 className="text-[18px] font-medium text-slate-900">Exports</h3>
+                    <p className="mt-1 text-[12px] text-slate-500">Packs utiles pour banque, comptable et suivi outillage.</p>
                 </div>
-                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                <div className="grid grid-cols-2 gap-[6px]">
                     {buttons.map((button) => (
                         <button
                             key={button.kind}
+                            type="button"
                             onClick={() => download(button.kind)}
                             disabled={loadingKind !== null}
-                            className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-indigo-200 hover:bg-indigo-50 disabled:opacity-50"
+                            className="rounded-[8px] border border-slate-200 bg-slate-50 px-[10px] py-[9px] text-left disabled:opacity-50"
                         >
-                            <div className="flex items-center justify-between gap-3">
-                                <div className="font-semibold text-slate-900">{button.label}</div>
-                                {loadingKind === button.kind ? <Loader2 className="h-4 w-4 animate-spin text-slate-400" /> : <Download className="h-4 w-4 text-slate-400" />}
+                            <div className="text-[12px] font-medium text-slate-900">{button.label}</div>
+                            <div className="mt-0.5 text-[11px] text-slate-500">
+                                {loadingKind === button.kind ? 'Préparation...' : button.note}
                             </div>
-                            <div className="mt-2 text-sm text-slate-500">{button.note}</div>
                         </button>
                     ))}
                 </div>
