@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Script from 'next/script';
 import { createAppUrl, getConfiguredAppUrl } from '@/lib/app-url';
+import { seoCalculatorPages } from '@/lib/seo-calculator-pages';
 import { getSeoLandingPage, seoLandingPages, type SeoLandingPage } from '@/lib/seo-pages';
 import '@/app/landing.css';
 
@@ -64,7 +65,7 @@ export function buildSeoLandingMetadata(page: SeoLandingPage): Metadata {
 export function SeoLandingPageView({ page }: { page: SeoLandingPage }) {
   const appUrl = getConfiguredAppUrl();
   const pageUrl = createAppUrl(`/${page.slug}`, appUrl);
-  const relatedPages = seoLandingPages.filter((entry) => entry.slug !== page.slug).slice(0, 3);
+  const relatedPages = [...seoLandingPages, ...seoCalculatorPages].filter((entry) => entry.slug !== page.slug).slice(0, 4);
   const formattedUpdatedDate = formatUpdatedDate(page.updatedAt);
 
   const breadcrumbJsonLd = {
@@ -245,6 +246,11 @@ export function SeoLandingPageView({ page }: { page: SeoLandingPage }) {
         <p className="final-cta-sub">
           Créez un compte gratuit pour visualiser vos cotisations URSSAF, la TVA et votre net après impôt sur la même interface.
         </p>
+        {page.slug === 'tva-micro-entreprise' ? (
+          <p className="final-cta-sub">
+            Ou testez directement le <Link href="/simulateur-tva-auto-entrepreneur" className="footer-link">simulateur TVA auto-entrepreneur</Link> pour voir le seuil et l’impact sur votre net.
+          </p>
+        ) : null}
         <Link href="/auth/register" className="btn-hero-primary">Créer mon compte gratuit</Link>
       </section>
 

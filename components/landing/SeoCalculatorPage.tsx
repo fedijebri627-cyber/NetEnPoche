@@ -9,6 +9,11 @@ import '@/app/landing.css';
 
 const mandatoryLinks = [
   {
+    href: '/simulateur-tva-auto-entrepreneur',
+    title: 'Simulateur TVA auto-entrepreneur',
+    description: 'Voir le seuil TVA, la bascule et l’impact sur le net à partir de votre CA.',
+  },
+  {
     href: '/simulateur-brut-net-auto-entrepreneur',
     title: 'Simulateur brut net auto-entrepreneur',
     description: 'Transformer un CA mensuel en net réel puis en équivalent salarié.',
@@ -88,6 +93,7 @@ export function buildSeoCalculatorMetadata(page: SeoCalculatorPage): Metadata {
 export function SeoCalculatorPageView({ page }: { page: SeoCalculatorPage }) {
   const appUrl = getConfiguredAppUrl();
   const pageUrl = createAppUrl(`/${page.slug}`, appUrl);
+  const isCalculatorFirst = page.variant === 'tva';
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -182,32 +188,61 @@ export function SeoCalculatorPageView({ page }: { page: SeoCalculatorPage }) {
           <Link href="/#features" className="nav-link">Fonctionnalités</Link>
           <Link href="/#pricing" className="nav-link">Tarifs</Link>
           <Link href="/#guides" className="nav-link">Guides</Link>
+          <Link href="/blog" className="nav-link">Blog</Link>
           <Link href="/auth/register" className="nav-cta">Créer mon compte</Link>
         </div>
       </nav>
 
-      <section className="seo-tool-hero">
-        <div className="seo-tool-hero-copy">
-          <div className="hero-eyebrow">{page.heroEyebrow}</div>
-          <h1 className="hero-title seo-hero-title">{page.heroTitle}</h1>
-          <p className="hero-sub seo-hero-sub">{page.heroSubtitle}</p>
-          <div className="seo-tool-points">
-            {page.introPoints.map((point) => (
-              <div key={point} className="seo-tool-point-card">
-                <span className="seo-tool-point-mark">+</span>
-                <p>{point}</p>
+      <section className={`seo-tool-hero ${isCalculatorFirst ? 'is-calculator-first' : ''}`}>
+        {isCalculatorFirst ? (
+          <>
+            <div className="seo-tool-shell">
+              <PublicSeoCalculator variant={page.variant} />
+              <div className="seo-tool-cta-row">
+                <span>Suivez ce calcul chaque mois automatiquement</span>
+                <Link href="/auth/register" className="btn-hero-primary">Créer mon compte gratuit — c'est rapide</Link>
               </div>
-            ))}
-          </div>
-        </div>
+            </div>
 
-        <div className="seo-tool-shell">
-          <PublicSeoCalculator variant={page.variant} />
-          <div className="seo-tool-cta-row">
-            <span>Suivez ce calcul chaque mois automatiquement</span>
-            <Link href="/auth/register" className="btn-hero-primary">Créer mon compte gratuit — c'est rapide</Link>
-          </div>
-        </div>
+            <div className="seo-tool-hero-copy is-below-shell">
+              <div className="hero-eyebrow">{page.heroEyebrow}</div>
+              <h1 className="hero-title seo-hero-title is-secondary">{page.heroTitle}</h1>
+              <p className="hero-sub seo-hero-sub">{page.heroSubtitle}</p>
+              <div className="seo-tool-points">
+                {page.introPoints.map((point) => (
+                  <div key={point} className="seo-tool-point-card">
+                    <span className="seo-tool-point-mark">+</span>
+                    <p>{point}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="seo-tool-hero-copy">
+              <div className="hero-eyebrow">{page.heroEyebrow}</div>
+              <h1 className="hero-title seo-hero-title">{page.heroTitle}</h1>
+              <p className="hero-sub seo-hero-sub">{page.heroSubtitle}</p>
+              <div className="seo-tool-points">
+                {page.introPoints.map((point) => (
+                  <div key={point} className="seo-tool-point-card">
+                    <span className="seo-tool-point-mark">+</span>
+                    <p>{point}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="seo-tool-shell">
+              <PublicSeoCalculator variant={page.variant} />
+              <div className="seo-tool-cta-row">
+                <span>Suivez ce calcul chaque mois automatiquement</span>
+                <Link href="/auth/register" className="btn-hero-primary">Créer mon compte gratuit — c'est rapide</Link>
+              </div>
+            </div>
+          </>
+        )}
       </section>
 
       <section className="section seo-section-tight">
@@ -375,8 +410,10 @@ export function SeoCalculatorPageView({ page }: { page: SeoCalculatorPage }) {
         </Link>
         <div className="footer-links">
           <Link href="/simulateur-brut-net-auto-entrepreneur" className="footer-link">Brut net auto-entrepreneur</Link>
+          <Link href="/simulateur-tva-auto-entrepreneur" className="footer-link">Simulateur TVA</Link>
           <Link href="/freelance-vs-salarie" className="footer-link">Freelance vs salarié</Link>
           <Link href="/calculateur-tjm" className="footer-link">Calculateur TJM</Link>
+          <Link href="/blog" className="footer-link">Blog</Link>
           <Link href="/cgu" className="footer-link">CGU</Link>
           <Link href="/rgpd" className="footer-link">RGPD</Link>
           <Link href="/contact" className="footer-link">Contact</Link>

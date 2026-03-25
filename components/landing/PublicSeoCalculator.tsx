@@ -7,19 +7,18 @@ import {
   calculateEquivalentSalaryForFreelanceNet,
   calculateFreelanceSnapshot,
   calculateSalariedNet,
+  calculateTvaSimulationSnapshot,
   findMonthlyCaForTargetNet,
   type PublicFamilyStatus,
 } from '@/lib/public-calculators';
 
-type CalculatorVariant = 'brut-net' | 'freelance-vs-salarie' | 'tjm';
+type CalculatorVariant = 'brut-net' | 'freelance-vs-salarie' | 'tjm' | 'tva';
 
 const euroFormatter = new Intl.NumberFormat('fr-FR', {
   style: 'currency',
   currency: 'EUR',
   maximumFractionDigits: 0,
 });
-
-const numberFormatter = new Intl.NumberFormat('fr-FR');
 
 const activityOptions: Array<{ value: ActivityType; label: string }> = [
   { value: 'services_bic', label: 'Services BIC' },
@@ -45,14 +44,28 @@ function describeTvaStatus(percentage: number) {
   const rounded = Math.round(percentage);
 
   if (percentage >= 100) {
-    return `Seuil d?pass? - TVA obligatoire (${rounded} %)`;
+    return `Seuil dépassé - TVA obligatoire (${rounded} %).`;
   }
 
   if (percentage >= 85) {
-    return `Alerte TVA (${rounded} % du seuil)`;
+    return `Alerte TVA (${rounded} % du seuil).`;
   }
 
-  return `${rounded} % du seuil`;
+  return `${rounded} % du seuil.`;
+}
+
+function getTvaStatusLabel(status: 'safe' | 'warning' | 'danger') {
+  if (status === 'danger') return 'TVA obligatoire';
+  if (status === 'warning') return 'Seuil proche';
+  return 'Franchise active';
+}
+
+function getTvaImpactLabel(value: number) {
+  if (value >= 0) {
+    return `Net préservé : ${formatCurrency(value)} de marge conservée.`;
+  }
+
+  return `Impact si vous absorbez la TVA : ${formatCurrency(Math.abs(value))} de net en moins.`;
 }
 
 function BarComparison({
@@ -159,7 +172,7 @@ function BrutNetCalculator() {
     <div className="seo-tool-card-grid">
       <div className="seo-tool-input-column">
         <div className="seo-tool-kicker">Simulateur public</div>
-        <h2>CA mensuel → net freelance → équivalent salarié</h2>
+        <h2>CA mensuel vers net freelance puis équivalent salarié</h2>
         <p>Entrez votre chiffre d'affaires mensuel hors taxes. Le calcul s'actualise à chaque frappe.</p>
 
         <label className="seo-tool-label" htmlFor="brut-net-ca">CA mensuel HT</label>
@@ -517,6 +530,144 @@ function TjmCalculator() {
   );
 }
 
+function TvaCalculator() {
+  const defaultMonthlyCA = 3200;
+  const [monthlyCAInput, setMonthlyCAInput] = useState('');
+  const [activityType, setActivityType] = useState<ActivityType>('services_bnc');
+  const [versementLiberatoire, setVersementLiberatoire] = useState(false);
+
+  const monthlyCA = useMemo(() => {
+    if (!monthlyCAInput.trim()) {
+      return defaultMonthlyCA;
+    }
+
+    const parsed = Number(monthlyCAInput);
+    return Number.isFinite(parsed) ? Math.max(0, parsed) : defaultMonthlyCA;
+  }, [monthlyCAInput]);
+
+  const snapshot = useMemo(
+      () => calculateTvaSimulationSnapshot({ monthlyCA, activityType, versementLiberatoire }),
+      [monthlyCA, activityType, versementLiberatoire]
+  );
+
+  const fillWidth = `${Math.min(snapshot.percentage, 100)}%`;
+
+  return (
+    <div className="seo-tool-card-grid is-tva">
+      <div className="seo-tool-input-column">
+        <div className="seo-tool-kicker">Simulateur TVA</div>
+        <h2>À partir de quel niveau de CA la TVA change votre lecture du net ?</h2>
+        <p>Entrez votre chiffre d'affaires mensuel hors taxes pour voir si vous êtes encore en franchise, quand le seuil bascule et ce que cela change concrètement.</p>
+
+        <label className="seo-tool-label" htmlFor="tva-ca">CA mensuel HT</label>
+        <div className="seo-tool-input-wrap">
+          <input
+            id="tva-ca"
+            type="number"
+            min={0}
+            step={100}
+            autoFocus
+            value={monthlyCAInput}
+            placeholder={String(defaultMonthlyCA)}
+            onChange={(event) => setMonthlyCAInput(event.target.value)}
+            className="seo-tool-input"
+          />
+          <span>€ / mois</span>
+        </div>
+
+        <div className="seo-tool-field-group">
+          <div className="seo-tool-label">Type d'activité</div>
+          <ActivityButtons value={activityType} onChange={setActivityType} />
+        </div>
+
+        <ToggleField
+          checked={versementLiberatoire}
+          onChange={setVersementLiberatoire}
+          label="Comparer avec versement libératoire"
+        />
+      </div>
+
+      <div className="seo-tool-output-column">
+        <div className={`seo-tool-output-panel seo-tool-status-card is-${snapshot.status}`}>
+          <div className="seo-tool-status-top">
+            <div>
+              <div className="seo-tool-panel-title">Votre statut TVA</div>
+              <div className="seo-tool-big-number">{getTvaStatusLabel(snapshot.status)}</div>
+            </div>
+            <div className="seo-tool-status-badge">{Math.round(snapshot.percentage)}%</div>
+          </div>
+          <div className="seo-tool-status-track">
+            <div className={`seo-tool-status-fill is-${snapshot.status}`} style={{ width: fillWidth }} />
+          </div>
+          <div className="seo-tool-data-list">
+            <div className="seo-tool-data-row">
+              <span>Seuil annuel</span>
+              <strong>{formatCurrency(snapshot.threshold)}</strong>
+            </div>
+            <div className="seo-tool-data-row">
+              <span>CA annuel projeté</span>
+              <strong>{formatCurrency(snapshot.annualCA)}</strong>
+            </div>
+            <div className="seo-tool-data-row is-muted">
+              <span>Lecture immédiate</span>
+              <strong>{describeTvaStatus(snapshot.percentage)}</strong>
+            </div>
+          </div>
+        </div>
+
+        <div className="seo-tool-output-panel seo-tool-horizontal-grid">
+          <div className="seo-tool-horizontal-card">
+            <div className="seo-tool-panel-title">Si vous restez en franchise</div>
+            <div className="seo-tool-compact-grid">
+              <div>
+                <span className="seo-tool-data-label">Net actuel estimé</span>
+                <strong>{formatCurrency(snapshot.currentNetMonthly)}</strong>
+              </div>
+              <div>
+                <span className="seo-tool-data-label">Marge avant seuil</span>
+                <strong>{formatCurrency(snapshot.remaining)}</strong>
+              </div>
+              <div>
+                <span className="seo-tool-data-label">Mois avant seuil</span>
+                <strong>{snapshot.monthsUntilThreshold ? `${snapshot.monthsUntilThreshold} mois` : '—'}</strong>
+              </div>
+              <div>
+                <span className="seo-tool-data-label">Lecture</span>
+                <strong>{snapshot.status === 'danger' ? 'Bascule déjà en vue' : 'Encore sous franchise'}</strong>
+              </div>
+            </div>
+          </div>
+
+            <div className="seo-tool-horizontal-card is-verdict is-tva-comparator">
+            <div className={`seo-tool-verdict-badge ${snapshot.netDeltaIfTvaAbsorbed >= 0 ? 'is-positive' : 'is-negative'}`}>
+              Si vous dépassez le seuil
+            </div>
+            <p>
+              TVA à collecter : <strong>{formatCurrency(snapshot.tvaToCollectMonthly)}</strong> par mois
+              ({formatCurrency(snapshot.tvaToCollectAnnual)} par an).
+            </p>
+            <div className="seo-tool-impact-grid is-horizontal">
+              <div className="seo-tool-impact-card">
+                <span className="seo-tool-data-label">Si vous ajoutez la TVA</span>
+                <strong>{formatCurrency(snapshot.currentNetMonthly)}</strong>
+                <p>Le net HT reste proche de l'actuel.</p>
+              </div>
+              <div className="seo-tool-impact-card">
+                <span className="seo-tool-data-label">Si vous l'absorbez</span>
+                <strong>{formatCurrency(snapshot.netMonthlyIfTvaAbsorbed)}</strong>
+                <p>{getTvaImpactLabel(snapshot.netDeltaIfTvaAbsorbed)}</p>
+              </div>
+            </div>
+            <div className="seo-tool-note">
+              Même prix TTC côté client = base HT ramenée à {formatCurrency(snapshot.monthlyCaIfTvaAbsorbed)} par mois.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function PublicSeoCalculator({ variant }: { variant: CalculatorVariant }) {
   if (variant === 'freelance-vs-salarie') {
     return <FreelanceVsSalarieCalculator />;
@@ -526,6 +677,9 @@ export function PublicSeoCalculator({ variant }: { variant: CalculatorVariant })
     return <TjmCalculator />;
   }
 
+  if (variant === 'tva') {
+    return <TvaCalculator />;
+  }
+
   return <BrutNetCalculator />;
 }
-

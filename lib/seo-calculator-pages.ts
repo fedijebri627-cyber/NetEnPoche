@@ -27,7 +27,7 @@ export type SeoCalculatorExample = {
 
 export type SeoCalculatorPage = {
   slug: string;
-  variant: 'brut-net' | 'freelance-vs-salarie' | 'tjm';
+  variant: 'brut-net' | 'freelance-vs-salarie' | 'tjm' | 'tva';
   title: string;
   description: string;
   keywords: string[];
@@ -64,6 +64,151 @@ const officialSources = {
 };
 
 export const seoCalculatorPages: SeoCalculatorPage[] = [
+  {
+    slug: 'simulateur-tva-auto-entrepreneur',
+    variant: 'tva',
+    title: 'Simulateur TVA Auto-Entrepreneur 2026 — Seuils, Bascule et Impact Net',
+    description:
+      "Entrez votre CA mensuel et voyez immédiatement si vous restez en franchise de TVA, ce qui se passe si vous dépassez le seuil, et l'impact sur votre net.",
+    keywords: [
+      'simulateur tva auto entrepreneur',
+      'calcul tva auto entrepreneur',
+      'seuil tva micro entrepreneur simulateur',
+      'franchise tva auto entrepreneur calcul',
+      'impact tva net auto entrepreneur',
+    ],
+    cardTitle: 'Simulateur TVA auto-entrepreneur',
+    cardDescription:
+      "Voir si vous êtes encore en franchise, quand le seuil bascule et ce que cela change sur votre net.",
+    heroEyebrow: 'TVA micro-entreprise 2026',
+    heroTitle: "Simulateur TVA auto-entrepreneur : voyez le seuil, la bascule et l'impact sur votre net",
+    heroSubtitle:
+      "Entrez votre CA mensuel et obtenez tout de suite la lecture qui manque le plus souvent aux freelances : êtes-vous encore sous franchise, que se passe-t-il si vous dépassez le seuil, et que devient votre net si vous devez absorber la TVA ?",
+    updatedAt: '2026-03-25',
+    updateNote: 'Mis à jour le 25 mars 2026 — seuils de franchise TVA et impact net revus pour les profils micro-entrepreneur 2026.',
+    introPoints: [
+      "Voir si vous êtes encore sous franchise en base de TVA.",
+      "Comprendre ce qui change dès que le seuil est dépassé.",
+      "Mesurer l'impact sur votre net si vous devez absorber la TVA dans vos prix TTC.",
+    ],
+    examples: [
+      {
+        title: 'Consultant à 3 200 € / mois',
+        summary: "Un rythme encore compatible avec la franchise de services, mais déjà assez haut pour justifier une vraie surveillance.",
+        values: [
+          { label: 'CA annuel projeté', value: '38 400 €' },
+          { label: 'Lecture', value: 'seuil presque atteint' },
+          { label: 'Action', value: 'préparer le scénario de bascule' },
+        ],
+      },
+      {
+        title: 'Freelance à 4 500 € / mois',
+        summary: "Le cas typique où le dépassement n'est plus théorique et où la TVA modifie immédiatement la lecture du revenu.",
+        values: [
+          { label: 'CA annuel projeté', value: '54 000 €' },
+          { label: 'TVA à collecter', value: '≈ 900 € / mois' },
+          { label: 'Risque', value: 'absorber la TVA détruit la marge' },
+        ],
+      },
+      {
+        title: 'Activité de vente à 7 000 € / mois',
+        summary: 'Un exemple utile pour rappeler que le seuil de vente laisse davantage de marge avant la bascule.',
+        values: [
+          { label: 'CA annuel projeté', value: '84 000 €' },
+          { label: 'Lecture', value: 'encore sous franchise vente' },
+          { label: 'Priorité', value: 'surveiller la cadence plus que le mois isolé' },
+        ],
+      },
+    ],
+    sections: [
+      {
+        title: 'Comment utiliser ce simulateur TVA auto-entrepreneur',
+        paragraphs: [
+          "La plupart des guides TVA s'arrêtent à une question binaire : êtes-vous encore en franchise ou non ? Pour un indépendant, ce n'est pas suffisant. La bonne lecture consiste à relier votre chiffre d'affaires mensuel à un rythme annuel, à le comparer au seuil de votre activité puis à voir ce que cette bascule change réellement sur votre revenu.",
+          "Ce simulateur part donc de deux éléments simples : votre CA mensuel HT et votre type d'activité. À partir de là, il projette votre rythme annuel, mesure votre exposition au seuil de franchise et vous montre deux scénarios lisibles : celui où vous restez sous franchise et celui où vous dépassez le seuil.",
+          "Le vrai sujet n'est pas la règle administrative. Le vrai sujet est l'impact financier. C'est pourquoi la page ne se contente pas d'afficher un pourcentage de seuil : elle montre aussi ce qui se passe sur votre net si vous devez absorber la TVA dans vos prix TTC."
+        ],
+      },
+      {
+        title: 'Franchise en base de TVA : ce que le seuil change vraiment',
+        paragraphs: [
+          "Tant que vous restez sous la franchise en base, vous ne facturez pas la TVA et vous ne la reversez pas. Votre chiffre d'affaires HT se lit donc assez simplement. Dès que le seuil approche, cette simplicité disparaît. Une partie de ce que vous allez encaisser ne correspond plus à du revenu conservé, mais à une TVA collectée pour l'État.",
+          "C'est le moment où beaucoup de freelances se trompent. Ils continuent à lire leur activité comme si tout ce qui entre sur le compte bancaire leur appartenait. En réalité, la bascule TVA change votre prix, votre trésorerie et parfois même votre position commerciale si vos clients sont sensibles au TTC.",
+          "Le simulateur aide à voir ce moment avant qu'il ne soit subi. Un seuil n'est utile que s'il déclenche une décision : ajuster vos prix, prévenir vos clients, revoir votre marge ou anticiper le mois exact où la lecture du net doit changer."
+        ],
+        bullets: [
+          "Sous franchise : le CA encaissé HT reste lisible comme base de revenu.",
+          "Au-dessus du seuil : la TVA collectée doit être séparée mentalement et financièrement.",
+          "Si vous gardez les mêmes prix TTC, c'est votre marge qui absorbe le choc.",
+        ],
+      },
+      {
+        title: 'Que se passe-t-il si vous dépassez le seuil de TVA ?',
+        paragraphs: [
+          "Deux réalités existent. Première possibilité : vous facturez la TVA en plus à vos clients. Dans ce cas, votre base HT peut rester stable et votre net hors TVA change peu, mais vous devez gérer la collecte, la déclaration et le reversement. Deuxième possibilité : vous n'arrivez pas à augmenter vos prix TTC. Vous absorbez alors la TVA dans votre tarif actuel, ce qui réduit votre base HT et donc votre net réel.",
+          "C'est ce second scénario qui fait mal et que les freelances sous-estiment le plus souvent. Le chiffre d'affaires apparent semble identique côté client, mais votre base taxable micro-entrepreneur baisse mécaniquement. Résultat : moins de marge, moins de disponible, et parfois une activité qui paraît toujours rentable alors qu'elle s'est compressée sans bruit.",
+          "Le simulateur affiche volontairement les deux lectures pour que vous puissiez décider laquelle ressemble le plus à votre réalité commerciale."
+        ],
+      },
+      {
+        title: "Impact TVA sur le net : l'erreur à éviter",
+        paragraphs: [
+          "L'erreur classique consiste à traiter la TVA comme un simple sujet de comptabilité. Pour un indépendant, c'est souvent un sujet de prix. Si vos clients acceptent facilement un supplément de TVA parce qu'ils la récupèrent eux-mêmes, l'impact net peut être limité. Si vous travaillez surtout avec des particuliers ou des clients très sensibles au TTC, l'histoire est différente : c'est vous qui absorbez le coût économique.",
+          "Autrement dit, la bonne question n'est pas seulement 'quand est-ce que je dois facturer la TVA ?'. La vraie question est : 'si je la facture, puis-je la répercuter sans casser ma demande ?' La réponse change complètement l'effet sur le revenu.",
+          "Le simulateur sert précisément à rendre cette tension visible : d'un côté la TVA à collecter, de l'autre le net qui resterait si vous gardiez les mêmes prix TTC."
+        ],
+        table: {
+          headers: ['Situation', 'Lecture utile'],
+          rows: [
+            ['Sous franchise', 'Le CA HT reste votre base de lecture principale'],
+            ['Seuil proche', 'Préparer la bascule et revoir la politique de prix'],
+            ['TVA facturée en plus', "Impact net limité, mais obligation de collecte et de reversement"],
+            ['TVA absorbée dans les prix', 'Baisse directe du CA HT et du net disponible'],
+          ],
+        },
+      },
+      {
+        title: 'Comment utiliser ce résultat dans NetEnPoche ensuite',
+        paragraphs: [
+          "Cette page répond à une intention SEO très précise : comprendre la TVA micro-entreprise sans jargon. Mais sa vraie utilité augmente encore quand vous passez sur le compte gratuit. Le dashboard vous permet ensuite de suivre votre cadence réelle, de repérer plus tôt le moment où le seuil approche et d'intégrer cette bascule à la lecture de votre net.",
+          "L'intérêt n'est donc pas seulement de faire une simulation ponctuelle. L'intérêt est de garder la même logique de lecture tous les mois : chiffre d'affaires, TVA, URSSAF, impôt et réserve. La TVA cesse alors d'être une surprise et devient un signal de pilotage."
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: "Comment savoir si je suis encore en franchise de TVA ?",
+        answer:
+          "Il faut comparer votre chiffre d'affaires annuel projeté au seuil applicable à votre activité. Pour les services, le seuil est bien plus bas que pour la vente.",
+      },
+      {
+        question: 'Pourquoi le simulateur parle-t-il de rythme annuel ?',
+        answer:
+          "Parce que la TVA se déclenche à partir d'un seuil annuel. Un mois isolé ne suffit pas ; il faut lire votre cadence sur douze mois.",
+      },
+      {
+        question: "Que signifie 'absorber la TVA dans mes prix' ?",
+        answer:
+          "Cela signifie garder le même prix TTC côté client. Votre base HT baisse alors mécaniquement et votre net se comprime.",
+      },
+      {
+        question: "Si je facture la TVA en plus, est-ce que mon net change ?",
+        answer:
+          "Votre net HT change peu si vos clients acceptent la hausse et si vos prix hors taxe restent identiques. En revanche, vous devez collecter puis reverser la TVA.",
+      },
+      {
+        question: 'Puis-je utiliser ce simulateur sans compte ?',
+        answer:
+          "Oui. La simulation TVA est publique. Le compte gratuit sert ensuite à suivre la trajectoire mois après mois.",
+      },
+      {
+        question: 'Pourquoi relier la TVA au net ?',
+        answer:
+          "Parce que la TVA devient dangereuse quand elle fausse votre lecture du revenu disponible. Le bon réflexe est de l'intégrer à votre pilotage, pas de la traiter à part.",
+      },
+    ],
+    officialSources: [officialSources.tvaThresholds, officialSources.urssafStatus],
+  },
   {
     slug: 'simulateur-brut-net-auto-entrepreneur',
     variant: 'brut-net',

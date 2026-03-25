@@ -29,6 +29,7 @@ const guideDescriptions: Record<string, string> = {
   'plafond-tva-auto-entrepreneur': 'Anticiper le moment où le seuil TVA approche et préparer la suite sans surprise.',
   'versement-liberatoire-auto-entrepreneur': 'Comparer votre situation avec ou sans versement libératoire avant de choisir.',
   'simulateur-brut-net-auto-entrepreneur': 'Comparer votre net freelance à un salaire salarié sans ouvrir un tableur.',
+  'simulateur-tva-auto-entrepreneur': 'Voir immédiatement si vous restez en franchise de TVA et ce que la bascule change sur votre net.',
   'freelance-vs-salarie': 'Voir à partir de quel CA le freelance devient plus rentable qu’un salarié.',
   'calculateur-tjm': 'Calculer le TJM minimum pour atteindre un objectif de net réaliste.',
 };

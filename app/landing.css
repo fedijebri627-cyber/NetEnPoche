@@ -1945,15 +1945,42 @@ th.comp-me {
 
 /* SEO calculator pages */
 .seo-tool-hero {
-  padding: 150px 60px 90px;
-  max-width: 1280px;
+  padding: 146px 24px 90px;
+  max-width: 100%;
   margin: 0 auto;
   display: grid;
   gap: 36px;
 }
 
+.seo-tool-hero.is-calculator-first {
+  padding-top: 126px;
+}
+
 .seo-tool-hero-copy {
   text-align: left;
+}
+
+.seo-tool-hero-copy.is-below-shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.seo-hero-title.is-secondary {
+  font-size: clamp(34px, 4.2vw, 56px);
+  max-width: 980px;
+}
+
+.seo-tool-hero-copy.is-below-shell .hero-eyebrow,
+.seo-tool-hero-copy.is-below-shell .hero-title,
+.seo-tool-hero-copy.is-below-shell .hero-sub {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.seo-tool-hero-copy.is-below-shell .seo-tool-points {
+  max-width: 1180px;
+  margin: 28px auto 0;
 }
 
 .seo-tool-shell {
@@ -1962,17 +1989,24 @@ th.comp-me {
   border-radius: 24px;
   padding: 22px;
   box-shadow: 0 28px 80px rgba(0, 0, 0, 0.35);
+  width: min(1760px, calc(100vw - 48px));
+  justify-self: center;
 }
 
 .seo-tool-card-grid {
   display: grid;
-  grid-template-columns: minmax(320px, 1.1fr) minmax(320px, 0.9fr);
+  grid-template-columns: minmax(420px, 1.2fr) minmax(420px, 1fr);
   gap: 22px;
 }
 
 .seo-tool-card-grid.is-compare,
-.seo-tool-card-grid.is-tjm {
-  grid-template-columns: minmax(320px, 1fr) minmax(300px, 0.95fr);
+.seo-tool-card-grid.is-tjm,
+.seo-tool-card-grid.is-tva {
+  grid-template-columns: minmax(560px, 1.05fr) minmax(760px, 1.35fr);
+}
+
+.seo-tool-card-grid.is-tva {
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
 }
 
 .seo-tool-input-column,
@@ -1980,6 +2014,7 @@ th.comp-me {
   display: flex;
   flex-direction: column;
   gap: 18px;
+  min-width: 0;
 }
 
 .seo-tool-input-column h2 {
@@ -2079,6 +2114,10 @@ th.comp-me {
   outline: none;
 }
 
+.seo-tool-input::placeholder {
+  color: rgba(255, 255, 255, 0.42);
+}
+
 .seo-tool-chip-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2164,6 +2203,148 @@ th.comp-me {
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(255, 255, 255, 0.05);
   padding: 20px;
+}
+
+.seo-tool-status-card {
+  gap: 16px;
+}
+
+.seo-tool-status-card.is-safe {
+  border-color: rgba(0, 200, 117, 0.25);
+  background: rgba(0, 200, 117, 0.08);
+}
+
+.seo-tool-status-card.is-warning {
+  border-color: rgba(245, 166, 35, 0.28);
+  background: rgba(245, 166, 35, 0.08);
+}
+
+.seo-tool-status-card.is-danger {
+  border-color: rgba(232, 64, 64, 0.28);
+  background: rgba(232, 64, 64, 0.08);
+}
+
+.seo-tool-status-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.seo-tool-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 72px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  font-family: var(--font-syne), sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.seo-tool-status-track {
+  height: 12px;
+  margin: 16px 0 14px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.seo-tool-status-fill {
+  height: 100%;
+  border-radius: inherit;
+}
+
+.seo-tool-status-fill.is-safe {
+  background: linear-gradient(90deg, #00c875, #62f4b6);
+}
+
+.seo-tool-status-fill.is-warning {
+  background: linear-gradient(90deg, #f5a623, #ffd36b);
+}
+
+.seo-tool-status-fill.is-danger {
+  background: linear-gradient(90deg, #e84040, #ff8a8a);
+}
+
+.seo-tool-impact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.seo-tool-impact-grid.is-horizontal {
+  margin-top: 16px;
+}
+
+.seo-tool-horizontal-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.76fr) minmax(0, 1.24fr);
+  gap: 16px;
+}
+
+.seo-tool-horizontal-card {
+  border-radius: 18px;
+  padding: 18px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  min-width: 0;
+}
+
+.seo-tool-horizontal-card.is-verdict {
+  background: linear-gradient(180deg, rgba(73, 28, 39, 0.9), rgba(31, 18, 36, 0.94));
+  border-color: rgba(255, 130, 130, 0.22);
+  box-shadow: inset 0 0 0 1px rgba(255, 130, 130, 0.08);
+}
+
+.seo-tool-horizontal-card.is-tva-comparator {
+  background: linear-gradient(180deg, rgba(17, 72, 117, 0.96), rgba(16, 42, 86, 0.98));
+  border-color: rgba(111, 184, 255, 0.34);
+  box-shadow:
+    inset 0 0 0 1px rgba(158, 214, 255, 0.12),
+    0 16px 42px rgba(6, 18, 40, 0.28);
+}
+
+.seo-tool-horizontal-card.is-tva-comparator .seo-tool-impact-card {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(168, 214, 255, 0.2);
+}
+
+.seo-tool-compact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 18px;
+}
+
+.seo-tool-impact-card {
+  border-radius: 16px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: grid;
+  gap: 8px;
+  min-height: 150px;
+  min-width: 0;
+}
+
+.seo-tool-impact-card p,
+.seo-tool-note {
+  color: rgba(255, 255, 255, 0.68);
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.seo-tool-note {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 14px;
 }
 
 .seo-tool-panel-title {
@@ -2300,6 +2481,14 @@ th.comp-me {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
+}
+
+.seo-tool-card-grid.is-tva .seo-tool-input-column h2 {
+  max-width: 28ch;
+}
+
+.seo-tool-card-grid.is-tva .seo-tool-output-column {
+  gap: 16px;
 }
 
 .seo-tool-output-panel.is-highlight-panel {
@@ -2452,10 +2641,14 @@ th.comp-me {
   .seo-tool-card-grid,
   .seo-tool-card-grid.is-compare,
   .seo-tool-card-grid.is-tjm,
+  .seo-tool-card-grid.is-tva,
   .seo-tool-field-row,
   .seo-tool-compare-panels,
   .seo-tool-output-panel.is-split,
-  .seo-tool-output-panel.is-highlight-panel {
+  .seo-tool-output-panel.is-highlight-panel,
+  .seo-tool-impact-grid,
+  .seo-tool-horizontal-grid,
+  .seo-tool-compact-grid {
     grid-template-columns: 1fr;
   }
 
@@ -2477,6 +2670,7 @@ th.comp-me {
 
   .seo-tool-shell {
     padding: 16px;
+    width: 100%;
   }
 
   .seo-tool-input {

@@ -56,6 +56,24 @@ export interface FreelanceSnapshot {
   tvaStatus: 'safe' | 'warning' | 'danger';
 }
 
+export interface TvaSimulationSnapshot {
+  activityType: ActivityType;
+  monthlyCA: number;
+  annualCA: number;
+  threshold: number;
+  percentage: number;
+  remaining: number;
+  status: 'safe' | 'warning' | 'danger';
+  monthsUntilThreshold: number | null;
+  currentNetMonthly: number;
+  tvaToCollectMonthly: number;
+  tvaToCollectAnnual: number;
+  monthlyCaIfTvaAbsorbed: number;
+  annualCaIfTvaAbsorbed: number;
+  netMonthlyIfTvaAbsorbed: number;
+  netDeltaIfTvaAbsorbed: number;
+}
+
 export function calculateFreelanceSnapshot(params: {
   monthlyCA: number;
   activityType: ActivityType;
@@ -109,6 +127,57 @@ export function calculateFreelanceSnapshot(params: {
     tvaThreshold: tva.threshold,
     tvaStatus: tva.status,
   } satisfies FreelanceSnapshot;
+}
+
+export function calculateTvaSimulationSnapshot(params: {
+  monthlyCA: number;
+  activityType: ActivityType;
+  versementLiberatoire?: boolean;
+  familyStatus?: PublicFamilyStatus;
+  acreEnabled?: boolean;
+}) {
+  const monthlyCA = Math.max(0, Number(params.monthlyCA || 0));
+  const annualCA = monthlyCA * 12;
+  const versementLiberatoire = Boolean(params.versementLiberatoire);
+  const familyStatus = params.familyStatus ?? 'celibataire';
+  const acreEnabled = Boolean(params.acreEnabled);
+
+  const current = calculateFreelanceSnapshot({
+    monthlyCA,
+    activityType: params.activityType,
+    versementLiberatoire,
+    familyStatus,
+    acreEnabled,
+  });
+
+  const tva = getTVAStatus(annualCA, params.activityType);
+  const monthlyCaIfTvaAbsorbed = monthlyCA / 1.2;
+  const annualCaIfTvaAbsorbed = monthlyCaIfTvaAbsorbed * 12;
+  const absorbed = calculateFreelanceSnapshot({
+    monthlyCA: monthlyCaIfTvaAbsorbed,
+    activityType: params.activityType,
+    versementLiberatoire,
+    familyStatus,
+    acreEnabled,
+  });
+
+  return {
+    activityType: params.activityType,
+    monthlyCA,
+    annualCA,
+    threshold: tva.threshold,
+    percentage: tva.percentage,
+    remaining: tva.remaining,
+    status: tva.status,
+    monthsUntilThreshold: monthlyCA > 0 ? Math.ceil(tva.threshold / monthlyCA) : null,
+    currentNetMonthly: current.netAfterAllChargesMonthly,
+    tvaToCollectMonthly: monthlyCA * 0.2,
+    tvaToCollectAnnual: annualCA * 0.2,
+    monthlyCaIfTvaAbsorbed,
+    annualCaIfTvaAbsorbed,
+    netMonthlyIfTvaAbsorbed: absorbed.netAfterAllChargesMonthly,
+    netDeltaIfTvaAbsorbed: absorbed.netAfterAllChargesMonthly - current.netAfterAllChargesMonthly,
+  } satisfies TvaSimulationSnapshot;
 }
 
 export function calculateSalariedNet(grossMonthlySalary: number) {
