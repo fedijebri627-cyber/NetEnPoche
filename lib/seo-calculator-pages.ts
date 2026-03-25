@@ -167,13 +167,13 @@ export const seoCalculatorPages: SeoCalculatorPage[] = [
           ],
         },
       },
-      {
-        title: 'Comment utiliser ce résultat dans NetEnPoche ensuite',
-        paragraphs: [
-          "Cette page répond à une intention SEO très précise : comprendre la TVA micro-entreprise sans jargon. Mais sa vraie utilité augmente encore quand vous passez sur le compte gratuit. Le dashboard vous permet ensuite de suivre votre cadence réelle, de repérer plus tôt le moment où le seuil approche et d'intégrer cette bascule à la lecture de votre net.",
-          "L'intérêt n'est donc pas seulement de faire une simulation ponctuelle. L'intérêt est de garder la même logique de lecture tous les mois : chiffre d'affaires, TVA, URSSAF, impôt et réserve. La TVA cesse alors d'être une surprise et devient un signal de pilotage."
-        ],
-      },
+        {
+          title: 'Comment utiliser ce résultat dans NetEnPoche ensuite',
+          paragraphs: [
+            "Cette simulation donne une première lecture claire de votre situation TVA. Si vous passez ensuite sur le compte gratuit, vous pouvez suivre votre cadence réelle mois après mois, voir plus tôt le moment où le seuil approche et intégrer cette bascule à la lecture de votre net sans refaire le calcul à la main.",
+            "L'intérêt n'est donc pas seulement de faire une simulation ponctuelle. L'intérêt est de garder la même logique de lecture tous les mois : chiffre d'affaires, TVA, URSSAF, impôt et réserve. La TVA cesse alors d'être une surprise et devient un signal de pilotage."
+          ],
+        },
     ],
     faq: [
       {
