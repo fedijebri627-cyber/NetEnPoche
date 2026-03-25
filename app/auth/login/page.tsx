@@ -24,17 +24,26 @@ function LoginPageContent() {
         setLoading(true)
         setError(null)
 
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-            email,
-            password,
+        const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email,
+                password,
+                next: nextPath,
+            }),
         })
 
-        if (signInError) {
-            setError(signInError.message)
+        const payload = (await response.json().catch(() => null)) as { error?: string; nextPath?: string } | null
+
+        if (!response.ok) {
+            setError(payload?.error ?? "Connexion impossible pour le moment.")
             setLoading(false)
         } else {
-            router.push(nextPath)
-            router.refresh()
+            const destination = payload?.nextPath ?? nextPath
+            window.location.assign(destination)
         }
     }
 
