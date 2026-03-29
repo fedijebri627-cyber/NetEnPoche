@@ -87,9 +87,9 @@ export function DeadlinePill() {
         };
 
     return (
-        <div className={`flex items-center gap-2 rounded-full px-3 py-1.5 text-[12px] font-medium ${classes.wrapper}`}>
+        <div className={`flex max-w-full min-w-0 items-center gap-2 rounded-full px-3 py-1.5 text-[12px] font-medium ${classes.wrapper}`}>
             <span className={`h-[7px] w-[7px] shrink-0 rounded-full ${classes.dot}`} />
-            <span className="whitespace-nowrap">
+            <span className="block min-w-0 truncate md:whitespace-nowrap">
                 Échéance URSSAF - {formatCurrency(upcoming.amount)} {`dans ${upcoming.daysLeft} jours`}
             </span>
         </div>

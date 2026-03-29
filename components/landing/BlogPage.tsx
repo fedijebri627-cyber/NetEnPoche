@@ -68,7 +68,7 @@ function renderFooter() {
 
 export function buildBlogIndexMetadata(): Metadata {
   return {
-    title: 'Blog freelance et micro-entreprise 2026 | NetEnPoche',
+    title: 'Blog freelance et micro-entreprise 2026',
     description:
       'Des articles clairs pour mieux piloter son activité freelance ou micro-entreprise : URSSAF, impôt, TVA, TJM et vrai net.',
     alternates: {
@@ -107,7 +107,7 @@ export function buildBlogIndexMetadata(): Metadata {
 
 export function buildBlogPostMetadata(post: BlogPost): Metadata {
   return {
-    title: `${post.frontmatter.title} | NetEnPoche`,
+    title: post.frontmatter.title,
     description: post.frontmatter.description,
     keywords: post.frontmatter.tags,
     alternates: {

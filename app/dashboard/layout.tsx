@@ -24,7 +24,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <OfflineBanner />
                 <Header />
                 <Tabs />
-                <main className="flex-1 overflow-x-hidden">
+                <main className="flex-1 overflow-x-hidden pb-[calc(4rem+env(safe-area-inset-bottom)+1rem)] md:pb-0">
                     {children}
                 </main>
             </DashboardTourProvider>

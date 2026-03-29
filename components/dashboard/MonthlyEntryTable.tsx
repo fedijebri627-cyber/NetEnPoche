@@ -60,7 +60,7 @@ function MonthlyRow({ monthIndex, caAmount, cumulativeCA, onSave, activityType, 
                         onChange={(e) => setLocalValue(e.target.value)}
                         onBlur={handleBlur}
                         placeholder="0.00"
-                        className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-right text-[13px] font-medium text-slate-800 transition focus:border-[#00c875] focus:outline-none focus:ring-2 focus:ring-[#00c875]/20"
+                        className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pl-3 pr-8 text-right text-[13px] font-medium text-slate-800 transition focus:border-[#00c875] focus:outline-none focus:ring-2 focus:ring-[#00c875]/20"
                     />
                     <span className="pointer-events-none absolute right-3 text-slate-400">{'\u20ac'}</span>
                     {isSaving && <Loader2 className="absolute -right-6 h-4 w-4 animate-spin text-[#00c875]" />}
