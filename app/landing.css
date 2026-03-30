@@ -1674,6 +1674,7 @@ th.comp-me {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
+  align-items: stretch;
 }
 
 .hero-calculator-card,
@@ -1686,6 +1687,10 @@ th.comp-me {
 
 .hero-calculator-card {
   padding: 18px;
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .hero-calculator-card-label {
@@ -1699,9 +1704,14 @@ th.comp-me {
 .hero-calculator-card-value {
   margin-top: 12px;
   font-family: var(--font-syne), sans-serif;
-  font-size: clamp(1.4rem, 2.2vw, 2rem);
+  display: block;
+  max-width: 100%;
+  font-size: clamp(1.1rem, 1.6vw, 1.7rem);
   font-weight: 800;
-  line-height: 1;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .hero-calculator-card-value.is-green {
