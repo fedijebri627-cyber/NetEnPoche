@@ -79,7 +79,7 @@ export function buildBlogIndexMetadata(): Metadata {
       },
     },
     openGraph: {
-      title: 'Blog freelance et micro-entreprise 2026 | NetEnPoche',
+      title: 'Blog freelance et micro-entreprise 2026',
       description:
         'Des articles clairs pour mieux piloter son activité freelance ou micro-entreprise : URSSAF, impôt, TVA, TJM et vrai net.',
       url: createAppUrl('/blog'),
@@ -97,7 +97,7 @@ export function buildBlogIndexMetadata(): Metadata {
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Blog freelance et micro-entreprise 2026 | NetEnPoche',
+      title: 'Blog freelance et micro-entreprise 2026',
       description:
         'Des articles clairs pour mieux piloter son activité freelance ou micro-entreprise : URSSAF, impôt, TVA, TJM et vrai net.',
       images: ['/brand/netenpoche-og-image.png'],
@@ -118,7 +118,7 @@ export function buildBlogPostMetadata(post: BlogPost): Metadata {
       },
     },
     openGraph: {
-      title: `${post.frontmatter.title} | NetEnPoche`,
+      title: post.frontmatter.title,
       description: post.frontmatter.description,
       url: createAppUrl(`/blog/${post.slug}`),
       siteName: 'NetEnPoche',
@@ -135,7 +135,7 @@ export function buildBlogPostMetadata(post: BlogPost): Metadata {
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${post.frontmatter.title} | NetEnPoche`,
+      title: post.frontmatter.title,
       description: post.frontmatter.description,
       images: ['/brand/netenpoche-og-image.png'],
     },

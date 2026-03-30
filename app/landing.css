@@ -2741,6 +2741,12 @@ th.comp-me {
   max-width: 860px;
 }
 
+.blog-post-title {
+  font-size: clamp(24px, 2.8vw, 38px);
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+}
+
 .blog-index-sub,
 .blog-post-sub {
   max-width: 760px;
