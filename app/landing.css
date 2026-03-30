@@ -1703,13 +1703,13 @@ th.comp-me {
 
 .hero-calculator-card-value {
   margin-top: 12px;
-  font-family: var(--font-syne), sans-serif;
+  font-family: var(--font-dm-sans), sans-serif;
   display: block;
   max-width: 100%;
   font-size: clamp(1.1rem, 1.6vw, 1.7rem);
-  font-weight: 800;
-  line-height: 0.95;
-  letter-spacing: -0.04em;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
   overflow-wrap: anywhere;
   word-break: break-word;
 }
